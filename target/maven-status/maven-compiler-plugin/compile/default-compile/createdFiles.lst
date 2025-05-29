@@ -4,12 +4,12 @@ model\Stadium.class
 model\SystemLog.class
 dao\AccountDAO.class
 com\mycompany\footballmanagement\resources\JakartaEE10Resource.class
+controller\SignupServlet.class
 model\Team.class
 model\Role.class
 model\UserRole.class
 model\Tournament.class
 model\User.class
-controller\NewServlet.class
 model\Notification.class
 controller\LoginServlet.class
 model\UserSettings.class
