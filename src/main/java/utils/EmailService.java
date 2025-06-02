@@ -13,20 +13,20 @@ public class EmailService {
     private static final int SMTP_PORT = 587;
 
     private void validateCredentials() {
-        if (EMAIL_SENDER == null || EMAIL_SENDER == null) {
-            System.out.println("? Please configure environment variables SENDER_EMAIL and SENDER_PASSWORD.");
-            throw new IllegalStateException("Email credentials not configured.");
+        if (EMAIL_SENDER == null || EMAIL_PASSWORD == null) {
+            System.out.println("⚠️ Vui lòng cấu hình biến môi trường SENDER_EMAIL và SENDER_PASSWORD.");
+            throw new IllegalStateException("Chưa cấu hình thông tin email.");
         }
-        System.out.println("? SENDER_EMAIL: " + EMAIL_SENDER);
-        System.out.println("? SENDER_PASSWORD: " + (EMAIL_SENDER != null ? "********" : "NULL"));
+        System.out.println("✅ SENDER_EMAIL: " + EMAIL_SENDER);
+        System.out.println("✅ SENDER_PASSWORD: " + (EMAIL_PASSWORD != null ? "********" : "NULL"));
     }
 
     private Session createSession() {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.host", SMTP_HOST);
+        props.put("mail.smtp.port", SMTP_PORT);
         props.put("mail.debug", "true");
 
         return Session.getInstance(props, new Authenticator() {
@@ -47,22 +47,22 @@ public class EmailService {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
             message.setSubject(subject);
             message.setContent(
-                    "<h1>OTP Request</h1>"
-                    + "<p>Hello,</p>"
-                    + "<p>We have received an OTP reset request for your account.</p>"
-                    + "<p>Your verification code is: <strong>" + resetCode + "</strong></p>"
-                    + "<p>This code is valid for 5 minutes. Please enter this code to proceed with resetting your password.</p>"
-                    + "<p>If you did not request this, please ignore this email.</p>"
-                    + "<p>Best regards,</p>"
-                    + "<p>Application Team</p>",
-                    "text/html; charset=UTF-8"
+                "<h1>Yêu cầu xác thực OTP</h1>"
+                + "<p>Xin chào,</p>"
+                + "<p>Chúng tôi đã nhận được một yêu cầu cho tài khoản của bạn.</p>"
+                + "<p>Mã xác thực của bạn là: <strong>" + resetCode + "</strong></p>"
+                + "<p>Mã này có hiệu lực trong vòng 5 phút. Vui lòng nhập mã để tiếp tục quá trình đặt lại mật khẩu.</p>"
+                + "<p>Nếu bạn không yêu cầu, hãy bỏ qua email này.</p>"
+                + "<p>Trân trọng,</p>"
+                + "<p>Đội ngũ Ứng dụng</p>",
+                "text/html; charset=UTF-8"
             );
 
             Transport.send(message);
-            System.out.println("? Forgot password email sent successfully to: " + recipientEmail);
+            System.out.println("✅ Đã gửi email OTP đến: " + recipientEmail);
 
         } catch (MessagingException e) {
-            System.err.println("? Email sending failed: " + e.getMessage());
+            System.err.println("❌ Gửi email thất bại: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -75,27 +75,27 @@ public class EmailService {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(EMAIL_SENDER));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            message.setSubject("Welcome to Our Application!");
+            message.setSubject("Chào mừng bạn đến với Ứng dụng của chúng tôi!");
             message.setContent(
-                    "<h1>Registration Successful</h1>"
-                    + "<p>Hello " + username + ",</p>"
-                    + "<p>Congratulations! You have successfully registered an account.</p>"
-                    + "<p>Account details:</p>"
-                    + "<ul>"
-                    + "<li>Username: " + username + "</li>"
-                    + "<li>Email: " + recipientEmail + "</li>"
-                    + "</ul>"
-                    + "<p>You can now log in and start exploring our services.</p>"
-                    + "<p>Best regards,</p>"
-                    + "<p>Application Team</p>",
-                    "text/html; charset=UTF-8"
+                "<h1>Đăng ký thành công</h1>"
+                + "<p>Xin chào " + username + ",</p>"
+                + "<p>Chúc mừng! Bạn đã đăng ký tài khoản thành công.</p>"
+                + "<p>Thông tin tài khoản:</p>"
+                + "<ul>"
+                + "<li>Tên người dùng: " + username + "</li>"
+                + "<li>Email: " + recipientEmail + "</li>"
+                + "</ul>"
+                + "<p>Bạn có thể đăng nhập và bắt đầu sử dụng các dịch vụ của chúng tôi.</p>"
+                + "<p>Trân trọng,</p>"
+                + "<p>Đội ngũ Ứng dụng</p>",
+                "text/html; charset=UTF-8"
             );
 
             Transport.send(message);
-            System.out.println("? Manual signup email sent successfully to: " + recipientEmail);
+            System.out.println("✅ Đã gửi email đăng ký thủ công đến: " + recipientEmail);
 
         } catch (MessagingException e) {
-            System.err.println("? Email sending failed: " + e.getMessage());
+            System.err.println("❌ Gửi email thất bại: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -108,27 +108,27 @@ public class EmailService {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(EMAIL_SENDER));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            message.setSubject("Welcome to Our Application - Google Signup");
+            message.setSubject("Chào mừng bạn - Đăng ký bằng Google");
             message.setContent(
-                    "<h1>Google Signup Successful</h1>"
-                    + "<p>Hello " + username + ",</p>"
-                    + "<p>Congratulations! You have successfully signed up using Google.</p>"
-                    + "<p>Account details:</p>"
-                    + "<ul>"
-                    + "<li>Username: " + username + "</li>"
-                    + "<li>Email: " + recipientEmail + "</li>"
-                    + "</ul>"
-                    + "<p>You can log in anytime using your Google account.</p>"
-                    + "<p>Best regards,</p>"
-                    + "<p>Application Team</p>",
-                    "text/html; charset=UTF-8"
+                "<h1>Đăng ký bằng Google thành công</h1>"
+                + "<p>Xin chào " + username + ",</p>"
+                + "<p>Bạn đã đăng ký tài khoản thành công bằng Google.</p>"
+                + "<p>Thông tin tài khoản:</p>"
+                + "<ul>"
+                + "<li>Tên người dùng: " + username + "</li>"
+                + "<li>Email: " + recipientEmail + "</li>"
+                + "</ul>"
+                + "<p>Bạn có thể đăng nhập bất cứ lúc nào bằng tài khoản Google.</p>"
+                + "<p>Trân trọng,</p>"
+                + "<p>Đội ngũ Ứng dụng</p>",
+                "text/html; charset=UTF-8"
             );
 
             Transport.send(message);
-            System.out.println("? Google signup email sent successfully to: " + recipientEmail);
+            System.out.println("✅ Đã gửi email đăng ký bằng Google đến: " + recipientEmail);
 
         } catch (MessagingException e) {
-            System.err.println("? Email sending failed: " + e.getMessage());
+            System.err.println("❌ Gửi email thất bại: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -141,27 +141,27 @@ public class EmailService {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(EMAIL_SENDER));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            message.setSubject("Order Confirmation");
+            message.setSubject("Xác nhận đơn hàng");
             message.setContent(
-                    "<h1>Thank you for your order!</h1>"
-                    + "<p>Order details:</p>"
-                    + "<pre>" + orderDetails + "</pre>"
-                    + "<p><strong>Note:</strong> Your order will be shipped within 2-3 days.</p>",
-                    "text/html; charset=UTF-8"
+                "<h1>Cảm ơn bạn đã đặt hàng!</h1>"
+                + "<p>Chi tiết đơn hàng:</p>"
+                + "<pre>" + orderDetails + "</pre>"
+                + "<p><strong>Lưu ý:</strong> Đơn hàng sẽ được giao trong vòng 2-3 ngày.</p>",
+                "text/html; charset=UTF-8"
             );
 
             Transport.send(message);
-            System.out.println("? Order confirmation email sent successfully to: " + recipientEmail);
+            System.out.println("✅ Đã gửi email xác nhận đơn hàng đến: " + recipientEmail);
 
         } catch (MessagingException e) {
-            System.err.println("? Email sending failed: " + e.getMessage());
+            System.err.println("❌ Gửi email thất bại: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     public static void sendEmail(String recipientEmail, String subject, String messageText) throws MessagingException {
-        System.out.println("? [DEBUG] - B?t ??u g?i email...");
-        System.out.println("? [DEBUG] - G?i t?i: " + recipientEmail);
+        System.out.println("📨 [DEBUG] - Bắt đầu gửi email...");
+        System.out.println("📨 [DEBUG] - Gửi tới: " + recipientEmail);
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -185,12 +185,12 @@ public class EmailService {
             message.setSubject(subject);
             message.setText(messageText);
 
-            System.out.println("? [INFO] - ?ang g?i email...");
+            System.out.println("📨 [INFO] - Đang gửi email...");
             Transport.send(message);
-            System.out.println("? Email ?� g?i th�nh c�ng!");
+            System.out.println("✅ Email đã gửi thành công!");
 
         } catch (MessagingException e) {
-            System.err.println("? G?i email th?t b?i: " + e.getMessage());
+            System.err.println("❌ Gửi email thất bại: " + e.getMessage());
             e.printStackTrace();
         }
     }
