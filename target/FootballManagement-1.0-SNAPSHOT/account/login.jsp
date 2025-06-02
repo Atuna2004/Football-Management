@@ -26,13 +26,13 @@
             %>
 
             <div class="social-icons">
-                <a href="#"><img src="https://img.icons8.com/ios-glyphs/30/google-logo.png"/></a>
+                <a href="https://accounts.google.com/o/oauth2/auth?scope=email profile openid&redirect_uri=http://localhost:8080/FootballManagement/login&response_type=code&client_id=525166296465-4q4lifsqbuqhg7ptinpu0g5bc5tcjkqk.apps.googleusercontent.com&approval_prompt=force"><img src="https://img.icons8.com/ios-glyphs/30/google-logo.png"/></a>
                 <a href="#"><img src="https://img.icons8.com/ios-glyphs/30/facebook-new.png"/></a>
                 <a href="#"><img src="https://img.icons8.com/ios-glyphs/30/github.png"/></a>
                 <a href="#"><img src="https://img.icons8.com/ios-glyphs/30/linkedin.png"/></a>
             </div>
             <p>hoặc sử dụng email của bạn</p>
-            <form action="${pageContext.request.contextPath}/login123" method="post">
+            <form action="${pageContext.request.contextPath}/login" method="post">
                 <input type="email" name="email" placeholder="Email" required />
                 <input type="password" name="password" placeholder="Password" required />
                 <button type="submit">Đăng nhập</button>

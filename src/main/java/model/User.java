@@ -13,12 +13,14 @@ public class User {
     private boolean isActive;
     private String googleID;
     private String avatarUrl;
+    private Date birthDate;      // thêm trường BirthDate
+    private String address;      // thêm trường Address
 
-    
     public User() {
     }
 
-    public User(int userID, String email, String passwordHash, String fullName, String phone, Date createdAt, boolean isActive, String googleID, String avatarUrl) {
+    public User(int userID, String email, String passwordHash, String fullName, String phone, Date createdAt,
+                boolean isActive, String googleID, String avatarUrl, Date birthDate, String address) {
         this.userID = userID;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -28,6 +30,8 @@ public class User {
         this.isActive = isActive;
         this.googleID = googleID;
         this.avatarUrl = avatarUrl;
+        this.birthDate = birthDate;
+        this.address = address;
     }
 
     public int getUserID() {
@@ -82,8 +86,8 @@ public class User {
         return isActive;
     }
 
-    public void setActive(boolean isActive) {
-        this.isActive = isActive;
+    public void setActive(boolean active) {
+        this.isActive = active;
     }
 
     public String getGoogleID() {
@@ -101,5 +105,20 @@ public class User {
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
     }
-    
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }

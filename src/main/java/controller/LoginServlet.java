@@ -13,50 +13,47 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.Random;
+import model.GoogleAccount;
+import utils.GoogleLogin;
 
 public class LoginServlet extends HttpServlet {
+
+    private String generateRandomPassword(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%";
+        StringBuilder password = new StringBuilder();
+        Random rnd = new Random();
+        for (int i = 0; i < length; i++) {
+            password.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        return password.toString();
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        System.out.println("🟢 [POST] LoginServlet được gọi!");
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        System.out.println("📩 [STEP 2] Email người dùng nhập: " + email);
-        System.out.println("🔑 [STEP 3] Password người dùng nhập: " + password);
-
         try (Connection conn = DBConnection.getConnection()) {
-            System.out.println("🔌 [STEP 4] Kết nối DB thành công");
 
             AccountDAO dao = new AccountDAO(conn);
             User user = dao.getUserByEmail(email);
 
             if (user != null) {
-                System.out.println("🧍 [STEP 5] User tìm thấy: " + user.getEmail());
-
                 if (user.getPasswordHash().equals(password)) {
-                    System.out.println("✅ [STEP 6] Mật khẩu đúng. Đăng nhập thành công");
-
                     HttpSession session = request.getSession();
                     session.setAttribute("currentUser", user);
-
-                    System.out.println("➡️ [STEP 7] Redirect về trang home.jsp");
                     response.sendRedirect(request.getContextPath() + "/home.jsp");
                     return;
-
                 } else {
-                    System.out.println("❌ [ERROR] Mật khẩu sai");
                     HttpSession session = request.getSession();
                     session.setAttribute("errorMessage", "Sai email hoặc mật khẩu.");
                     response.sendRedirect(request.getContextPath() + "/account/login.jsp");
                     return;
                 }
-
             } else {
-                System.out.println("❌ [ERROR] Không tìm thấy user theo email");
                 HttpSession session = request.getSession();
                 session.setAttribute("errorMessage", "Sai email hoặc mật khẩu.");
                 response.sendRedirect(request.getContextPath() + "/account/login.jsp");
@@ -64,9 +61,7 @@ public class LoginServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
-            System.out.println("❌ [ERROR] Lỗi khi truy vấn DB: " + e.getMessage());
             e.printStackTrace();
-
             HttpSession session = request.getSession();
             session.setAttribute("errorMessage", "Lỗi hệ thống. Vui lòng thử lại sau.");
             response.sendRedirect(request.getContextPath() + "/account/login.jsp");
@@ -76,7 +71,48 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("➡️ [GET] Điều hướng tới login.jsp");
-        request.getRequestDispatcher("account/login.jsp").forward(request, response);
+        String code = request.getParameter("code");
+        if (code == null || code.isEmpty()) {
+            response.sendRedirect("account/login.jsp?error=Missing code");
+            return;
+        }
+
+        try (Connection conn = DBConnection.getConnection()) {
+            GoogleLogin gg = new GoogleLogin();
+            String accessToken = gg.getToken(code);
+            GoogleAccount acc = gg.getUserInfo(accessToken);
+
+            if (acc == null || acc.getEmail() == null) {
+                response.sendRedirect("account/login.jsp?error=Invalid token");
+                return;
+            }
+
+            AccountDAO dao = new AccountDAO(conn);
+            User user = dao.getUserByEmail(acc.getEmail());
+
+            if (user == null) {
+                user = new User();
+                user.setEmail(acc.getEmail());
+                user.setFullName(acc.getName());
+                user.setPasswordHash(generateRandomPassword(10));
+                user.setPhone("");
+                user.setActive(true);
+                user.setGoogleID(acc.getId());
+                user.setAvatarUrl(acc.getPicture());
+                user.setCreatedAt(new java.util.Date());
+
+                dao.addUser(user);
+                user = dao.getUserByEmail(acc.getEmail());
+            }
+
+            HttpSession session = request.getSession();
+            session.setAttribute("currentUser", user);
+            response.sendRedirect(request.getContextPath() + "/home.jsp");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.getSession().setAttribute("errorMessage", "Lỗi đăng nhập bằng Google. Vui lòng thử lại.");
+            response.sendRedirect(request.getContextPath() + "/account/login.jsp");
+        }
     }
 }
