@@ -46,7 +46,7 @@ public class AccountDAO {
 
     // Get user by email
     public User getUserByEmail(String email) throws SQLException {
-        String sql = "SELECT * FROM [User] WHERE Email = ?";
+        String sql = "SELECT * FROM [User] WHERE Email = ? AND isActive = 1";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, email);
             try (ResultSet rs = stmt.executeQuery()) {

@@ -4,6 +4,7 @@ package controller.Authentication;
 import connect.DBConnection;
 import java.io.IOException;
 import dao.AccountDAO;
+import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,11 +26,16 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
             AccountDAO userDAO = new AccountDAO(conn);
 
             if ("activate".equals(otpMode)) {
-                userDAO.activateUser(email);
-                clearOtpSession(request);
-                response.sendRedirect(request.getContextPath() + "/home.jsp");
-
-            } else if ("reset".equals(otpMode)) {
+                User pendingUser = (User) request.getSession().getAttribute("pendingUser");
+                if (pendingUser != null) {
+                    userDAO.addUser(pendingUser); // Bây giờ mới lưu vào DB
+                    clearOtpSession(request);
+                    request.getSession().removeAttribute("pendingUser");
+                    response.sendRedirect(request.getContextPath() + "/home.jsp");
+                    request.getSession().removeAttribute("pendingUser");
+                }
+            }
+            else if ("reset".equals(otpMode)) {
                 //Chỉnh code reset Password ở đây
             } else {
                 // Không xác định mục đích

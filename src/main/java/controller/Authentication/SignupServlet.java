@@ -57,21 +57,17 @@ public class SignupServlet extends HttpServlet {
             newUser.setGoogleID(null);
             newUser.setAvatarUrl(null);
 
-            boolean success = userDAO.addUser(newUser);
+            // Lưu user vào session, KHÔNG lưu DB
+            request.getSession().setAttribute("pendingUser", newUser);
+            String otp = OTPGenerator.generateOTP();
+            EmailService emailService = new EmailService();
+            request.getSession().setAttribute("otp", otp);
+            request.getSession().setAttribute("email", email);
+            request.getSession().setAttribute("otpMode", "activate");
+            String subject = "Activate account OTP";
+            emailService.sendOTPEmail(email, otp, subject);
+            response.sendRedirect("account/confirmOTP.jsp");
 
-            if (success) {
-                String otp = OTPGenerator.generateOTP();
-                EmailService emailService = new EmailService();
-                request.getSession().setAttribute("otp", otp);
-                request.getSession().setAttribute("email", email);
-                request.getSession().setAttribute("otpMode", "activate");
-                String subject = "Activate account OTP";
-                emailService.sendOTPEmail(email, otp, subject);
-                response.sendRedirect("account/confirmOTP.jsp");
-            } else {
-                request.setAttribute("error", "Đăng ký thất bại, vui lòng thử lại!");
-                request.getRequestDispatcher("account/register.jsp").forward(request, response);
-            }
 
         } catch (SQLException e) {
             throw new ServletException("Lỗi cơ sở dữ liệu", e);
