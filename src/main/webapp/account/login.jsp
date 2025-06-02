@@ -26,7 +26,9 @@
             %>
 
             <div class="social-icons">
-                <a href="#"><img src="https://img.icons8.com/ios-glyphs/30/google-logo.png"/></a>
+                <a href="${pageContext.request.contextPath}/google-login">
+                    <img src="https://img.icons8.com/ios-glyphs/30/google-logo.png" alt="Google Sign-In"/>
+                </a>
                 <a href="#"><img src="https://img.icons8.com/ios-glyphs/30/facebook-new.png"/></a>
                 <a href="#"><img src="https://img.icons8.com/ios-glyphs/30/github.png"/></a>
                 <a href="#"><img src="https://img.icons8.com/ios-glyphs/30/linkedin.png"/></a>

@@ -18,9 +18,9 @@
     <div class="container">
         <div class="form-container">
             <h2>Xác minh OTP</h2>
-            <p>Chúng tôi đã gửi mã xác minh đến số điện thoại/email của bạn</p>
-            <form action="#">
-                <input type="text" placeholder="Nhập mã OTP" maxlength="6" required>
+            <p>Chúng tôi đã gửi mã xác minh đến email của bạn</p>
+            <form action="${pageContext.request.contextPath}/otp" method="post">
+                <input type="text" name="otp" placeholder="Nhập mã OTP" maxlength="6" required>
                 <button type="submit">Xác nhận</button>
             </form>
         </div>
