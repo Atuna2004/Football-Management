@@ -111,4 +111,12 @@ public class AccountDAO {
         u.setAvatarUrl(rs.getString("AvatarUrl"));
         return u;
     }
+    
+    public boolean activateUser(String email) throws SQLException {
+        String sql = "UPDATE [User] SET isActive = 1 WHERE Email = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            return stmt.executeUpdate() > 0;
+        }
+    }
 }
