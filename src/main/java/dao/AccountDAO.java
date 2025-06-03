@@ -16,7 +16,6 @@ public class AccountDAO {
         List<User> list = new ArrayList<>();
         String sql = "SELECT * FROM [User]";
         try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
-
             while (rs.next()) {
                 list.add(extractUser(rs));
             }
@@ -45,7 +44,7 @@ public class AccountDAO {
     }
 
     public boolean addUser(User user) throws SQLException {
-        String sql = "INSERT INTO [User] (Email, PasswordHash, FullName, Phone, CreatedAt, IsActive, GoogleID, AvatarUrl, DateOfBirth, Address) VALUES (?, ?, ?, ?, GETDATE(), ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO [User] (Email, PasswordHash, FullName, Phone, CreatedAt, IsActive, GoogleID, AvatarUrl, DateOfBirth, Address) VALUES (?, ?, ?, ?, GETDATE(), ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.getEmail());
             stmt.setString(2, user.getPasswordHash());
@@ -111,15 +110,11 @@ public class AccountDAO {
         u.setActive(rs.getBoolean("IsActive"));
         u.setGoogleID(rs.getString("GoogleID"));
         u.setAvatarUrl(rs.getString("AvatarUrl"));
-        u.setDateOfBirth(rs.getObject("DateOfBirth", java.sql.Date.class)); 
-        u.setAddress(rs.getString("Address")); 
-
+        u.setDateOfBirth(rs.getObject("DateOfBirth", java.sql.Date.class));
+        u.setAddress(rs.getString("Address"));
         return u;
     }
-<<<<<<< HEAD
-}
-=======
-    
+
     public boolean activateUser(String email) throws SQLException {
         String sql = "UPDATE [User] SET isActive = 1 WHERE Email = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -128,4 +123,3 @@ public class AccountDAO {
         }
     }
 }
->>>>>>> origin/main

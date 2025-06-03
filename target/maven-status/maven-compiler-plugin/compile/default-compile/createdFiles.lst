@@ -4,27 +4,18 @@ model\SystemLog.class
 dao\AccountDAO.class
 controller\Authentication\UpdateProfileServlet.class
 com\mycompany\footballmanagement\resources\JakartaEE10Resource.class
-<<<<<<< HEAD
-=======
 utils\EmailService$1.class
->>>>>>> origin/main
 model\Team.class
 utils\OTPGenerator.class
 model\Role.class
 controller\Authentication\LoginServlet.class
-<<<<<<< HEAD
-=======
 model\GoogleAccount.class
->>>>>>> origin/main
 model\UserRole.class
 constant\Iconstant.class
 model\Tournament.class
 model\User.class
 model\Notification.class
-<<<<<<< HEAD
-=======
 controller\Stadium\StadiumListServlet.class
->>>>>>> origin/main
 controller\Authentication\LogoutServlet.class
 model\UserSettings.class
 controller\Authentication\OTPServlet.class
@@ -36,18 +27,12 @@ model\FoodOrderItem.class
 model\Payment.class
 model\DiscountCode.class
 model\Feedback.class
-<<<<<<< HEAD
-controller\Authentication\AvatarUploadServlet.class
-model\TeamMember.class
-model\FoodItem.class
-com\mycompany\footballmanagement\JakartaRestConfiguration.class
-=======
 utils\EmailService$2.class
+controller\Authentication\AvatarUploadServlet.class
 utils\EmailService.class
 model\TeamMember.class
 model\FoodItem.class
 com\mycompany\footballmanagement\JakartaRestConfiguration.class
 dao\StadiumDAO.class
->>>>>>> origin/main
 controller\Authentication\HttpServletRequest.class
 model\TimeSlot.class
