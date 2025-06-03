@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./css/header.css"/>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/header.css"> 
 
     <!-- Nhúng Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
@@ -20,7 +20,7 @@
                     <div class="col-sm-6">
                         <div class="logo">
                             <a href="home.jsp">
-                                <img src="./images/logo.png" alt="logo"/>
+                                <img src="<%= request.getContextPath() %>/images/logo.png" alt="logo"/>
                             </a>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                     <div class="col-8 menu-wrapper">
                         <div class="item"><a href="home.jsp"><i class="fa-solid fa-house"></i></a></div>
                         <div class="item"><a href="#">Trang chủ</a></div>
-                        <div class="item"><a href="#">Danh sách sân bóng</a></div>
+                        <div class="item"><a href="<%= request.getContextPath() %>/stadiums">Danh sách sân bóng</a></div>
                         <div class="item"><a href="#">Đồ ăn</a></div>
                         <div class="item"><a href="#">Giới thiệu</a></div>
                         <div class="item"><a href="#">Dành cho chủ sân</a></div>
@@ -63,8 +63,8 @@
                             } else {
                         %>
                             <div class="account item">
-                                <a class="register me-2" href="./account/register.jsp">Đăng ký</a>
-                                <a href="./account/login.jsp">Đăng nhập</a>
+                                <a class="register me-2" href="<%= request.getContextPath() %>/account/register.jsp">Đăng ký</a>
+                                <a href="<%= request.getContextPath() %>/account/login.jsp">Đăng nhập</a>
                             </div>
                         <%
                             }

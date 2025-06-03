@@ -13,13 +13,23 @@ public class User {
     private boolean isActive;
     private String googleID;
     private String avatarUrl;
+<<<<<<< HEAD
     private java.util.Date dateOfBirth;
     private String address;
+=======
+    private Date birthDate;      // thêm trường BirthDate
+    private String address;      // thêm trường Address
+>>>>>>> origin/main
 
     public User() {
     }
 
+<<<<<<< HEAD
     public User(int userID, String email, String passwordHash, String fullName, String phone, Date createdAt, boolean isActive, String googleID, String avatarUrl, String address) {
+=======
+    public User(int userID, String email, String passwordHash, String fullName, String phone, Date createdAt,
+                boolean isActive, String googleID, String avatarUrl, Date birthDate, String address) {
+>>>>>>> origin/main
         this.userID = userID;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -29,6 +39,10 @@ public class User {
         this.isActive = isActive;
         this.googleID = googleID;
         this.avatarUrl = avatarUrl;
+<<<<<<< HEAD
+=======
+        this.birthDate = birthDate;
+>>>>>>> origin/main
         this.address = address;
     }
 
@@ -84,8 +98,8 @@ public class User {
         return isActive;
     }
 
-    public void setActive(boolean isActive) {
-        this.isActive = isActive;
+    public void setActive(boolean active) {
+        this.isActive = active;
     }
 
     public String getGoogleID() {
@@ -104,12 +118,21 @@ public class User {
         this.avatarUrl = avatarUrl;
     }
 
+<<<<<<< HEAD
     public java.util.Date getDateOfBirth() {
         return dateOfBirth;
     }
 
     public void setDateOfBirth(java.util.Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+=======
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+>>>>>>> origin/main
     }
 
     public String getAddress() {
@@ -119,5 +142,8 @@ public class User {
     public void setAddress(String address) {
         this.address = address;
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 }

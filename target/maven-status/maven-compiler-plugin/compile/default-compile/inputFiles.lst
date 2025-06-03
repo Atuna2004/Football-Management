@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 D:\FPT\Sem 5\SWP\Project\Football-Management\src\main\java\com\mycompany\footballmanagement\resources\JakartaEE10Resource.java
 D:\FPT\Sem 5\SWP\Project\Football-Management\src\main\java\model\DiscountCode.java
 D:\FPT\Sem 5\SWP\Project\Football-Management\src\main\java\model\Notification.java
@@ -26,3 +27,39 @@ D:\FPT\Sem 5\SWP\Project\Football-Management\src\main\java\model\Tournament.java
 D:\FPT\Sem 5\SWP\Project\Football-Management\src\main\java\model\UserRole.java
 D:\FPT\Sem 5\SWP\Project\Football-Management\src\main\java\model\UserSettings.java
 D:\FPT\Sem 5\SWP\Project\Football-Management\src\main\java\connect\DBConnection.java
+=======
+D:\SWP391\FootballManagement\src\main\java\model\Payment.java
+D:\SWP391\FootballManagement\src\main\java\model\TimeSlot.java
+D:\SWP391\FootballManagement\src\main\java\controller\Authentication\HttpServletRequest.java
+D:\SWP391\FootballManagement\src\main\java\model\GoogleAccount.java
+D:\SWP391\FootballManagement\src\main\java\model\User.java
+D:\SWP391\FootballManagement\src\main\java\utils\OTPGenerator.java
+D:\SWP391\FootballManagement\src\main\java\model\Stadium.java
+D:\SWP391\FootballManagement\src\main\java\controller\Authentication\SignupServlet.java
+D:\SWP391\FootballManagement\src\main\java\dao\AccountDAO.java
+D:\SWP391\FootballManagement\src\main\java\model\Tournament.java
+D:\SWP391\FootballManagement\src\main\java\model\Role.java
+D:\SWP391\FootballManagement\src\main\java\model\FoodItem.java
+D:\SWP391\FootballManagement\src\main\java\model\FoodOrderItem.java
+D:\SWP391\FootballManagement\src\main\java\controller\Authentication\LogoutServlet.java
+D:\SWP391\FootballManagement\src\main\java\connect\DBConnection.java
+D:\SWP391\FootballManagement\src\main\java\dao\StadiumDAO.java
+D:\SWP391\FootballManagement\src\main\java\model\SystemLog.java
+D:\SWP391\FootballManagement\src\main\java\model\Feedback.java
+D:\SWP391\FootballManagement\src\main\java\model\TeamMember.java
+D:\SWP391\FootballManagement\src\main\java\com\mycompany\footballmanagement\JakartaRestConfiguration.java
+D:\SWP391\FootballManagement\src\main\java\controller\Authentication\OTPServlet.java
+D:\SWP391\FootballManagement\src\main\java\com\mycompany\footballmanagement\resources\JakartaEE10Resource.java
+D:\SWP391\FootballManagement\src\main\java\controller\Stadium\StadiumListServlet.java
+D:\SWP391\FootballManagement\src\main\java\utils\GoogleLogin.java
+D:\SWP391\FootballManagement\src\main\java\constant\Iconstant.java
+D:\SWP391\FootballManagement\src\main\java\model\DiscountCode.java
+D:\SWP391\FootballManagement\src\main\java\model\Team.java
+D:\SWP391\FootballManagement\src\main\java\model\FoodOrder.java
+D:\SWP391\FootballManagement\src\main\java\model\UserRole.java
+D:\SWP391\FootballManagement\src\main\java\model\UserSettings.java
+D:\SWP391\FootballManagement\src\main\java\model\Booking.java
+D:\SWP391\FootballManagement\src\main\java\model\Notification.java
+D:\SWP391\FootballManagement\src\main\java\utils\EmailService.java
+D:\SWP391\FootballManagement\src\main\java\controller\Authentication\LoginServlet.java
+>>>>>>> origin/main

@@ -11,11 +11,13 @@ public class Stadium {
     private String type;
     private String status;
     private Date createdAt;
+    private String phoneNumber;
 
     public Stadium() {
     }
 
-    public Stadium(int stadiumID, String name, String location, String description, String type, String status, Date createdAt) {
+
+    public Stadium(int stadiumID, String name, String location, String description, String type, String status, Date createdAt, String phoneNumber) {
         this.stadiumID = stadiumID;
         this.name = name;
         this.location = location;
@@ -23,6 +25,7 @@ public class Stadium {
         this.type = type;
         this.status = status;
         this.createdAt = createdAt;
+        this.phoneNumber = phoneNumber;
     }
 
     public int getStadiumID() {
@@ -79,5 +82,13 @@ public class Stadium {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+    
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

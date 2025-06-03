@@ -4,6 +4,8 @@ package controller.Authentication;
 import connect.DBConnection;
 import dao.AccountDAO;
 import model.User;
+import utils.EmailService;
+import utils.OTPGenerator;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -47,22 +49,25 @@ public class SignupServlet extends HttpServlet {
             // Tạo user mới
             User newUser = new User();
             newUser.setEmail(email);
-            newUser.setPasswordHash(password); // Nên mã hóa mật khẩu thật sự!
+            newUser.setPasswordHash(password); 
             newUser.setFullName(fullName);
             newUser.setPhone(phone);
-            newUser.setActive(true);
+            newUser.setActive(false);
             newUser.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             newUser.setGoogleID(null);
             newUser.setAvatarUrl(null);
 
-            boolean success = userDAO.addUser(newUser);
+            // Lưu user vào session, KHÔNG lưu DB
+            request.getSession().setAttribute("pendingUser", newUser);
+            String otp = OTPGenerator.generateOTP();
+            EmailService emailService = new EmailService();
+            request.getSession().setAttribute("otp", otp);
+            request.getSession().setAttribute("email", email);
+            request.getSession().setAttribute("otpMode", "activate");
+            String subject = "Activate account OTP";
+            emailService.sendOTPEmail(email, otp, subject);
+            response.sendRedirect("account/confirmOTP.jsp");
 
-            if (success) {
-                response.sendRedirect("account/login.jsp");
-            } else {
-                request.setAttribute("error", "Đăng ký thất bại, vui lòng thử lại!");
-                request.getRequestDispatcher("account/register.jsp").forward(request, response);
-            }
 
         } catch (SQLException e) {
             throw new ServletException("Lỗi cơ sở dữ liệu", e);

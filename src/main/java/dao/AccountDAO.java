@@ -35,7 +35,7 @@ public class AccountDAO {
     }
 
     public User getUserByEmail(String email) throws SQLException {
-        String sql = "SELECT * FROM [User] WHERE Email = ?";
+        String sql = "SELECT * FROM [User] WHERE Email = ? AND isActive = 1";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, email);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -116,4 +116,16 @@ public class AccountDAO {
 
         return u;
     }
+<<<<<<< HEAD
 }
+=======
+    
+    public boolean activateUser(String email) throws SQLException {
+        String sql = "UPDATE [User] SET isActive = 1 WHERE Email = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+}
+>>>>>>> origin/main

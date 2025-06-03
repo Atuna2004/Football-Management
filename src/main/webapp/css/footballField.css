@@ -1,0 +1,234 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Jun 2, 2025, 11:25:14 PM
+    Author     : ADMIN
+*/
+main {
+    font-family: "Roboto", sans-serif;
+    height: 2750px;
+}
+
+html {
+    font-size: 62.5%;
+}
+
+a {
+    color: #1976d2;
+}
+
+.list-stadium {
+    padding: 10px 0 50px;
+    height: 432px;
+}
+
+.box-search {
+    padding: 12px;
+}
+
+.football-search {
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    float: left;
+    width: 100%;
+}
+
+.football-content {
+    float: left;
+    width: 100%;
+    position: relative;
+    padding: 25px 30px 30px;
+}
+
+.football-header {
+    margin: 0 0 25px;
+    float: left;
+    width: 100%;
+    border-bottom: 1px solid #eee;
+    position: relative;
+}
+
+.football-header h3 {
+    font-size: 1.85rem;
+    font-weight: 600;
+    color: #183c7d;
+}
+
+.cat-item li {
+    float: left;
+    width: 100%;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+    text-align: left;
+    position: relative;
+    list-style: none;
+}
+
+.cat-item li a {
+    font-size: 14px;
+    font-weight: 400;
+    text-decoration: none;
+    color: #1976d2;
+}
+
+.cat-item li a:active {
+    color: #f9b90f;
+}
+
+.cat-item li::before {
+    content: "";
+    position: absolute;
+    bottom: 6px;
+    width: 100px;
+    height: 1px;
+    background: #eee;
+    left: 50%;
+    margin-left: -25px;
+}
+
+.cat-item li span {
+    float: right;
+    color: #f9b90f;
+    font-size: 12px;
+}
+
+.main-title {
+    height: 125px !important;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 12px;
+    max-width: 100%
+}
+
+.section-title h2 {
+    font-size: 2.4rem;
+    float: left;
+    width: 100%;
+    margin-bottom: 5px;;
+    font-weight: 600;
+    color: #18458b;
+}
+
+.section-title-separator {
+    margin-bottom: 10px;
+}
+
+main .section-separator {
+    float: left;
+    width: 100%;
+    position: relative;
+    margin: 10px 0 15px;
+}
+
+main .section-separator:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    height: 4px;
+    margin-left: -25px;
+    width: 50px;
+    border-radius: 3px;
+    background: #3aaced;
+}
+
+.listing-item {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 0 4px 8px rgba(0, 0, 0, .02);
+    border-radius: 32px;
+}
+
+.stadium-img {
+    float: left;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    border-radius: 10px 10px 0 0;
+}
+
+.stadium-img img {
+    padding: 10px 10px 0;
+    width: 100%;
+    -o-object-fit: cover;
+    object-fit: cover;
+    border-radius: 32px 32px 0 0;
+    overflow: hidden;
+    transform: translateZ(0);
+    transition: all 2s cubic-bezier(.19,1,.22,1) 0ms;
+}
+
+.title-stadium {
+    padding: 10px;
+}
+
+.stadium-content h3 {
+    float: left;
+    text-align: left;
+    margin: 10px 0 5px;
+    width: 100%;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    color: #19458a;
+}
+
+.stadium-content a {
+    color: #19458a;
+    text-decoration: none;
+}
+
+.stadium-content img {
+    max-width: 15px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.location-stadium .p-12 {
+    
+}
+
+.style-a a {
+    float: left;
+    text-align: left;
+    text-decoration: none;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    color: #000;
+    opacity: .5;
+    display: inline-block;
+    width: 100%;
+    padding: 8px 0;
+}
+
+.location-stadium i {
+    margin-right: 4px;
+}
+.detail {
+    padding-top: 22px;
+    text-align: center;
+}
+
+.detail button {
+    height: 3.6rem;
+    min-width: 110px;
+    padding: 0 16px;
+    background-color: #19458a;;
+    color: #fff;
+    border-radius: 4px;
+}
+
+.detail span {
+    font-size: 1.4rem;
+}

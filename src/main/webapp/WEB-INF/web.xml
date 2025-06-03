@@ -5,13 +5,24 @@
             30
         </session-timeout>
     </session-config>
+<<<<<<< HEAD
+=======
+    <servlet>
+        <servlet-name>NewServlet</servlet-name>
+        <servlet-class>controller.NewServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NewServlet</servlet-name>
+        <url-pattern>/newservlet</url-pattern>
+    </servlet-mapping>
+>>>>>>> origin/main
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>controller.Authentication.LoginServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
-        <url-pattern>/login123</url-pattern>
+        <url-pattern>/login</url-pattern>
     </servlet-mapping>
     <!--sign up-->
     <servlet>
@@ -22,7 +33,10 @@
         <servlet-name>SignupServlet</servlet-name>
         <url-pattern>/signup</url-pattern>
     </servlet-mapping>
+<<<<<<< HEAD
     <!--ConfirmOTP-->
+=======
+>>>>>>> origin/main
     <servlet>
         <servlet-name>OTPServlet</servlet-name>
         <servlet-class>controller.Authentication.OTPServlet</servlet-class>
@@ -31,6 +45,10 @@
         <servlet-name>OTPServlet</servlet-name>
         <url-pattern>/otp</url-pattern>
     </servlet-mapping>
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
     <welcome-file-list>
         <welcome-file>home.jsp</welcome-file>
     </welcome-file-list>
