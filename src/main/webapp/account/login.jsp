@@ -43,7 +43,7 @@
             <div class="overlay-content">
                 <h2>Xin chào, bạn!</h2>
                 <p>Hãy đăng ký với thông tin cá nhân của bạn để sử dụng đầy đủ các tính năng của trang web.</p>
-                <button class="ghost">Đăng ký</button>
+                <button class="ghost" onclick="location.href='${pageContext.request.contextPath}/account/register.jsp'">Đăng kí</button>
             </div>
         </div>
     </div>
