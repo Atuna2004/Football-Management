@@ -16,7 +16,10 @@ model\Tournament.class
 controller\Authentication\ForgotPasswordServlet.class
 model\User.class
 model\Notification.class
+<<<<<<< HEAD
 controller\Stadium\StadiumListServlet.class
+=======
+>>>>>>> f0b40b4e6993cbe4cc9206cd22caa50a9df00784
 controller\Authentication\LogoutServlet.class
 model\UserSettings.class
 controller\Authentication\OTPServlet.class
@@ -33,5 +36,9 @@ utils\EmailService.class
 model\TeamMember.class
 model\FoodItem.class
 com\mycompany\footballmanagement\JakartaRestConfiguration.class
+<<<<<<< HEAD
 dao\StadiumDAO.class
+=======
+controller\Authentication\HttpServletRequest.class
+>>>>>>> f0b40b4e6993cbe4cc9206cd22caa50a9df00784
 model\TimeSlot.class

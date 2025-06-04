@@ -6,6 +6,14 @@
         </session-timeout>
     </session-config>
     <servlet>
+        <servlet-name>NewServlet</servlet-name>
+        <servlet-class>controller.NewServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NewServlet</servlet-name>
+        <url-pattern>/newservlet</url-pattern>
+    </servlet-mapping>
+    <servlet>
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>controller.Authentication.LoginServlet</servlet-class>
     </servlet>
@@ -30,6 +38,7 @@
         <servlet-name>OTPServlet</servlet-name>
         <url-pattern>/otp</url-pattern>
     </servlet-mapping>
+<<<<<<< HEAD
     <servlet>
         <servlet-name>ForgotPasswordServlet</servlet-name>
         <servlet-class>controller.Authentication.ForgotPasswordServlet</servlet-class>
@@ -46,6 +55,8 @@
         <servlet-name>ResetNewPasswordServlet</servlet-name>
         <url-pattern>/reset-pass</url-pattern>
     </servlet-mapping>
+=======
+>>>>>>> f0b40b4e6993cbe4cc9206cd22caa50a9df00784
 
     <welcome-file-list>
         <welcome-file>home.jsp</welcome-file>

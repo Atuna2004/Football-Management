@@ -112,7 +112,7 @@ public class AccountDAO {
         return u;
     }
     
-    //activate user when signup
+
     public boolean activateUser(String email) throws SQLException {
         String sql = "UPDATE [User] SET isActive = 1 WHERE Email = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -120,6 +120,7 @@ public class AccountDAO {
             return stmt.executeUpdate() > 0;
         }
     }
+
     
     //update password when forgot
     public boolean updatePassword(String email, String pass) throws SQLException{
@@ -130,4 +131,5 @@ public class AccountDAO {
             return stmt.executeUpdate() > 0;
     }
 }
+
 }
