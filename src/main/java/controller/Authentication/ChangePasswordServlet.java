@@ -39,13 +39,13 @@ public class ChangePasswordServlet extends HttpServlet {
         if (currentPassword == null || newPassword == null || confirmPassword == null
                 || currentPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
             request.setAttribute("errorMessage", "Vui lòng điền đầy đủ thông tin.");
-            request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
+            request.getRequestDispatcher("/account//profile.jsp").forward(request, response);
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
             request.setAttribute("errorMessage", "Mật khẩu mới và xác nhận mật khẩu không khớp.");
-            request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
+            request.getRequestDispatcher("/account//profile.jsp").forward(request, response);
             return;
         }
 
@@ -56,7 +56,7 @@ public class ChangePasswordServlet extends HttpServlet {
             User freshUser = accountDAO.getUserById(currentUser.getUserID());
             if (freshUser == null) {
                 request.setAttribute("errorMessage", "Người dùng không tồn tại.");
-                request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
+                request.getRequestDispatcher("/account//profile.jsp").forward(request, response);
                 return;
             }
 
@@ -64,7 +64,7 @@ public class ChangePasswordServlet extends HttpServlet {
             // Ở đây tạm so sánh chuỗi trực tiếp (bạn có thể bổ sung hash password)
             if (!freshUser.getPasswordHash().equals(currentPassword)) {
                 request.setAttribute("errorMessage", "Mật khẩu hiện tại không đúng.");
-                request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
+                request.getRequestDispatcher("/account//profile.jsp").forward(request, response);
                 return;
             }
 
@@ -85,6 +85,6 @@ public class ChangePasswordServlet extends HttpServlet {
             request.setAttribute("errorMessage", "Lỗi hệ thống: " + e.getMessage());
         }
 
-        request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
+        request.getRequestDispatcher("/account//profile.jsp").forward(request, response);
     }
 }

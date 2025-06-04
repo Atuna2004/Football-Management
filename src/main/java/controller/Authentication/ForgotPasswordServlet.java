@@ -48,7 +48,7 @@ public class ForgotPasswordServlet extends HttpServlet {
             new EmailService().sendOTPEmail(email, otp, "Mã OTP đặt lại mật khẩu");
 
             // Chuyển hướng tới trang nhập OTP
-            response.sendRedirect("account/confirmOTP.jsp");
+            response.sendRedirect(request.getContextPath() + "account/confirmOTP.jsp");
 
         } catch (Exception e) {
             e.printStackTrace();
