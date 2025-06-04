@@ -44,7 +44,7 @@
         <servlet-name>OTPServlet</servlet-name>
         <url-pattern>/otp</url-pattern>
     </servlet-mapping>
-<<<<<<< HEAD
+
     <servlet>
         <servlet-name>ForgotPasswordServlet</servlet-name>
         <servlet-class>controller.Authentication.ForgotPasswordServlet</servlet-class>
@@ -53,6 +53,7 @@
         <servlet-name>ForgotPasswordServlet</servlet-name>
         <url-pattern>/forgotPassword</url-pattern>
     </servlet-mapping>
+
     <servlet>
         <servlet-name>ResetNewPasswordServlet</servlet-name>
         <servlet-class>controller.Authentication.ResetNewPasswordServlet</servlet-class>
@@ -61,8 +62,6 @@
         <servlet-name>ResetNewPasswordServlet</servlet-name>
         <url-pattern>/reset-pass</url-pattern>
     </servlet-mapping>
-=======
->>>>>>> f0b40b4e6993cbe4cc9206cd22caa50a9df00784
 
     <welcome-file-list>
         <welcome-file>home.jsp</welcome-file>
