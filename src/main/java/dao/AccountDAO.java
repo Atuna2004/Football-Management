@@ -15,7 +15,8 @@ public class AccountDAO {
     public List<User> getAllUsers() throws SQLException {
         List<User> list = new ArrayList<>();
         String sql = "SELECT * FROM [User]";
-        try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 list.add(extractUser(rs));
             }
@@ -44,7 +45,8 @@ public class AccountDAO {
     }
 
     public boolean addUser(User user) throws SQLException {
-        String sql = "INSERT INTO [User] (Email, PasswordHash, FullName, Phone, CreatedAt, IsActive, GoogleID, AvatarUrl, DateOfBirth, Address) VALUES (?, ?, ?, ?, GETDATE(), ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO [User] (Email, PasswordHash, FullName, Phone, CreatedAt, IsActive, GoogleID, AvatarUrl, DateOfBirth, Address) " +
+                     "VALUES (?, ?, ?, ?, GETDATE(), ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.getEmail());
             stmt.setString(2, user.getPasswordHash());
