@@ -10,6 +10,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class OTPServlet extends HttpServlet {
     @Override
@@ -28,28 +31,31 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
             if ("activate".equals(otpMode)) {
                 User pendingUser = (User) request.getSession().getAttribute("pendingUser");
                 if (pendingUser != null) {
-                    userDAO.addUser(pendingUser); // Bây giờ mới lưu vào DB
-                    clearOtpSession(request);
+
+                    pendingUser.setActive(true);
+                    userDAO.addUser(pendingUser); // lưu vào DB
+                    User user = userDAO.getUserByEmail(email);
+                    
+                    // login sau khi đăng kí
+                    request.getSession().setAttribute("currentUser", user);
+                    
+                    request.getSession().removeAttribute("otp");
+                    request.getSession().removeAttribute("otpMode");
                     request.getSession().removeAttribute("pendingUser");
                     response.sendRedirect(request.getContextPath() + "/home.jsp");
-                    request.getSession().removeAttribute("pendingUser");
                 }
             }
             else if ("reset".equals(otpMode)) {
-                //Chỉnh code reset Password ở đây
+                response.sendRedirect(request.getContextPath() + "/account/resetPassword.jsp");
             } else {
                 // Không xác định mục đích
                 clearOtpSession(request);
-                response.sendRedirect("error.jsp");
-            }
-
-        } catch (Exception e) {
-            throw new ServletException("Lỗi khi xử lý OTP", e);
+                response.sendRedirect(request.getContextPath() + "/home.jsp");
+             }
+            } catch (SQLException ex) {
+            Logger.getLogger(OTPServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
-    } else {
-        request.getSession().setAttribute("otpError", "Mã OTP không hợp lệ. Vui lòng thử lại.");
-        response.sendRedirect("confirmOTP.jsp");
-    }
+   }
 }
 
 private void clearOtpSession(HttpServletRequest request) {

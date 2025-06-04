@@ -124,4 +124,14 @@ public class AccountDAO {
             return stmt.executeUpdate() > 0;
         }
     }
+
+    // Update password when forgot
+    public boolean updatePassword(String email, String pass) throws SQLException {
+        String sql = "UPDATE [User] SET PasswordHash = ? WHERE Email = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, pass);
+            stmt.setString(2, email);
+            return stmt.executeUpdate() > 0;
+        }
+    }
 }
