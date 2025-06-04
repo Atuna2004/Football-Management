@@ -28,19 +28,25 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
             if ("activate".equals(otpMode)) {
                 User pendingUser = (User) request.getSession().getAttribute("pendingUser");
                 if (pendingUser != null) {
-                    userDAO.addUser(pendingUser); // Bây giờ mới lưu vào DB
-                    clearOtpSession(request);
+                    pendingUser.setActive(true);
+                    userDAO.addUser(pendingUser); // lưu vào DB
+                    User user = userDAO.getUserByEmail("email");
+                    
+                    // login sau khi đăng kí
+                    request.getSession().setAttribute("currentUser", user);
+                    
+                    request.getSession().removeAttribute("otp");
+                    request.getSession().removeAttribute("otpMode");
                     request.getSession().removeAttribute("pendingUser");
                     response.sendRedirect(request.getContextPath() + "/home.jsp");
-                    request.getSession().removeAttribute("pendingUser");
                 }
             }
             else if ("reset".equals(otpMode)) {
-                //Chỉnh code reset Password ở đây
+                response.sendRedirect(request.getContextPath() + "/account/resetPassword.jsp");
             } else {
                 // Không xác định mục đích
                 clearOtpSession(request);
-                response.sendRedirect("error.jsp");
+                response.sendRedirect(request.getContextPath() + "/home.jsp");
             }
 
         } catch (Exception e) {

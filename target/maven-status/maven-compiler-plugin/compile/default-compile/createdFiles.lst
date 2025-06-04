@@ -2,6 +2,7 @@ connect\DBConnection.class
 model\Stadium.class
 model\SystemLog.class
 dao\AccountDAO.class
+controller\Authentication\ResetNewPasswordServlet.class
 com\mycompany\footballmanagement\resources\JakartaEE10Resource.class
 utils\EmailService$1.class
 model\Team.class
@@ -12,6 +13,7 @@ model\GoogleAccount.class
 model\UserRole.class
 constant\Iconstant.class
 model\Tournament.class
+controller\Authentication\ForgotPasswordServlet.class
 model\User.class
 model\Notification.class
 controller\Stadium\StadiumListServlet.class
@@ -32,5 +34,4 @@ model\TeamMember.class
 model\FoodItem.class
 com\mycompany\footballmanagement\JakartaRestConfiguration.class
 dao\StadiumDAO.class
-controller\Authentication\HttpServletRequest.class
 model\TimeSlot.class
