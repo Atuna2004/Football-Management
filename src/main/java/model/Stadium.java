@@ -8,7 +8,6 @@ public class Stadium {
     private String name;
     private String location;
     private String description;
-    private String type;
     private String status;
     private Date createdAt;
     private String phoneNumber;
@@ -17,12 +16,11 @@ public class Stadium {
     }
 
 
-    public Stadium(int stadiumID, String name, String location, String description, String type, String status, Date createdAt, String phoneNumber) {
+    public Stadium(int stadiumID, String name, String location, String description, String status, Date createdAt, String phoneNumber) {
         this.stadiumID = stadiumID;
         this.name = name;
         this.location = location;
         this.description = description;
-        this.type = type;
         this.status = status;
         this.createdAt = createdAt;
         this.phoneNumber = phoneNumber;
@@ -58,14 +56,6 @@ public class Stadium {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getStatus() {
