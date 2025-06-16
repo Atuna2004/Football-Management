@@ -8,7 +8,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 */
 main {
     font-family: "Roboto", sans-serif;
-    height: 2750px;
+/*    height: 2750px;*/
 }
 
 html {
@@ -21,7 +21,7 @@ a {
 
 .list-stadium {
     padding: 10px 0 50px;
-    height: 432px;
+    min-height: 432px;
 }
 
 .box-search {
