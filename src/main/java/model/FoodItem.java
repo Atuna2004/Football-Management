@@ -71,11 +71,13 @@ public class FoodItem {
         this.stockQuantity = stockQuantity;
     }
 
-    public boolean isActive() {
+    public boolean isIsActive() {
         return isActive;
     }
 
-    public void setActive(boolean isActive) {
+    public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
+
+ 
 }
