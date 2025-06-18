@@ -5,21 +5,36 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 import java.util.List;
 
 import dao.StadiumDAO;
 import model.Stadium;
+import model.User;
 
 @WebServlet("/stadiums")
 public class StadiumListServlet extends HttpServlet {
-
     private static final int RECORDS_PER_PAGE = 15;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("currentUser");
+
+        // Kiểm tra nếu chưa đăng nhập hoặc không phải là chủ sân
+        if (currentUser == null) {
+            session.setAttribute("errorMessage", "Vui lòng đăng nhập để tiếp tục.");
+            response.sendRedirect(request.getContextPath() + "/account/login.jsp");
+            return;
+        }
+
+        Integer ownerId = currentUser.getUserID();
+
+        // Xử lý phân trang
         int page = 1;
         String pageParam = request.getParameter("page");
         if (pageParam != null) {
@@ -31,35 +46,25 @@ public class StadiumListServlet extends HttpServlet {
             }
         }
 
-        StadiumDAO dao = new StadiumDAO();
-        List<Stadium> allStadiums = dao.getAllStadiums();
+        StadiumDAO stadiumDAO = new StadiumDAO();
 
-        // Debug log kiểm tra dữ liệu lấy được
-        System.out.println("Total stadiums from DB: " + allStadiums.size());
-        for (Stadium s : allStadiums) {
-            System.out.println("Stadium: " + s.getName() + ", Location: " + s.getLocation());
-        }
-
-        int totalStadiums = allStadiums.size();
+        // Lấy tổng số sân của owner này
+        int totalStadiums = stadiumDAO.getTotalStadiumCountByOwnerId(ownerId);
         int totalPages = (int) Math.ceil((double) totalStadiums / RECORDS_PER_PAGE);
 
-        // Giới hạn page không vượt quá tổng trang
         if (page > totalPages && totalPages > 0) {
             page = totalPages;
         }
 
-        int start = (page - 1) * RECORDS_PER_PAGE;
-        int end = Math.min(start + RECORDS_PER_PAGE, totalStadiums);
+        // Lấy danh sách sân bóng của owner và phân trang
+        List<Stadium> pagedStadiums = stadiumDAO.getStadiumsByOwnerIdAndPage(ownerId, page, RECORDS_PER_PAGE);
 
-        List<Stadium> pagedStadiums = allStadiums.subList(start, end);
-
-        System.out.println("Page: " + page + ", Start: " + start + ", End: " + end);
-        System.out.println("Stadiums to send to JSP: " + pagedStadiums.size());
-
+        // Truyền dữ liệu sang JSP
         request.setAttribute("stadiums", pagedStadiums);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
 
-        request.getRequestDispatcher("/stadium/footballField.jsp").forward(request, response);
+        // Forward tới JSP
+        request.getRequestDispatcher("/fieldOwner/StadiumList.jsp").forward(request, response);
     }
 }

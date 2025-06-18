@@ -41,13 +41,13 @@ public class DBConnection {
     }
 
     // Optional: For manual connection test only
-    public static void main(String[] args) {
-        Connection testConn = getConnection();
-        if (testConn != null) {
-            System.out.println("🟢 Connection test successful.");
-        } else {
-            System.out.println("🔴 Connection test failed.");
-        }
-        closeConnection();
-    }
+//    public static void main(String[] args) {
+//        Connection testConn = getConnection();
+//        if (testConn != null) {
+//            System.out.println("🟢 Connection test successful.");
+//        } else {
+//            System.out.println("🔴 Connection test failed.");
+//        }
+//        closeConnection();
+//    }
 }
