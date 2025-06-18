@@ -47,6 +47,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
             }
             else if ("reset".equals(otpMode)) {
             request.getSession().setAttribute("action", "reset");
+
                 response.sendRedirect(request.getContextPath() + "/account/resetPassword.jsp");
             } else {
                 // Không xác định mục đích

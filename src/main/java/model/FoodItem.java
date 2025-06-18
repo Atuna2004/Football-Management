@@ -1,7 +1,6 @@
 package model;
 
 public class FoodItem {
-
     private int foodItemID;
     private int stadiumID;
     private String name;
@@ -75,7 +74,7 @@ public class FoodItem {
         return isActive;
     }
 
-    public void setActive(boolean isActive) {
-        this.isActive = isActive;
+    public void setActive(boolean active) {
+        this.isActive = active;
     }
 }

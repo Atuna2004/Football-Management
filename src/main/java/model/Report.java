@@ -28,6 +28,7 @@ public class Report {
         this.status = status;
         this.adminResponse = adminResponse;
         this.respondedAt = respondedAt;
+
     }
 
     public int getReportID() {
@@ -68,6 +69,7 @@ public class Report {
 
     public void setTitle(String title) {
         this.title = title;
+
     }
 
     public String getDescription() {
@@ -108,5 +110,6 @@ public class Report {
 
     public void setRespondedAt(Date respondedAt) {
         this.respondedAt = respondedAt;
+
     }
 }

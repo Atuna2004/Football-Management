@@ -40,7 +40,7 @@
                         <div class="item"><a href="<%= request.getContextPath() %>/stadiums">Danh sách sân bóng</a></div>
                         <div class="item"><a href="#">Đồ ăn</a></div>
                         <div class="item"><a href="#">Giới thiệu</a></div>
-                        <div class="item"><a href="#">Dành cho chủ sân</a></div>
+                        <div class="item"><a href="<%= request.getContextPath() %>/fieldOwner/FODB.jsp">Dành cho chủ sân</a></div>
                         <div class="item"><a href="#">Liên hệ</a></div>
                         <div class="item"><a href="#">Chính sách</a></div>
                     </div>

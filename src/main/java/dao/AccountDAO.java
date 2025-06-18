@@ -35,12 +35,15 @@ public class AccountDAO {
                     acc.setFullName(rs.getString("FullName"));
                     acc.setEmail(rs.getString("Email"));
                     acc.setActive(rs.getBoolean("IsActive")); // ✅ Sửa từ "Active" → "IsActive"
+
                     acc.setRoles(new ArrayList<>());
                     userMap.put(id, acc);
                 }
                 String roleName = rs.getString("RoleName");
                 if (roleName != null) {
+
                     acc.getRoles().add(new model.Role(rs.getInt("RoleID"), roleName));
+
                 }
             }
         }
@@ -92,6 +95,7 @@ public class AccountDAO {
                     user.setRoles(getUserRoles(user.getUserID()));
                     return user;
                 }
+
             }
         }
         return null;
@@ -111,6 +115,7 @@ public class AccountDAO {
                 }
             }
         }
+
         return roles;
     }
 
@@ -145,12 +150,11 @@ public class AccountDAO {
                 return false;
             }
 
-            // Nếu thêm thành công, lấy UserID tự sinh và chèn vào UserRole
+
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     int userID = generatedKeys.getInt(1);
 
-                    // Mặc định gán role 'user' (RoleID = 3)
                     String insertUserRoleSql = "INSERT INTO UserRole (UserID, RoleID) VALUES (?, 3)";
                     try (PreparedStatement ps = conn.prepareStatement(insertUserRoleSql)) {
                         ps.setInt(1, userID);
@@ -193,7 +197,14 @@ public class AccountDAO {
         }
     }
 
-    // Hàm trích xuất dữ liệu người dùng từ ResultSet
+    public boolean deleteUser(int userID) throws SQLException {
+        String sql = "DELETE FROM [User] WHERE UserID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userID);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
     private User extractUser(ResultSet rs) throws SQLException {
         User u = new User();
         u.setUserID(rs.getInt("UserID"));
@@ -221,7 +232,7 @@ public class AccountDAO {
         }
     }
 
-    // Cập nhật mật khẩu
+
     public boolean updatePassword(String email, String pass) throws SQLException {
         String sql = "UPDATE [User] SET PasswordHash = ? WHERE Email = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {

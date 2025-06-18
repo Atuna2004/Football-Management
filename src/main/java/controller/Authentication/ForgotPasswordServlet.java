@@ -3,26 +3,26 @@ package controller.Authentication;
 import connect.DBConnection;
 import dao.AccountDAO;
 import model.User;
+
 import service.OTPGenerator;
 import service.EmailService;
 import service.PasswordService;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 import java.io.IOException;
 import java.sql.Connection;
 
 @WebServlet(name = "ForgotPasswordServlet", urlPatterns = {"/forgotPassword"})
 public class ForgotPasswordServlet extends HttpServlet {
-
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
 
         HttpSession session = request.getSession();
         String action = (String) session.getAttribute("action");
@@ -30,20 +30,21 @@ public class ForgotPasswordServlet extends HttpServlet {
         if (action == null) {
             handleForgotPassword(request, response);
         } else if ("reset".equals(action)) {
+
             handleResetPassword(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
         }
     }
 
+
     private void handleForgotPassword(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         String email = request.getParameter("email");
-
+        
         try (Connection conn = DBConnection.getConnection()) {
             AccountDAO accountDAO = new AccountDAO(conn);
-
             User user = accountDAO.getUserByEmail(email);
             if (user == null) {
                 request.setAttribute("error", "Email không tồn tại.");
@@ -51,12 +52,15 @@ public class ForgotPasswordServlet extends HttpServlet {
                 return;
             }
 
+
             String otp = OTPGenerator.generateOTP();
+
 
             HttpSession session = request.getSession();
             session.setAttribute("email", email);
             session.setAttribute("otp", otp);
             session.setAttribute("otpMode", "reset");
+
 
             new EmailService().sendOTPEmail(email, otp, "Mã OTP đặt lại mật khẩu");
 
@@ -68,6 +72,7 @@ public class ForgotPasswordServlet extends HttpServlet {
             request.getRequestDispatcher("/account/forgotPassword.jsp").forward(request, response);
         }
     }
+
 
     private void handleResetPassword(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -98,6 +103,7 @@ public class ForgotPasswordServlet extends HttpServlet {
             String hashedPassword = passwordService.hashPassword(newPassword);
 
             accountDAO.updatePassword(email, hashedPassword);
+
 
             session.removeAttribute("email");
             session.removeAttribute("otp");

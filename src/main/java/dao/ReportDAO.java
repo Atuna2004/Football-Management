@@ -2,13 +2,16 @@ package dao;
 
 import connect.DBConnection;
 import model.Report;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReportDAO {
 
+
     private final Connection conn;
+
 
     public ReportDAO(Connection conn) {
         this.conn = conn;
@@ -17,6 +20,7 @@ public class ReportDAO {
     // Lấy danh sách tất cả báo cáo
     public List<Report> getAllReports() throws SQLException {
         List<Report> reports = new ArrayList<>();
+
         String sql = "SELECT * FROM Report";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
@@ -33,11 +37,13 @@ public class ReportDAO {
                 report.setAdminResponse(rs.getString("AdminResponse"));
                 report.setRespondedAt(rs.getTimestamp("RespondedAt"));
 
+
                 reports.add(report);
             }
         }
         return reports;
     }
+
     
      public static void main(String[] args) throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
@@ -71,6 +77,7 @@ public class ReportDAO {
             }
             stmt.setString(4, report.getTitle());
             stmt.setString(5, report.getDescription());
+
 
             return stmt.executeUpdate() > 0;
         }

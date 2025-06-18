@@ -73,7 +73,7 @@
     }
 </style>
 
-<!-- Sidebar -->
+
 <div class="sidebar">
     <div class="sidebar-header">
         <h3 style="margin: 0"></i> Quản lí </h3>
@@ -86,7 +86,9 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="./userManagement.jsp" class="nav-link">
+
+            <a href="./user-list" class="nav-link">
+
                 <i class="fas fa-users"></i>
                 Quản Lý Người Dùng
             </a>
@@ -98,6 +100,7 @@
             </a>
         </div>
         <div class="nav-item">
+
             <a href="<%=request.getContextPath()%>/admin/user-report" class="nav-link">
                 <i class="fas fa-flag"></i>
                 Báo Cáo Người Dùng
@@ -131,12 +134,14 @@
                     links.forEach(l => l.classList.remove("active")); // Bỏ active cũ
                     this.classList.add("active"); // Gán active mới
 
-                    // Nếu bạn muốn lưu vị trí active khi reload lại trang:
+
+
+
                     localStorage.setItem("activeSidebar", this.getAttribute("href"));
                 });
             });
 
-            // Duy trì active sau khi reload (optional)
+
             const currentActive = localStorage.getItem("activeSidebar");
             if (currentActive) {
                 links.forEach(link => {
