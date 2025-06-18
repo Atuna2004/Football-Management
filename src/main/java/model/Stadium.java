@@ -11,7 +11,6 @@ public class Stadium {
     private String status;
     private Date createdAt;
     private String phoneNumber;
-    private String imageUrl;
 
     public Stadium() {
     }

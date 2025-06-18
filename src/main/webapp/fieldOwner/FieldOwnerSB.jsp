@@ -31,7 +31,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/stadiums" class="nav-link">
+            <a href="${pageContext.request.contextPath}/fieldOwner/FOSTD" class="nav-link">
                 <i class="fas fa-warehouse"></i>
                 <span>Quản lý sân</span>
             </a>
