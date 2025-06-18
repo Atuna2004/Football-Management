@@ -11,6 +11,7 @@ public class Stadium {
     private String status;
     private Date createdAt;
     private String phoneNumber;
+    private String imageUrl;
 
     public Stadium() {
     }
@@ -81,4 +82,18 @@ public class Stadium {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+    
+
+    @Override
+public String toString() {
+    return "Stadium{" +
+            "stadiumID=" + stadiumID +
+            ", name='" + name + '\'' +
+            ", location='" + location + '\'' +
+            ", description='" + description + '\'' +
+            ", status='" + status + '\'' +
+            ", createdAt=" + createdAt +
+            ", phoneNumber='" + phoneNumber + '\'' +
+            '}';
+}
 }

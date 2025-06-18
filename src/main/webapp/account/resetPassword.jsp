@@ -12,7 +12,7 @@
     <div class="container">
         <div class="form-container">
             <h2>Khôi phục mật khẩu</h2>
-            <form action="${pageContext.request.contextPath}/reset-pass" method="post">
+            <form action="${pageContext.request.contextPath}/forgotPassword" method="post">
                 <input type="password" name="password" placeholder="Nhập mật khẩu mới" required>
                 <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu mới của bạn" required>
                 <button type="submit">Xác nhận</button>
