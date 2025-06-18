@@ -2,6 +2,7 @@ package controller.Stadium;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,17 +11,24 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
+
+import jakarta.servlet.http.*;
+
 import dao.StadiumDAO;
 import model.Stadium;
 import model.User;
 
+import java.io.IOException;
+import java.util.List;
+
 @WebServlet("/stadiums")
 public class StadiumListServlet extends HttpServlet {
     private static final int RECORDS_PER_PAGE = 15;
-
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
 
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("currentUser");
@@ -35,6 +43,9 @@ public class StadiumListServlet extends HttpServlet {
         Integer ownerId = currentUser.getUserID();
 
         // Xử lý phân trang
+
+        
+
         int page = 1;
         String pageParam = request.getParameter("page");
         if (pageParam != null) {
@@ -46,7 +57,24 @@ public class StadiumListServlet extends HttpServlet {
             }
         }
 
+
         StadiumDAO stadiumDAO = new StadiumDAO();
+
+        String location = request.getParameter("location");
+        if (location != null) {
+            location = location.trim();
+            if (location.isEmpty()) {
+                location = null;
+            }
+        }
+
+        StadiumDAO dao = new StadiumDAO();
+        List<Stadium> allStadiums = (location != null)
+                ? dao.getStadiumsByLocation(location)
+                : dao.getAllStadiums();
+
+        List<String> allLocations = dao.getDistinctLocations();
+
 
         // Lấy tổng số sân của owner này
         int totalStadiums = stadiumDAO.getTotalStadiumCountByOwnerId(ownerId);
@@ -56,13 +84,21 @@ public class StadiumListServlet extends HttpServlet {
             page = totalPages;
         }
 
+
         // Lấy danh sách sân bóng của owner và phân trang
         List<Stadium> pagedStadiums = stadiumDAO.getStadiumsByOwnerIdAndPage(ownerId, page, RECORDS_PER_PAGE);
 
         // Truyền dữ liệu sang JSP
+
+        int start = (page - 1) * RECORDS_PER_PAGE;
+        int end = Math.min(start + RECORDS_PER_PAGE, totalStadiums);
+        List<Stadium> pagedStadiums = allStadiums.subList(start, end);
+
         request.setAttribute("stadiums", pagedStadiums);
+        request.setAttribute("locations", allLocations);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("selectedLocation", location);
 
         // Forward tới JSP
         request.getRequestDispatcher("/fieldOwner/StadiumList.jsp").forward(request, response);
