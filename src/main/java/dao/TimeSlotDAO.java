@@ -5,7 +5,6 @@ import model.TimeSlot;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +20,6 @@ public class TimeSlotDAO {
             "WHERE f.stadiumID = ? " +
             "AND ts.date BETWEEN ? AND ? " +
             "ORDER BY ts.date, ts.startTime";
-
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -39,8 +37,7 @@ public class TimeSlotDAO {
                 ts.setStartTime(rs.getTime("startTime").toLocalTime());
                 ts.setEndTime(rs.getTime("endTime").toLocalTime());
                 ts.setPrice(rs.getDouble("price"));
-                ts.setFieldName(rs.getString("fieldName")); // ✅
-
+                ts.setFieldName(rs.getString("fieldName"));
                 list.add(ts);
             }
 
@@ -49,5 +46,24 @@ public class TimeSlotDAO {
         }
 
         return list;
+    }
+
+    // ✅ Hàm mới: Lấy giá theo TimeSlotID
+    public double getPriceByTimeSlotId(int timeSlotId) {
+        String sql = "SELECT price FROM TimeSlot WHERE timeSlotID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, timeSlotId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getDouble("price");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0; // Trả về 0 nếu không tìm thấy hoặc lỗi
     }
 }
