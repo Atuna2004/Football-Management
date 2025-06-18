@@ -1,10 +1,12 @@
 package model;
 
 import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
 
 public class User {
 
-    private int userID;  
+    private int userID;
     private String email;
     private String passwordHash;
     private String fullName;
@@ -13,14 +15,17 @@ public class User {
     private boolean isActive;
     private String googleID;
     private String avatarUrl;
-    private Date dateOfBirth;  // thống nhất dùng dateOfBirth
+    private Date dateOfBirth;
     private String address;
+
+    private List<Role> roles = new ArrayList<>();
 
     public User() {
     }
 
-    public User(int userID, String email, String passwordHash, String fullName, String phone, Date createdAt,
-                boolean isActive, String googleID, String avatarUrl, Date dateOfBirth, String address) {
+    public User(int userID, String email, String passwordHash, String fullName, String phone,
+            Date createdAt, boolean isActive, String googleID, String avatarUrl,
+            Date dateOfBirth, String address, List<Role> roles) {
         this.userID = userID;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -32,6 +37,52 @@ public class User {
         this.avatarUrl = avatarUrl;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
+        this.roles = roles != null ? roles : new ArrayList<>();
+    }
+
+    public User(int userID, String email, String passwordHash, String fullName, String phone,
+            Date createdAt, boolean isActive, String googleID, String avatarUrl,
+            Date dateOfBirth, String address) {
+        this.userID = userID;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.createdAt = createdAt;
+        this.isActive = isActive;
+        this.googleID = googleID;
+        this.avatarUrl = avatarUrl;
+        this.dateOfBirth = dateOfBirth;
+        this.address = address;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles != null ? roles : new ArrayList<>();
+    }
+
+    public boolean isAdmin() {
+        if (roles == null || roles.isEmpty()) {
+            return false;
+        }
+        return roles.stream().anyMatch(r -> "admin".equalsIgnoreCase(r.getRoleName()));
+    }
+
+    public boolean isFieldOwner() {
+        if (roles == null || roles.isEmpty()) {
+            return false;
+        }
+        return roles.stream().anyMatch(r -> "field_owner".equalsIgnoreCase(r.getRoleName()));
+    }
+
+    public boolean isUser() {
+        if (roles == null || roles.isEmpty()) {
+            return false;
+        }
+        return roles.stream().anyMatch(r -> "user".equalsIgnoreCase(r.getRoleName()));
     }
 
     public int getUserID() {
@@ -87,7 +138,7 @@ public class User {
     }
 
     public void setActive(boolean active) {
-        this.isActive = active;
+        isActive = active;
     }
 
     public String getGoogleID() {

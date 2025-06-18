@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.util.Random;
 import model.GoogleAccount;
-import utils.GoogleLogin;
+import service.GoogleLogin;
 
 public class LoginServlet extends HttpServlet {
 

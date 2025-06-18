@@ -1,12 +1,10 @@
 package model;
 
 public class Role {
-
     private int roleID;
     private String roleName;
 
-    public Role() {
-    }
+    public Role() {}
 
     public Role(int roleID, String roleName) {
         this.roleID = roleID;
