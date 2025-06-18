@@ -1,26 +1,28 @@
 package model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class Booking {
-
     private int bookingID;
     private int userID;
-    private int timeSlotID;
-    private Integer discountCodeID;
+    private Integer discountCodeID; // Có thể null
     private String status;
-    private Date createdAt;
+    private LocalDateTime createdAt;
+    private double originalAmount;
+    private double totalAmount;
 
     public Booking() {
     }
 
-    public Booking(int bookingID, int userID, int timeSlotID, Integer discountCodeID, String status, Date createdAt) {
+    public Booking(int bookingID, int userID, Integer discountCodeID, String status,
+                   LocalDateTime createdAt, double originalAmount, double totalAmount) {
         this.bookingID = bookingID;
         this.userID = userID;
-        this.timeSlotID = timeSlotID;
         this.discountCodeID = discountCodeID;
         this.status = status;
         this.createdAt = createdAt;
+        this.originalAmount = originalAmount;
+        this.totalAmount = totalAmount;
     }
 
     public int getBookingID() {
@@ -39,14 +41,6 @@ public class Booking {
         this.userID = userID;
     }
 
-    public int getTimeSlotID() {
-        return timeSlotID;
-    }
-
-    public void setTimeSlotID(int timeSlotID) {
-        this.timeSlotID = timeSlotID;
-    }
-
     public Integer getDiscountCodeID() {
         return discountCodeID;
     }
@@ -63,11 +57,36 @@ public class Booking {
         this.status = status;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public double getOriginalAmount() {
+        return originalAmount;
+    }
+
+    public void setOriginalAmount(double originalAmount) {
+        this.originalAmount = originalAmount;
+    }
+
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    // Nếu cần dùng lại getter setPrice/setPrice thì bạn có thể tạo alias như sau:
+    public double getPrice() {
+        return totalAmount;
+    }
+
+    public void setPrice(double price) {
+        this.totalAmount = price;
     }
 }

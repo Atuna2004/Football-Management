@@ -1,0 +1,126 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Jun 15, 2025, 10:50:13 PM
+    Author     : ADMIN
+*/
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            font-size: 14px;
+        }
+        .calendar-container {
+            max-width: 1400px; margin: 20px auto;
+            background: white; border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .calendar-header {
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 15px 20px;
+            background: #fff; border-bottom: 1px solid #e0e0e0;
+        }
+        .nav-section { display: flex; align-items: center; gap: 15px; }
+        .today-btn, .view-btn, .nav-arrow {
+            padding: 8px 16px; border: 1px solid #ddd; background: white;
+            border-radius: 4px; cursor: pointer; font-size: 14px;
+        }
+        .nav-arrows { display: flex; gap: 5px; }
+        .nav-arrow { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+        .view-toggle { display: flex; gap: 5px; }
+        .view-btn.active { background: #1976d2; color: white; border-color: #1976d2; }
+        .date-range { font-size: 16px; font-weight: 500; color: #333; }
+        .calendar-grid {
+            display: grid; grid-template-columns: 120px repeat(7, 1fr);
+            border-top: 1px solid #e0e0e0;
+        }
+        .time-column, .day-header, .time-slot {
+            background: #f8f9fa; border-right: 1px solid #e0e0e0; text-align: center;
+        }
+        .day-header, .time-slot {
+            padding: 15px 10px; border-bottom: 1px solid #e0e0e0; font-weight: 500;
+        }
+        .day-date { font-size: 12px; color: #666; }
+        .day-name { font-size: 14px; color: #333; }
+        .day-column {
+            border-right: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
+            min-height: 60px;
+            padding: 4px;
+        }
+        .booking-item {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border: 1px solid #90caf9;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            color: #1565c0;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .booking-item:hover {
+            background: linear-gradient(135deg, #bbdefb, #90caf9);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .booking-client { font-weight: 500; margin-bottom: 2px; }
+        .booking-price { font-size: 11px; color: #1976d2; font-weight: 600; }
+        @media (max-width: 768px) {
+            .calendar-container { margin: 10px; }
+            .calendar-grid { grid-template-columns: 80px repeat(7, 1fr); }
+            .day-header { padding: 10px 5px; font-size: 12px; }
+            .booking-item { font-size: 10px; padding: 2px 4px; }
+        }
+        
+        .booking-form button[type="submit"] {
+            background: linear-gradient(135deg, #1976d2, #42a5f5);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            box-shadow: 0 6px 16px rgba(25, 118, 210, 0.2);
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .booking-form button[type="submit"]:hover {
+            background: linear-gradient(135deg, #1565c0, #1e88e5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.3);
+        }
+
+        .booking-form button[type="submit"]:active {
+            transform: scale(0.98);
+        }
+
+        .back-button {
+            background: linear-gradient(135deg, #1976d2, #42a5f5);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            box-shadow: 0 6px 16px rgba(158, 158, 158, 0.2);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #1565c0, #1e88e5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(158, 158, 158, 0.3);
+        }
+
+        .back-button:active {
+            transform: scale(0.98);
+        }
