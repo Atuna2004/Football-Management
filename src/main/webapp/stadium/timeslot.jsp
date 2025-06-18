@@ -36,6 +36,32 @@
     <meta charset="UTF-8">
     <title>Lịch Đặt Sân</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/timeSlot.css"/>
+    <style>
+        .booking-form {
+            width: 100%;
+        }
+        .booking-item label {
+            display: block;
+            padding: 8px;
+            border: 1px solid #ccc;
+            margin: 3px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+        .booking-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 100px repeat(7, 1fr);
+        }
+        .day-header, .time-slot, .day-column {
+            padding: 5px;
+        }
+        .time-slot {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 <div class="calendar-container">
@@ -56,50 +82,50 @@
                 <%= startOfWeek.format(dayFormatter) %> - <%= startOfWeek.plusDays(6).format(dayFormatter) %> <%= startOfWeek.format(monthFormatter) %>
             </span>
         </div>
-        <div class="view-toggle">
-            <button class="view-btn active">Week</button>
-            <button class="view-btn">Day</button>
-        </div>
     </div>
 
-    <div class="calendar-grid">
-        <div class="time-column"></div>
+    <!-- Form bao toàn bộ TimeSlot -->
+    <form action="create-booking" method="get" class="booking-form">
+        <input type="hidden" name="stadiumId" value="<%= stadiumId %>" />
 
-        <% for (int i = 0; i < 7; i++) {
-            LocalDate date = startOfWeek.plusDays(i); %>
-            <div class="day-header">
-                <div class="day-name"><%= dayNamesVi[i] %></div>
-                <div class="day-date"><%= date.format(dayFormatter) %></div>
-            </div>
-        <% } %>
+        <div class="calendar-grid">
+            <div class="time-column"></div>
 
-        <% for (LocalTime time : allTimes) { %>
-            <div class="time-slot"><%= time.format(timeFormatter) %></div>
             <% for (int i = 0; i < 7; i++) {
-                LocalDate date = startOfWeek.plusDays(i);
-                List<TimeSlot> slots = groupedSlots
-                        .getOrDefault(date, Collections.emptyMap())
-                        .getOrDefault(time, Collections.emptyList());
-            %>
-            <div class="day-column">
-                <% for (TimeSlot slot : slots) { %>
-                    <div class="booking-item" onclick="bookSlot(<%= slot.getTimeSlotID() %>)">
-                        <div class="booking-client"><%= slot.getFieldName() %></div>
-                        <div class="booking-price"><%= String.format("%.0f đ", slot.getPrice()) %></div>
-                    </div>
-                <% } %>
-            </div>
+                LocalDate date = startOfWeek.plusDays(i); %>
+                <div class="day-header">
+                    <div class="day-name"><%= dayNamesVi[i] %></div>
+                    <div class="day-date"><%= date.format(dayFormatter) %></div>
+                </div>
             <% } %>
-        <% } %>
-    </div>
-</div>
 
-<script>
-    function bookSlot(slotId) {
-        if (confirm("Bạn có muốn đặt TimeSlot #" + slotId + " không?")) {
-            window.location.href = "selectFood.jsp?timeSlotId=" + slotId;
-        }
-    }
-</script>
+            <% for (LocalTime time : allTimes) { %>
+                <div class="time-slot"><%= time.format(timeFormatter) %></div>
+                <% for (int i = 0; i < 7; i++) {
+                    LocalDate date = startOfWeek.plusDays(i);
+                    List<TimeSlot> slots = groupedSlots
+                            .getOrDefault(date, Collections.emptyMap())
+                            .getOrDefault(time, Collections.emptyList());
+                %>
+                <div class="day-column">
+                    <% for (TimeSlot slot : slots) { %>
+                        <div class="booking-item">
+                            <label>
+                                <input type="checkbox" name="timeSlotIds" value="<%= slot.getTimeSlotID() %>" />
+                                <%= slot.getFieldName() %> - <%= String.format("%.0f đ", slot.getPrice()) %>
+                            </label>
+                        </div>
+                    <% } %>
+                </div>
+                <% } %>
+            <% } %>
+        </div>
+
+        <div style="text-align:center; margin-top:20px; display: flex; justify-content: center; gap: 20px;">
+            <a href="${pageContext.request.contextPath}/stadiums" class="back-button">← Quay lại chọn sân</a>
+            <button type="submit">Tiếp tục đặt món</button>
+        </div>
+    </form>
+</div>
 </body>
 </html>

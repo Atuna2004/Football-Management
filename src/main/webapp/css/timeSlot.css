@@ -76,3 +76,51 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
             .day-header { padding: 10px 5px; font-size: 12px; }
             .booking-item { font-size: 10px; padding: 2px 4px; }
         }
+        
+        .booking-form button[type="submit"] {
+            background: linear-gradient(135deg, #1976d2, #42a5f5);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            box-shadow: 0 6px 16px rgba(25, 118, 210, 0.2);
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .booking-form button[type="submit"]:hover {
+            background: linear-gradient(135deg, #1565c0, #1e88e5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.3);
+        }
+
+        .booking-form button[type="submit"]:active {
+            transform: scale(0.98);
+        }
+
+        .back-button {
+            background: linear-gradient(135deg, #1976d2, #42a5f5);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            box-shadow: 0 6px 16px rgba(158, 158, 158, 0.2);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #1565c0, #1e88e5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(158, 158, 158, 0.3);
+        }
+
+        .back-button:active {
+            transform: scale(0.98);
+        }
