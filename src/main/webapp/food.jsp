@@ -106,7 +106,7 @@
         <c:forEach var="item" items="${foodList}">
             <div class="col-md-4">
                 <div class="card h-100">
-                    <img src="images-food/default-food.jpg" class="card-img-top" alt="${item.name}" />
+                    <img src="images-food/default-food.jpg4" class="card-img-top" alt="${item.name}" />
                     <div class="card-body">
                         <h5 class="card-title">${item.name}</h5>
                         <p class="card-text">
@@ -131,7 +131,7 @@
             <input type="hidden" name="stadiumId" value="${stadiumId}" />
             <input type="hidden" name="bookingId" value="${bookingId}" />
             <button type="submit" class="btn btn-primary btn-lg">
-                💳 Chỉ thanh toán tiền sân
+                💳 Xác nhận thanh toán
             </button>
         </form>
     </div>

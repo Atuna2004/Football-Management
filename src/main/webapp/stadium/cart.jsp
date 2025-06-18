@@ -96,7 +96,7 @@
                 <a href="${pageContext.request.contextPath}/food?stadiumId=${stadiumId}&bookingId=${bookingId}" class="btn btn-secondary">⬅ Tiếp tục chọn món</a>
                 <div>
                     <button type="submit" class="btn btn-warning">🔄 Cập nhật</button>
-                    <a href="${pageContext.request.contextPath}/checkout?stadiumId=${stadiumId}&bookingId=${bookingId}" class="btn btn-success">✅ Thanh toán</a>
+                    <a href="${pageContext.request.contextPath}/checkout?stadiumId=${stadiumId}&bookingId=${bookingId}" class="btn btn-success">✅ Xác nhận thanh toán</a>
                 </div>
             </div>
         </form>
