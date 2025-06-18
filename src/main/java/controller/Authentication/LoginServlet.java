@@ -14,10 +14,15 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.Random;
-import model.GoogleAccount;
-import utils.GoogleLogin;
 
+import model.GoogleAccount;
+import service.GoogleLogin;
+import service.PasswordService; // 🔒 Thêm import
+
+@WebServlet("/login")
 public class LoginServlet extends HttpServlet {
+
+    private final PasswordService passwordService = new PasswordService(); // 🔒 Khởi tạo service
 
     private String generateRandomPassword(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%";
@@ -37,12 +42,12 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         try (Connection conn = DBConnection.getConnection()) {
-
             AccountDAO dao = new AccountDAO(conn);
             User user = dao.getUserByEmail(email);
 
             if (user != null) {
-                if (user.getPasswordHash().equals(password)) {
+                // 🔒 So sánh password đã hash
+                if (passwordService.checkPassword(password, user.getPasswordHash())) {
                     HttpSession session = request.getSession();
                     session.setAttribute("currentUser", user);
                     response.sendRedirect(request.getContextPath() + "/home.jsp");
@@ -94,7 +99,11 @@ public class LoginServlet extends HttpServlet {
                 user = new User();
                 user.setEmail(acc.getEmail());
                 user.setFullName(acc.getName());
-                user.setPasswordHash(generateRandomPassword(10));
+
+                // 🔒 Hash password ngẫu nhiên trước khi lưu
+                String randomPassword = generateRandomPassword(10);
+                user.setPasswordHash(passwordService.hashPassword(randomPassword));
+
                 user.setPhone("");
                 user.setActive(true);
                 user.setGoogleID(acc.getId());

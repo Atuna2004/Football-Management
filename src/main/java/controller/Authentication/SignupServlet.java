@@ -1,35 +1,36 @@
 package controller.Authentication;
 
-
 import connect.DBConnection;
 import dao.AccountDAO;
 import model.User;
-import utils.EmailService;
-import utils.OTPGenerator;
+import service.EmailService;
+import service.OTPGenerator;
+import service.PasswordService; // ✅ THÊM
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-
 public class SignupServlet extends HttpServlet {
+
+    private final PasswordService passwordService = new PasswordService(); // ✅ THÊM
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Lấy dữ liệu từ form
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
         String fullName = request.getParameter("fullName");
         String phone = request.getParameter("phone");
 
-        // Kiểm tra xác nhận mật khẩu
         if (!password.equals(confirmPassword)) {
             request.setAttribute("error", "Mật khẩu xác nhận không khớp!");
             request.getRequestDispatcher("account/register.jsp").forward(request, response);
@@ -39,17 +40,19 @@ public class SignupServlet extends HttpServlet {
         try (Connection conn = DBConnection.getConnection()) {
             AccountDAO userDAO = new AccountDAO(conn);
 
-            // Kiểm tra xem email đã tồn tại chưa
             if (userDAO.getUserByEmail(email) != null) {
                 request.setAttribute("error", "Email đã tồn tại!");
                 request.getRequestDispatcher("account/register.jsp").forward(request, response);
                 return;
             }
 
-            // Tạo user mới
             User newUser = new User();
             newUser.setEmail(email);
-            newUser.setPasswordHash(password); 
+
+            // ✅ THÊM HASH PASSWORD BÊN DƯỚI
+            String hashedPassword = passwordService.hashPassword(password);
+            newUser.setPasswordHash(hashedPassword);
+
             newUser.setFullName(fullName);
             newUser.setPhone(phone);
             newUser.setActive(false);
@@ -57,17 +60,17 @@ public class SignupServlet extends HttpServlet {
             newUser.setGoogleID(null);
             newUser.setAvatarUrl(null);
 
-            // Lưu user vào session, KHÔNG lưu DB
             request.getSession().setAttribute("pendingUser", newUser);
+
             String otp = OTPGenerator.generateOTP();
             EmailService emailService = new EmailService();
             request.getSession().setAttribute("otp", otp);
             request.getSession().setAttribute("email", email);
             request.getSession().setAttribute("otpMode", "activate");
+
             String subject = "Activate account OTP";
             emailService.sendOTPEmail(email, otp, subject);
             response.sendRedirect("account/confirmOTP.jsp");
-
 
         } catch (SQLException e) {
             throw new ServletException("Lỗi cơ sở dữ liệu", e);
