@@ -157,7 +157,7 @@
                             <h4><%= totalCustomers %></h4>
                             <p>Khách hàng</p>
                         </div>
-                    </div>
+                    </div>                    
                 </div>
                 
                 <%-- Hiển thị thông báo lỗi nếu có --%>
