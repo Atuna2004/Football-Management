@@ -4,9 +4,8 @@ import connect.DBConnection;
 import dao.BookingDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
+import model.User;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -19,14 +18,21 @@ public class BookingServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        int userId = 1; // Tạm hardcode người dùng đăng nhập
+        HttpSession session = request.getSession(false);
+        User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
+
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/account/login.jsp");
+            return;
+        }
+
+        int userId = currentUser.getUserID();
         String[] timeSlotIds = request.getParameterValues("timeSlotIds");
         String stadiumIdParam = request.getParameter("stadiumId");
 
-        // Validate input
         if (stadiumIdParam == null || timeSlotIds == null || timeSlotIds.length == 0) {
             request.setAttribute("errorMessage", "Vui lòng chọn ít nhất một khung giờ để đặt sân.");
-            request.setAttribute("stadiumId", stadiumIdParam); // Truyền lại để error.jsp có thể quay lại đúng sân
+            request.setAttribute("stadiumId", stadiumIdParam);
             request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
@@ -44,7 +50,8 @@ public class BookingServlet extends HttpServlet {
         try (Connection conn = DBConnection.getConnection()) {
             for (String idStr : timeSlotIds) {
                 int tsId = Integer.parseInt(idStr);
-                try (PreparedStatement ps = conn.prepareStatement("SELECT Price FROM TimeSlot WHERE TimeSlotID = ?")) {
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "SELECT Price FROM TimeSlot WHERE TimeSlotID = ?")) {
                     ps.setInt(1, tsId);
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
@@ -61,8 +68,8 @@ public class BookingServlet extends HttpServlet {
             return;
         }
 
-        // Tạo đơn đặt sân
         BookingDAO dao = new BookingDAO();
+        // ✅ Đặt status = 'Pending' mặc định trong hàm DAO
         int bookingId = dao.createBooking(userId, totalPrice, totalPrice);
 
         if (bookingId != -1) {
@@ -78,7 +85,7 @@ public class BookingServlet extends HttpServlet {
                 return;
             }
 
-            // Thành công => chuyển sang chọn món ăn
+            // ✅ Sau khi booking xong, chuyển sang đặt món (nếu có)
             response.sendRedirect("food?stadiumId=" + stadiumId + "&bookingId=" + bookingId);
         } else {
             request.setAttribute("errorMessage", "Không thể tạo đơn đặt sân.");

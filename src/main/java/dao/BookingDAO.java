@@ -4,12 +4,16 @@ import connect.DBConnection;
 import model.Booking;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BookingDAO {
 
-    // Lấy thông tin booking theo ID
     public Booking getBookingById(int bookingId) {
-        String sql = "SELECT * FROM Booking WHERE BookingID = ?";
+        String sql = "SELECT b.*, COALESCE(fo.TotalAmount, 0) AS FoodAmount " +
+                     "FROM Booking b LEFT JOIN FoodOrder fo ON b.BookingID = fo.BookingID " +
+                     "WHERE b.BookingID = ?";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -21,7 +25,6 @@ public class BookingDAO {
                 booking.setBookingID(rs.getInt("BookingID"));
                 booking.setUserID(rs.getInt("UserID"));
 
-                // Kiểm tra DiscountCodeID có thể null
                 Object discountObj = rs.getObject("DiscountCodeID");
                 if (discountObj != null) {
                     booking.setDiscountCodeID((Integer) discountObj);
@@ -30,7 +33,8 @@ public class BookingDAO {
                 booking.setStatus(rs.getString("Status"));
                 booking.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
                 booking.setOriginalAmount(rs.getDouble("OriginalAmount"));
-                booking.setTotalAmount(rs.getDouble("TotalAmount"));
+                booking.setFoodAmount(rs.getDouble("FoodAmount"));
+                booking.setTotalAmount(booking.getOriginalAmount() + booking.getFoodAmount());
 
                 return booking;
             }
@@ -42,9 +46,10 @@ public class BookingDAO {
         return null;
     }
 
-    // Tạo một bản ghi Booking mới và trả về bookingId
     public int createBooking(int userId, double originalAmount, double totalAmount) {
-        String sql = "INSERT INTO Booking (UserID, Status, OriginalAmount, TotalAmount) VALUES (?, 'Confirmed', ?, ?)";
+        String sql = "INSERT INTO Booking (UserID, Status, OriginalAmount, TotalAmount) " +
+                     "VALUES (?, 'Pending', ?, ?)";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -55,7 +60,7 @@ public class BookingDAO {
 
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
-                return rs.getInt(1); // BookingID
+                return rs.getInt(1);
             }
 
         } catch (Exception e) {
@@ -65,9 +70,9 @@ public class BookingDAO {
         return -1;
     }
 
-    // Gán TimeSlot vào Booking
     public void insertBookingTimeSlot(int bookingId, int timeSlotId) {
         String sql = "INSERT INTO BookingTimeSlot (BookingID, TimeSlotID) VALUES (?, ?)";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -79,4 +84,98 @@ public class BookingDAO {
             e.printStackTrace();
         }
     }
+
+    public List<Booking> getBookingsByUserId(int userId) {
+        List<Booking> list = new ArrayList<>();
+        String sql =
+            "SELECT b.*, " +
+            "       COALESCE(fo.TotalAmount, 0) AS FoodAmount, " +
+            "       COALESCE(p.Status, 'Pending') AS PaymentStatus " +
+            "FROM Booking b " +
+            "LEFT JOIN FoodOrder fo ON b.BookingID = fo.BookingID " +
+            "LEFT JOIN Payment p ON b.BookingID = p.BookingID " +
+            "WHERE b.UserID = ? " +
+            "ORDER BY b.CreatedAt DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Booking booking = new Booking();
+                booking.setBookingID(rs.getInt("BookingID"));
+                booking.setUserID(rs.getInt("UserID"));
+
+                Object discountObj = rs.getObject("DiscountCodeID");
+                if (discountObj != null) {
+                    booking.setDiscountCodeID((Integer) discountObj);
+                }
+
+                booking.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+                booking.setOriginalAmount(rs.getDouble("OriginalAmount"));
+                booking.setFoodAmount(rs.getDouble("FoodAmount"));
+                booking.setTotalAmount(booking.getOriginalAmount() + booking.getFoodAmount());
+                booking.setStatus(rs.getString("PaymentStatus"));
+
+                list.add(booking);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    // ✅ XÓA booking quá 15 phút chưa thanh toán
+    public void deleteExpiredPendingBookings() {
+        String deleteBookingTimeSlot =
+            "DELETE FROM BookingTimeSlot " +
+            "WHERE BookingID IN ( " +
+            "    SELECT BookingID FROM Booking " +
+            "    WHERE Status = 'Pending' AND DATEDIFF(MINUTE, CreatedAt, GETDATE()) > 5 " +
+            ")";
+
+        String deleteBooking =
+            "DELETE FROM Booking " +
+            "WHERE Status = 'Pending' AND DATEDIFF(MINUTE, CreatedAt, GETDATE()) > 5";
+
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement ps1 = conn.prepareStatement(deleteBookingTimeSlot);
+                 PreparedStatement ps2 = conn.prepareStatement(deleteBooking)) {
+
+                ps1.executeUpdate();
+                ps2.executeUpdate();
+
+                conn.commit();
+
+            } catch (Exception e) {
+                conn.rollback();
+                e.printStackTrace();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+        // ✅ Cập nhật trạng thái của đơn đặt sân
+    public boolean updateBookingStatus(int bookingId, String status) {
+        String sql = "UPDATE Booking SET Status = ? WHERE BookingID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, bookingId);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

@@ -1,27 +1,34 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public class Booking {
     private int bookingID;
     private int userID;
-    private Integer discountCodeID; // Có thể null
+    private Integer discountCodeID;
     private String status;
     private LocalDateTime createdAt;
     private double originalAmount;
+    private double foodAmount;
     private double totalAmount;
+    private String stadiumName;
+    private String timeSlot;
 
     public Booking() {
+        this.status = "Pending"; // ✅ Mặc định khi khởi tạo
     }
 
     public Booking(int bookingID, int userID, Integer discountCodeID, String status,
-                   LocalDateTime createdAt, double originalAmount, double totalAmount) {
+                   LocalDateTime createdAt, double originalAmount, double foodAmount, double totalAmount) {
         this.bookingID = bookingID;
         this.userID = userID;
         this.discountCodeID = discountCodeID;
         this.status = status;
         this.createdAt = createdAt;
         this.originalAmount = originalAmount;
+        this.foodAmount = foodAmount;
         this.totalAmount = totalAmount;
     }
 
@@ -73,6 +80,14 @@ public class Booking {
         this.originalAmount = originalAmount;
     }
 
+    public double getFoodAmount() {
+        return foodAmount;
+    }
+
+    public void setFoodAmount(double foodAmount) {
+        this.foodAmount = foodAmount;
+    }
+
     public double getTotalAmount() {
         return totalAmount;
     }
@@ -81,12 +96,58 @@ public class Booking {
         this.totalAmount = totalAmount;
     }
 
-    // Nếu cần dùng lại getter setPrice/setPrice thì bạn có thể tạo alias như sau:
     public double getPrice() {
         return totalAmount;
     }
 
     public void setPrice(double price) {
         this.totalAmount = price;
+    }
+
+    public String getStadiumName() {
+        return stadiumName;
+    }
+
+    public void setStadiumName(String stadiumName) {
+        this.stadiumName = stadiumName;
+    }
+
+    public String getTimeSlot() {
+        return timeSlot;
+    }
+
+    public void setTimeSlot(String timeSlot) {
+        this.timeSlot = timeSlot;
+    }
+
+    public Date getCreatedAtDate() {
+        return java.sql.Timestamp.valueOf(createdAt);
+    }
+
+    public String getFormattedCreatedAt() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        return createdAt.format(formatter);
+    }
+
+    public String getFormattedTotalAmount() {
+        return String.format("%,.0f", totalAmount);
+    }
+
+    // ✅ Kiểm tra trạng thái
+    public boolean isPending() {
+        return "Pending".equalsIgnoreCase(status);
+    }
+
+    public boolean isConfirmed() {
+        return "Confirmed".equalsIgnoreCase(status);
+    }
+
+    public boolean isCancelled() {
+        return "Cancelled".equalsIgnoreCase(status);
+    }
+
+    // ✅ Kiểm tra quá 15 phút chưa thanh toán
+    public boolean isExpired() {
+        return isPending() && createdAt.plusMinutes(15).isBefore(LocalDateTime.now());
     }
 }
