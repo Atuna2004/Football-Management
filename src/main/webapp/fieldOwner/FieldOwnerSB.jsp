@@ -14,9 +14,6 @@
 
 <!-- Left Navigation Sidebar -->
 <nav class="navigation-sidebar">
-    <div class="nav-header">
-        <h5><i class="fas fa-tachometer-alt me-2"></i>Menu</h5>
-    </div>
     <ul class="nav-menu">
         <li class="nav-item">
             <a href="${pageContext.request.contextPath}/fieldOwner/FODB.jsp" class="nav-link">
@@ -25,9 +22,15 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="${pageContext.request.contextPath}/confirmedBookings" class="nav-link">
                 <i class="fa-solid fa-clock"></i>
                 <span>Lịch đặt sân</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/pendingBookings" class="nav-link">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Đơn đặt sân</span>
             </a>
         </li>
         <li class="nav-item">
@@ -64,6 +67,12 @@
             <a href="#" class="nav-link">
                 <i class="fas fa-trophy"></i>
                 <span>Giải đấu</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-utensils"></i>
+                <span>Đồ ăn</span>
             </a>
         </li>
     </ul>
