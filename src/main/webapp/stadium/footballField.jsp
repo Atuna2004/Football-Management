@@ -86,7 +86,7 @@
                                                 </div>
                                                 <div class="row detail">
                                                     <div class="col-12 p-12">
-                                                        <a href="${pageContext.request.contextPath}/timeslot?stadiumId=${stadium.stadiumID}">
+                                                        <a href="${pageContext.request.contextPath}/stadium-detail?stadiumId=${stadium.stadiumID}">
                                                             <button class="btn btn-primary btn-sm"><span>Chi tiết</span></button>
                                                         </a>
                                                     </div>
