@@ -4,6 +4,8 @@ import connect.DBConnection;
 import model.Booking;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BookingDAO {
 
@@ -77,6 +79,104 @@ public class BookingDAO {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    
+    public List<Booking> getConfirmedBookings() {
+        String sql = "SELECT * FROM Booking WHERE Status = 'Confirmed'";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+            List<Booking> bookings = new ArrayList<>();
+
+            while (rs.next()) {
+                Booking booking = new Booking();
+                booking.setBookingID(rs.getInt("BookingID"));
+                booking.setUserID(rs.getInt("UserID"));
+
+                // Kiểm tra DiscountCodeID có thể null
+                Object discountObj = rs.getObject("DiscountCodeID");
+                if (discountObj != null) {
+                    booking.setDiscountCodeID((Integer) discountObj);
+                }
+
+                booking.setStatus(rs.getString("Status"));
+                booking.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+                booking.setOriginalAmount(rs.getDouble("OriginalAmount"));
+                booking.setTotalAmount(rs.getDouble("TotalAmount"));
+
+                bookings.add(booking);
+            }
+
+            return bookings;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public List<Booking> getPendingBookings() {
+        String sql = "SELECT * FROM Booking WHERE Status = 'Pending'";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+            List<Booking> bookings = new ArrayList<>();
+
+            while (rs.next()) {
+                Booking booking = new Booking();
+                booking.setBookingID(rs.getInt("BookingID"));
+                booking.setUserID(rs.getInt("UserID"));
+
+                // Kiểm tra DiscountCodeID có thể null
+                Object discountObj = rs.getObject("DiscountCodeID");
+                if (discountObj != null) {
+                    booking.setDiscountCodeID((Integer) discountObj);
+                }
+
+                booking.setStatus(rs.getString("Status"));
+                booking.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+                booking.setOriginalAmount(rs.getDouble("OriginalAmount"));
+                booking.setTotalAmount(rs.getDouble("TotalAmount"));
+
+                bookings.add(booking);
+            }
+
+            return bookings;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public boolean confirmBooking(int bookingId) {
+        String sql = "UPDATE Booking SET Status = 'Confirmed' WHERE BookingID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, bookingId);
+            int rowsAffected = ps.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean rejectBooking(int bookingId) {
+        String sql = "UPDATE Booking SET Status = 'Rejected' WHERE BookingID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, bookingId);
+            int rowsAffected = ps.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

@@ -6,6 +6,7 @@ import model.Stadium;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class StadiumDAO {
 
@@ -26,7 +27,8 @@ public class StadiumDAO {
 
                         rs.getString("status"),
                         rs.getTimestamp("createdAt"),
-                        rs.getString("phoneNumber")
+                        rs.getString("phoneNumber"),
+                        rs.getInt("OwnerID")
                 );
                 stadiumList.add(stadium);
             }
@@ -55,7 +57,8 @@ public class StadiumDAO {
                         rs.getString("description"),
                         rs.getString("status"),
                         rs.getTimestamp("createdAt"),
-                        rs.getString("phoneNumber")
+                        rs.getString("phoneNumber"),
+                        rs.getInt("OwnerID")
                 );
                 stadiumList.add(stadium);
             }
@@ -101,7 +104,8 @@ public class StadiumDAO {
 
                         rs.getString("status"),
                         rs.getTimestamp("createdAt"),
-                        rs.getString("phoneNumber")
+                        rs.getString("phoneNumber"),
+                        rs.getInt("OwnerID")
                 );
             }
 
@@ -113,7 +117,7 @@ public class StadiumDAO {
 
     // Insert new stadium
     public boolean insertStadium(Stadium stadium) {
-        String sql = "INSERT INTO Stadium(name, location, description, status, createdAt, phoneNumber) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Stadium(name, location, description, status, createdAt, phoneNumber, OwnerID) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -124,6 +128,7 @@ public class StadiumDAO {
             ps.setString(4, stadium.getStatus());
             ps.setTimestamp(5, new Timestamp(stadium.getCreatedAt().getTime()));
             ps.setString(6, stadium.getPhoneNumber());
+            ps.setInt(7, stadium.getOwnerID());
 
             return ps.executeUpdate() > 0;
 
@@ -135,7 +140,7 @@ public class StadiumDAO {
 
     // Update existing stadium
     public boolean updateStadium(Stadium stadium) {
-        String sql = "UPDATE Stadium SET name = ?, location = ?, description = ?, status = ?, createdAt = ?, phoneNumber = ? WHERE stadiumID = ?";
+        String sql = "UPDATE Stadium SET name = ?, location = ?, description = ?, status = ?, phoneNumber = ? WHERE stadiumID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -144,9 +149,9 @@ public class StadiumDAO {
             ps.setString(3, stadium.getDescription());
 
             ps.setString(4, stadium.getStatus());
-            ps.setTimestamp(5, new Timestamp(stadium.getCreatedAt().getTime()));
-            ps.setString(6, stadium.getPhoneNumber());
-            ps.setInt(7, stadium.getStadiumID());
+            
+            ps.setString(5, stadium.getPhoneNumber());
+            ps.setInt(6, stadium.getStadiumID());
 
             return ps.executeUpdate() > 0;
 
@@ -192,7 +197,8 @@ public class StadiumDAO {
 //                        rs.getString("type"),
                         rs.getString("status"),
                         rs.getTimestamp("createdAt"),
-                        rs.getString("phoneNumber")
+                        rs.getString("phoneNumber"),
+                        rs.getInt("OwnerID")
                 );
                 stadiumList.add(stadium);
             }
@@ -239,7 +245,8 @@ public List<Stadium> getStadiumsByOwnerId(int ownerId) {
 //                    rs.getString("type"),          // Nếu model có trường này
                     rs.getString("status"),
                     rs.getTimestamp("createdAt"),
-                    rs.getString("phoneNumber")
+                    rs.getString("phoneNumber"),
+                    rs.getInt("OwnerID")
             );
             stadiumList.add(stadium);
         }
@@ -293,7 +300,8 @@ public List<Stadium> getStadiumsByOwnerIdAndPage(int ownerId, int page, int reco
                     rs.getString("Description"),
                     rs.getString("Status"),
                     rs.getTimestamp("CreatedAt"),
-                    rs.getString("PhoneNumber")
+                    rs.getString("PhoneNumber"),
+                    rs.getInt("OwnerID")
             );
             stadiumList.add(stadium);
         }
@@ -307,18 +315,24 @@ public List<Stadium> getStadiumsByOwnerIdAndPage(int ownerId, int page, int reco
 //
 //    StadiumDAO stadiumDAO = new StadiumDAO();
 //    int ownerId = 1;
+//    int stadiumID = 3;
+//    
+//        Stadium stadiumToUpdate = new Stadium();
+//        stadiumToUpdate.setStadiumID(4);
+//        stadiumToUpdate.setName("2");
+//        stadiumToUpdate.setLocation("New Location City");
+//        stadiumToUpdate.setDescription("This is an updated description.");
+//        stadiumToUpdate.setStatus("inactive");
+//        stadiumToUpdate.setPhoneNumber("1112223333");
 //
-//    System.out.println("Tổng số sân của OwnerID " + ownerId + ": " + stadiumDAO.getTotalStadiumCountByOwnerId(ownerId));
+//        // Gọi hàm update trong DAO
+//        StadiumDAO dao = new StadiumDAO();
+//        boolean result = dao.updateStadium(stadiumToUpdate);
 //
-//    System.out.println("\nDanh sách tất cả sân của OwnerID " + ownerId + ":");
-//    for (Stadium s : stadiumDAO.getStadiumsByOwnerId(ownerId)) {
-//        System.out.println(s);
-//    }
-//
-//    int page = 1, recordsPerPage = 5;
-//    System.out.println("\nDanh sách sân (trang " + page + ") của OwnerID " + ownerId + ":");
-//    for (Stadium s : stadiumDAO.getStadiumsByOwnerIdAndPage(ownerId, page, recordsPerPage)) {
-//        System.out.println(s);
-//    }
+//        if (result) {
+//            System.out.println("Cập nhật sân thành công!");
+//        } else {
+//            System.out.println("Cập nhật sân thất bại hoặc không tìm thấy sân có ID = 4.");
+//        }
 //}
 }
