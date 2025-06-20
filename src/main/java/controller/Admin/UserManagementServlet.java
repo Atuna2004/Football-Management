@@ -29,8 +29,7 @@ public class UserManagementServlet extends HttpServlet {
             // Forward sang userManagement.jsp
             request.getRequestDispatcher("/admin/userManagement.jsp").forward(request, response);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ServletException | IOException | SQLException e) {
             throw new ServletException("Lỗi tải danh sách người dùng", e);
         }
     }
@@ -65,8 +64,7 @@ public class UserManagementServlet extends HttpServlet {
                     doGet(request, response);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ServletException | IOException | SQLException e) {
             request.setAttribute("error", "Lỗi xử lý hành động: " + e.getMessage());
             doGet(request, response);
         }
@@ -119,34 +117,56 @@ public class UserManagementServlet extends HttpServlet {
             throws IOException, ServletException, SQLException {
         request.setCharacterEncoding("UTF-8");
 
-        int userID = Integer.parseInt(request.getParameter("userID"));
-        String fullName = request.getParameter("fullName");
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        boolean isActive = "on".equals(request.getParameter("isActive"));
-        String address = request.getParameter("address");
-        String dobStr = request.getParameter("dateOfBirth");
+        try {
+            int userID = Integer.parseInt(request.getParameter("userID"));
+            String fullName = request.getParameter("fullName");
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+            boolean isActive = request.getParameter("isActive") != null;
+            String address = request.getParameter("address");
+            String dobStr = request.getParameter("dateOfBirth");
 
-        Date dob = null;
-        if (dobStr != null && !dobStr.isEmpty()) {
-            dob = Date.valueOf(dobStr);
-        }
+            // Các trường thêm vào
+            String googleID = request.getParameter("googleID");
+            String avatarUrl = request.getParameter("avatarUrl");
+            String passwordHash = request.getParameter("passwordHash");
 
-        User user = new User();
-        user.setUserID(userID);
-        user.setEmail(email);
-        user.setFullName(fullName);
-        user.setPhone(phone);
-        user.setActive(isActive);
-        user.setAddress(address);
-        user.setDateOfBirth(dob);
+            Date dob = null;
+            if (dobStr != null && !dobStr.isEmpty()) {
+                try {
+                    dob = Date.valueOf(dobStr);
+                } catch (IllegalArgumentException e) {
+                    request.setAttribute("error", "Ngày sinh không hợp lệ.");
+                    doGet(request, response);
+                    return;
+                }
+            }
 
-        boolean success = accountDAO.updateUser(user);
-        if (success) {
-            response.sendRedirect("user-list");
-        } else {
-            request.setAttribute("error", "Không thể cập nhật người dùng");
-            doGet(request, response); // Tải lại trang với lỗi
+            User user = new User();
+            user.setUserID(userID);
+            user.setEmail(email);
+            user.setFullName(fullName);
+            user.setPhone(phone);
+            user.setActive(isActive);
+            user.setAddress((address != null && !address.isEmpty()) ? address : null);
+            user.setDateOfBirth(dob);
+            user.setGoogleID((googleID != null && !googleID.isEmpty()) ? googleID : null);
+            user.setAvatarUrl((avatarUrl != null && !avatarUrl.isEmpty()) ? avatarUrl : null);
+
+            user.setPasswordHash((passwordHash != null && !passwordHash.isEmpty()) ? passwordHash : "");
+
+            boolean success = accountDAO.updateUser(user);
+
+            if (success) {
+                response.sendRedirect("user-list");
+            } else {
+                request.setAttribute("error", "Không thể cập nhật người dùng");
+                doGet(request, response);
+            }
+        } catch (ServletException | IOException | NumberFormatException | SQLException ex) {
+            ex.printStackTrace();
+            request.setAttribute("error", "Lỗi cập nhật người dùng: " + ex.getMessage());
+            doGet(request, response);
         }
     }
 
@@ -164,7 +184,6 @@ public class UserManagementServlet extends HttpServlet {
         try {
             success = accountDAO.deleteUser(userID);
         } catch (SQLException e) {
-            e.printStackTrace();
         }
 
         if (success) {

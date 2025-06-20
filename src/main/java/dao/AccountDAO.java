@@ -15,7 +15,7 @@ public class AccountDAO {
 
     public List<User> getAllUsers() throws SQLException {
         List<User> list = new ArrayList<>();
-        String sql = "SELECT u.UserID, u.FullName, u.Email, u.IsActive, r.RoleID, r.RoleName "
+        String sql = "SELECT u.UserID, u.FullName, u.Email, u.Phone, u.IsActive, u.Address, u.DateOfBirth, u.CreatedAt, u.AvatarUrl, u.GoogleID, r.RoleID, r.RoleName "
                 + "FROM [User] u "
                 + "LEFT JOIN UserRole ur ON u.UserID = ur.UserID "
                 + "LEFT JOIN Role r ON ur.RoleID = r.RoleID "
@@ -24,7 +24,6 @@ public class AccountDAO {
         Map<Integer, User> userMap = new HashMap<>();
 
         try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
-
             while (rs.next()) {
                 int id = rs.getInt("UserID");
                 User acc = userMap.get(id);
@@ -33,10 +32,17 @@ public class AccountDAO {
                     acc.setUserID(id);
                     acc.setFullName(rs.getString("FullName"));
                     acc.setEmail(rs.getString("Email"));
+                    acc.setPhone(rs.getString("Phone"));
                     acc.setActive(rs.getBoolean("IsActive"));
+                    acc.setAddress(rs.getString("Address"));
+                    acc.setDateOfBirth(rs.getDate("DateOfBirth"));
+                    acc.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                    acc.setAvatarUrl(rs.getString("AvatarUrl"));
+                    acc.setGoogleID(rs.getString("GoogleID"));
                     acc.setRoles(new ArrayList<>());
                     userMap.put(id, acc);
                 }
+
                 String roleName = rs.getString("RoleName");
                 if (roleName != null) {
                     acc.getRoles().add(new Role(rs.getInt("RoleID"), roleName));
@@ -207,7 +213,7 @@ public class AccountDAO {
     }
 
     public boolean deleteUser(int userID) throws SQLException {
-        String sql = "DELETE FROM [User] WHERE UserID = ?";
+        String sql = "UPDATE [User] SET IsActive = 0 WHERE UserID = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userID);
             return stmt.executeUpdate() > 0;
@@ -226,7 +232,9 @@ public class AccountDAO {
         u.setGoogleID(rs.getString("GoogleID"));
         u.setAvatarUrl(rs.getString("AvatarUrl"));
 
-        u.setDateOfBirth(rs.getObject("DateOfBirth", java.sql.Date.class));
+        u
+                .setDateOfBirth(rs.getObject("DateOfBirth", java.sql.Date.class
+                ));
         u.setAddress(rs.getString("Address"));
 
         return u;

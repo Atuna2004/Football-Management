@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>   
 <!DOCTYPE html>
 <html>
     <head>
@@ -168,16 +168,18 @@
 
             <div class="user-management">
                 <h2>Quản lý người dùng</h2>
-                <button class="add-btn" onclick="openAddModal()">
-                    + Thêm người dùng
-                </button>
+                <button class="add-btn" onclick="openAddModal()">+ Thêm người dùng</button>
 
-                <!-- Thông báo nếu không có dữ liệu -->
+
+                <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên hoặc email..." 
+                       style="padding: 10px 15px; width: 300px; margin: 15px 0 25px 0; border: 1px solid #ccc; border-radius: 6px;">
+
+
                 <c:if test="${empty userList}">
                     <p style="color: red; font-size: 16px;">Không có người dùng nào trong hệ thống.</p>
                 </c:if>
 
-                <!-- Bảng hiển thị người dùng -->
+
                 <c:if test="${not empty userList}">
                     <div class="table-container">
                         <table id="userTable">
@@ -186,6 +188,9 @@
                                     <th>ID</th>
                                     <th>Họ tên</th>
                                     <th>Email</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Địa chỉ</th>
+                                    <th>Ngày sinh</th>
                                     <th>Vai trò</th>
                                     <th>Trạng thái</th>
                                     <th>Hành động</th>
@@ -193,13 +198,20 @@
                             </thead>
                             <tbody>
                                 <c:forEach var="user" items="${userList}" varStatus="loop">
-                                    <tr class="user-row" data-name="${fn:toLowerCase(user.fullName)}" data-email="${fn:toLowerCase(user.email)}">
+                                    <tr class="user-row"
+                                        data-name="${fn:toLowerCase(user.fullName)}"
+                                        data-email="${fn:toLowerCase(user.email)}">
                                         <td>${user.userID}</td>
                                         <td>${user.fullName}</td>
                                         <td>${user.email}</td>
+                                        <td>${user.phone}</td>
+                                        <td>${user.address}</td>
+                                        <td>
+                                            <fmt:formatDate value="${user.dateOfBirth}" pattern="dd/MM/yyyy"/>
+                                        </td>
                                         <td>
                                             <c:forEach var="role" items="${user.roles}" varStatus="roleLoop">
-                                                ${role.roleName}${!roleLoop.last ? ', ' : ''}
+                                                ${role.roleName}<c:if test="${!roleLoop.last}">, </c:if>
                                             </c:forEach>
                                         </td>
                                         <td>
@@ -209,8 +221,15 @@
                                         </td>
                                         <td>
                                             <div class="action-buttons">
-                                                <button class="action-btn btn-edit"
-                                                        onclick="openEditModal(${user.userID}, '${user.fullName}', '${user.email}', '${user.phone}', '${user.address}', '<fmt:formatDate value='${user.dateOfBirth}' pattern='yyyy-MM-dd'/>', ${user.active})">
+                                                <button type="button" class="action-btn btn-edit"
+                                                        data-userid="${user.userID}"
+                                                        data-fullname="${fn:escapeXml(user.fullName)}"
+                                                        data-email="${fn:escapeXml(user.email)}"
+                                                        data-phone="${not empty user.phone ? fn:escapeXml(user.phone) : ''}"
+                                                        data-address="${not empty user.address ? fn:escapeXml(user.address) : ''}"
+                                                        data-dob="${not empty user.dateOfBirth ? user.dateOfBirth : ''}"
+                                                        data-active="${user.active}"
+                                                        onclick="handleEditClick(this)">
                                                     <i class="fas fa-edit"></i> Sửa
                                                 </button>
                                                 <form method="post" action="user-list" style="display:inline;" onsubmit="return confirm('Xác nhận xóa?')">
@@ -231,11 +250,12 @@
             </div>
         </div>
 
-        <!-- Modal Thêm/Sửa Người Dùng -->
-        <div id="userModal" class="modal">
+
+        <div id="userModal" class="modal">  
             <div class="modal-content">
                 <span class="close" onclick="closeModal()">&times;</span>
                 <h3 id="modalTitle">Thêm người dùng mới</h3>
+
                 <form id="userForm" method="post" action="user-list">
                     <input type="hidden" name="action" id="modalAction" value="add">
                     <input type="hidden" name="userID" id="modalUserID">
@@ -245,6 +265,12 @@
 
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" required><br/>
+
+
+                    <div id="passwordContainer">
+                        <label for="password">Mật khẩu:</label>
+                        <input type="password" id="password" name="passwordHash" required><br/>
+                    </div>
 
                     <label for="phone">Số điện thoại:</label>
                     <input type="text" id="phone" name="phone"><br/>
@@ -257,14 +283,15 @@
 
                     <label><input type="checkbox" id="isActive" name="isActive" checked> Hoạt động</label><br/><br/>
 
-                    <button type="submit" class="action-btn btn-edit">Lưu</button>
-                    <button type="button" class="action-btn btn-delete" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="action-btn btn-edit no-ripple">Lưu</button>
+                    <button type="button" class="action-btn btn-delete no-ripple" onclick="closeModal()">Hủy</button>
                 </form>
             </div>
         </div>
 
+
         <script>
-            // Ripple animation
+
             document.addEventListener('DOMContentLoaded', function () {
                 const buttons = document.querySelectorAll('.action-btn');
                 buttons.forEach(btn => {
@@ -272,9 +299,6 @@
                     btn.style.overflow = 'hidden';
 
                     btn.addEventListener('click', function (e) {
-                        if (!this.classList.contains('no-ripple')) {
-                            e.preventDefault();
-                        }
 
                         const ripple = document.createElement('span');
                         const rect = this.getBoundingClientRect();
@@ -309,36 +333,42 @@
             `;
             document.head.appendChild(style);
 
-            // Hàm mở modal thêm người dùng
+
             function openAddModal() {
                 document.getElementById("modalAction").value = "add";
                 document.getElementById("modalTitle").innerText = "Thêm người dùng mới";
                 document.getElementById("userForm").reset();
                 document.getElementById("modalUserID").value = "";
                 document.getElementById("userModal").style.display = "block";
+                document.getElementById("passwordContainer").style.display = "block";
+                document.getElementById("password").required = false;
             }
 
-            // Hàm mở modal sửa người dùng
-            function openEditModal(userID, fullName, email, phone, address, dob, isActive) {
-                document.getElementById("modalAction").value = "update";
-                document.getElementById("modalUserID").value = userID;
-                document.getElementById("fullName").value = fullName;
-                document.getElementById("email").value = email;
-                document.getElementById("phone").value = phone;
-                document.getElementById("address").value = address;
-                document.getElementById("dob").value = dob;
-                document.getElementById("isActive").checked = isActive;
 
+            function handleEditClick(button) {
+                document.getElementById("modalAction").value = "update";
+                document.getElementById("modalUserID").value = button.dataset.userid;
+                document.getElementById("fullName").value = button.dataset.fullname || "";
+                document.getElementById("email").value = button.dataset.email || "";
+                document.getElementById("phone").value = button.dataset.phone || "";
+                document.getElementById("address").value = button.dataset.address || "";
+                const dob = button.dataset.dob;
+                document.getElementById("dob").value = dob ? dob.substring(0, 10) : "";
+                const isActive = button.dataset.active === "true" || button.dataset.active === "1";
+                document.getElementById("isActive").checked = isActive;
                 document.getElementById("modalTitle").innerText = "Cập nhật người dùng";
                 document.getElementById("userModal").style.display = "block";
+                document.getElementById("passwordContainer").style.display = "none";
+                document.getElementById("password").removeAttribute("required");
             }
 
-            // Hàm đóng modal
+
+
             function closeModal() {
                 document.getElementById("userModal").style.display = "none";
             }
 
-            // Đóng modal khi click ra ngoài
+
             window.onclick = function (event) {
                 const modal = document.getElementById("userModal");
                 if (event.target === modal) {
@@ -346,7 +376,7 @@
                 }
             };
 
-            // Tìm kiếm người dùng
+
             document.getElementById("searchInput")?.addEventListener("input", function () {
                 const searchTerm = this.value.toLowerCase();
                 const rows = document.querySelectorAll(".user-row");
