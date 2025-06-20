@@ -41,7 +41,7 @@ public class StadiumDAO {
     }
 
     public boolean insertStadium(Stadium stadium) {
-        String sql = "INSERT INTO Stadium(name, location, description, status, createdAt, phoneNumber) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Stadium(name, location, description, status, createdAt, phoneNumber, OwnerID) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -51,6 +51,7 @@ public class StadiumDAO {
             ps.setString(4, stadium.getStatus());
             ps.setTimestamp(5, new Timestamp(stadium.getCreatedAt().getTime()));
             ps.setString(6, stadium.getPhoneNumber());
+            ps.setInt(7, stadium.getOwnerID());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -60,7 +61,7 @@ public class StadiumDAO {
     }
 
     public boolean updateStadium(Stadium stadium) {
-        String sql = "UPDATE Stadium SET name = ?, location = ?, description = ?, status = ?, createdAt = ?, phoneNumber = ? WHERE stadiumID = ?";
+        String sql = "UPDATE Stadium SET name = ?, location = ?, description = ?, status = ?, phoneNumber = ? WHERE stadiumID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -68,9 +69,8 @@ public class StadiumDAO {
             ps.setString(2, stadium.getLocation());
             ps.setString(3, stadium.getDescription());
             ps.setString(4, stadium.getStatus());
-            ps.setTimestamp(5, new Timestamp(stadium.getCreatedAt().getTime()));
-            ps.setString(6, stadium.getPhoneNumber());
-            ps.setInt(7, stadium.getStadiumID());
+            ps.setString(5, stadium.getPhoneNumber());
+            ps.setInt(6, stadium.getStadiumID());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -175,30 +175,64 @@ public class StadiumDAO {
         return stadiumList;
     }
 
-   public List<String> getDistinctCities() {
-    List<String> cities = new ArrayList<>();
-    String sql = "SELECT DISTINCT location FROM Stadium";
-    try (Connection conn = DBConnection.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-        while (rs.next()) {
-            String fullLocation = rs.getString("location");
-            if (fullLocation != null && fullLocation.contains(",")) {
-                String[] parts = fullLocation.split(",");
-                String city = parts[parts.length - 1].trim(); // lấy phần cuối
-                if (!cities.contains(city)) {
-                    cities.add(city);
+    public List<Stadium> getStadiumsByLocation(String location) {
+        List<Stadium> stadiumList = new ArrayList<>();
+        String sql = "SELECT * FROM Stadium WHERE location = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, location);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                stadiumList.add(mapResultSetToStadium(rs));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stadiumList;
+    }
+
+    public List<String> getDistinctLocations() {
+        List<String> locations = new ArrayList<>();
+        String sql = "SELECT DISTINCT location FROM Stadium WHERE location IS NOT NULL ORDER BY location";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                locations.add(rs.getString("location"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return locations;
+    }
+
+    public List<String> getDistinctCities() {
+        List<String> cities = new ArrayList<>();
+        String sql = "SELECT DISTINCT location FROM Stadium";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                String fullLocation = rs.getString("location");
+                if (fullLocation != null && fullLocation.contains(",")) {
+                    String[] parts = fullLocation.split(",");
+                    String city = parts[parts.length - 1].trim();
+                    if (!cities.contains(city)) {
+                        cities.add(city);
+                    }
                 }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return cities;
     }
-    return cities;
-}
 
-
-    // ✅ Lọc sân theo tỉnh/thành
     public List<Stadium> getStadiumsByCity(String city) {
         List<Stadium> stadiumList = new ArrayList<>();
         String sql = "SELECT * FROM Stadium WHERE location LIKE ?";
@@ -224,7 +258,8 @@ public class StadiumDAO {
                 rs.getString("description"),
                 rs.getString("status"),
                 rs.getTimestamp("createdAt"),
-                rs.getString("phoneNumber")
+                rs.getString("phoneNumber"),
+                rs.getInt("OwnerID")
         );
     }
 }

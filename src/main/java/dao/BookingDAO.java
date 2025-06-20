@@ -129,7 +129,6 @@ public class BookingDAO {
         return list;
     }
 
-    // ✅ XÓA booking quá 15 phút chưa thanh toán
     public void deleteExpiredPendingBookings() {
         String deleteBookingTimeSlot =
             "DELETE FROM BookingTimeSlot " +
@@ -163,7 +162,6 @@ public class BookingDAO {
         }
     }
 
-        // ✅ Cập nhật trạng thái của đơn đặt sân
     public boolean updateBookingStatus(int bookingId, String status) {
         String sql = "UPDATE Booking SET Status = ? WHERE BookingID = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -178,4 +176,99 @@ public class BookingDAO {
         return false;
     }
 
+    public List<Booking> getConfirmedBookings() {
+        String sql = "SELECT * FROM Booking WHERE Status = 'Confirmed'";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+            List<Booking> bookings = new ArrayList<>();
+
+            while (rs.next()) {
+                Booking booking = new Booking();
+                booking.setBookingID(rs.getInt("BookingID"));
+                booking.setUserID(rs.getInt("UserID"));
+
+                Object discountObj = rs.getObject("DiscountCodeID");
+                if (discountObj != null) {
+                    booking.setDiscountCodeID((Integer) discountObj);
+                }
+
+                booking.setStatus(rs.getString("Status"));
+                booking.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+                booking.setOriginalAmount(rs.getDouble("OriginalAmount"));
+                booking.setTotalAmount(rs.getDouble("TotalAmount"));
+
+                bookings.add(booking);
+            }
+
+            return bookings;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<Booking> getPendingBookings() {
+        String sql = "SELECT * FROM Booking WHERE Status = 'Pending'";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+            List<Booking> bookings = new ArrayList<>();
+
+            while (rs.next()) {
+                Booking booking = new Booking();
+                booking.setBookingID(rs.getInt("BookingID"));
+                booking.setUserID(rs.getInt("UserID"));
+
+                Object discountObj = rs.getObject("DiscountCodeID");
+                if (discountObj != null) {
+                    booking.setDiscountCodeID((Integer) discountObj);
+                }
+
+                booking.setStatus(rs.getString("Status"));
+                booking.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+                booking.setOriginalAmount(rs.getDouble("OriginalAmount"));
+                booking.setTotalAmount(rs.getDouble("TotalAmount"));
+
+                bookings.add(booking);
+            }
+
+            return bookings;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean confirmBooking(int bookingId) {
+        String sql = "UPDATE Booking SET Status = 'Confirmed' WHERE BookingID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, bookingId);
+            int rowsAffected = ps.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean rejectBooking(int bookingId) {
+        String sql = "UPDATE Booking SET Status = 'Rejected' WHERE BookingID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, bookingId);
+            int rowsAffected = ps.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

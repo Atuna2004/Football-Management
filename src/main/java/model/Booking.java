@@ -15,6 +15,8 @@ public class Booking {
     private double totalAmount;
     private String stadiumName;
     private String timeSlot;
+    private String userEmail;
+
 
     public Booking() {
         this.status = "Pending"; // ✅ Mặc định khi khởi tạo
@@ -149,5 +151,13 @@ public class Booking {
     // ✅ Kiểm tra quá 15 phút chưa thanh toán
     public boolean isExpired() {
         return isPending() && createdAt.plusMinutes(15).isBefore(LocalDateTime.now());
+    }
+    
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }
