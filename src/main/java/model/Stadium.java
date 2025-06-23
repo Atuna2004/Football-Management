@@ -11,12 +11,13 @@ public class Stadium {
     private String status;
     private Date createdAt;
     private String phoneNumber;
+    private int OwnerID;
 
     public Stadium() {
     }
 
 
-    public Stadium(int stadiumID, String name, String location, String description, String status, Date createdAt, String phoneNumber) {
+    public Stadium(int stadiumID, String name, String location, String description, String status, Date createdAt, String phoneNumber, int OwnerID) {
         this.stadiumID = stadiumID;
         this.name = name;
         this.location = location;
@@ -24,6 +25,7 @@ public class Stadium {
         this.status = status;
         this.createdAt = createdAt;
         this.phoneNumber = phoneNumber;
+        this.OwnerID = OwnerID;
     }
 
     public int getStadiumID() {
@@ -81,18 +83,12 @@ public class Stadium {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
-    
 
-    @Override
-public String toString() {
-    return "Stadium{" +
-            "stadiumID=" + stadiumID +
-            ", name='" + name + '\'' +
-            ", location='" + location + '\'' +
-            ", description='" + description + '\'' +
-            ", status='" + status + '\'' +
-            ", createdAt=" + createdAt +
-            ", phoneNumber='" + phoneNumber + '\'' +
-            '}';
-}
+    public int getOwnerID() {
+        return OwnerID;
+    }
+
+    public void setOwnerID(int OwnerID) {
+        this.OwnerID = OwnerID;
+    }
 }

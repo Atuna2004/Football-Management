@@ -1,0 +1,129 @@
+/* === Container chính === */
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding: 1rem 1.25rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #343a40;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-footer {
+    background-color: #fff;
+    border-top: none;
+    padding: 1rem;
+    text-align: right;
+}
+
+/* === Nhãn tiêu đề form === */
+.form-label {
+    font-weight: 500;
+    color: #343a40;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* === Các input và select === */
+.form-control,
+.form-select {
+    width: 100%;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    border: 1px solid #ced4da;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    outline: none;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* === Form group === */
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+/* === Checkbox === */
+.form-check {
+    margin-bottom: 1rem;
+}
+
+.form-check-input {
+    margin-top: 0.25rem;
+}
+
+.form-check-label {
+    margin-left: 0.5rem;
+    font-weight: 500;
+}
+
+/* === Nút hành động === */
+.btn-success {
+    background-color: #28a745;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 500;
+    border-radius: 8px;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 500;
+    border-radius: 8px;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 500;
+    border-radius: 8px;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* === Khoảng cách nút === */
+.btn-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* === Tiêu đề lớn === */
+h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #212529;
+}

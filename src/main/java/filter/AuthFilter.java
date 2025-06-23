@@ -10,9 +10,7 @@ import model.User;
 public class AuthFilter implements Filter {
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-      
-    }
+    public void init(FilterConfig filterConfig) throws ServletException {}
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -26,12 +24,6 @@ public class AuthFilter implements Filter {
 
         // Lấy currentUser từ session
         User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
-
-        // Chuyển hướng từ "/" hoặc "/home.jsp" sang dashboard nếu là admin
-        if ((path.equals("/") || path.equals("/home.jsp")) && currentUser != null && currentUser.isAdmin()) {
-            res.sendRedirect(req.getContextPath() + "/admin/adminPage.jsp");
-            return;
-        }
 
         // Cho phép truy cập /about mà không cần login
         if (path.equals("/about")) {
@@ -52,7 +44,5 @@ public class AuthFilter implements Filter {
     }
 
     @Override
-    public void destroy() {
-        // Dọn dẹp nếu cần
-    }
+    public void destroy() {}
 }
