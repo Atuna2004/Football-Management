@@ -59,7 +59,7 @@ public class UpdateProfileServlet extends HttpServlet {
                     return;
                 }
             }
-            phone = phone.replaceAll("\\D+", ""); // Chỉ giữ lại số
+            phone = phone.replaceAll("\\D+", "");
             if (phone.isEmpty()) {
                 HttpSession session = request.getSession();
                 session.setAttribute("errorMessage", "Số điện thoại không thể để trống.");

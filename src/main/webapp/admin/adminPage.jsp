@@ -12,20 +12,20 @@
                 padding: 0;
                 box-sizing: border-box;
             }
-            
+
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 min-height: 100vh;
                 color: #333;
             }
-            
+
             .main-content {
                 margin-left: 280px;
                 padding: 30px;
                 min-height: 100vh;
             }
-            
+
             .header {
                 background: rgba(255, 255, 255, 0.95);
                 backdrop-filter: blur(20px);
@@ -34,20 +34,20 @@
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
                 margin-bottom: 30px;
             }
-            
+
             .header h2 {
                 color: #333;
                 font-weight: 700;
                 font-size: 32px;
             }
-            
+
             .stats-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
                 gap: 25px;
                 margin-bottom: 40px;
             }
-            
+
             .stat-card {
                 background: rgba(255, 255, 255, 0.95);
                 backdrop-filter: blur(20px);
@@ -58,12 +58,12 @@
                 overflow: hidden;
                 transition: all 0.3s ease;
             }
-            
+
             .stat-card:hover {
                 transform: translateY(-5px);
                 box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
             }
-            
+
             .stat-card::before {
                 content: '';
                 position: absolute;
@@ -73,19 +73,19 @@
                 height: 4px;
                 background: linear-gradient(90deg, #667eea, #764ba2);
             }
-            
+
             .stat-card.primary::before {
                 background: linear-gradient(90deg, #667eea, #764ba2);
             }
-            
+
             .stat-card.success::before {
                 background: linear-gradient(90deg, #56ab2f, #a8e6cf);
             }
-            
+
             .stat-card.warning::before {
                 background: linear-gradient(90deg, #f093fb, #f5576c);
             }
-            
+
             .stat-card.danger::before {
                 background: linear-gradient(90deg, #4facfe, #00f2fe);
             }
@@ -101,19 +101,19 @@
                 color: white;
                 margin-bottom: 20px;
             }
-            
+
             .stat-card.primary .stat-icon {
                 background: linear-gradient(135deg, #667eea, #764ba2);
             }
-            
+
             .stat-card.success .stat-icon {
                 background: linear-gradient(135deg, #56ab2f, #a8e6cf);
             }
-            
+
             .stat-card.warning .stat-icon {
                 background: linear-gradient(135deg, #f093fb, #f5576c);
             }
-            
+
             .stat-card.danger .stat-icon {
                 background: linear-gradient(135deg, #4facfe, #00f2fe);
             }
@@ -126,14 +126,14 @@
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
-            
+
             .stat-value {
                 font-size: 32px;
                 font-weight: 700;
                 color: #333;
                 margin-bottom: 10px;
             }
-            
+
             .stat-change {
                 font-size: 12px;
                 color: #28a745;
@@ -148,7 +148,7 @@
                 margin-bottom: 30px;
                 overflow: hidden;
             }
-            
+
             .card-header {
                 padding: 25px 30px;
                 border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -156,30 +156,30 @@
                 justify-content: space-between;
                 align-items: center;
             }
-            
+
             .card-header h5 {
                 font-size: 20px;
                 font-weight: 700;
                 color: #333;
             }
-            
+
             .card-body {
                 padding: 30px;
             }
-            
+
             .table {
                 width: 100%;
                 border-collapse: collapse;
                 background: transparent;
             }
-            
+
             .table th,
             .table td {
                 padding: 15px;
                 text-align: left;
                 border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             }
-            
+
             .table th {
                 background: rgba(102, 126, 234, 0.1);
                 font-weight: 600;
@@ -188,11 +188,11 @@
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
-            
+
             .table tr:hover {
                 background: rgba(102, 126, 234, 0.05);
             }
-            
+
             .badge {
                 padding: 6px 12px;
                 border-radius: 20px;
@@ -201,17 +201,17 @@
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
-            
+
             .badge.success {
                 background: linear-gradient(135deg, #56ab2f, #a8e6cf);
                 color: white;
             }
-            
+
             .badge.pending {
                 background: linear-gradient(135deg, #f093fb, #f5576c);
                 color: white;
             }
-            
+
             .btn {
                 padding: 8px 16px;
                 border: none;
@@ -225,43 +225,43 @@
                 text-decoration: none;
                 display: inline-block;
             }
-            
+
             .btn:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             }
-            
+
             .btn-primary {
                 background: linear-gradient(135deg, #667eea, #764ba2);
                 color: white;
             }
-            
+
             .btn-info {
                 background: linear-gradient(135deg, #4facfe, #00f2fe);
                 color: white;
             }
-            
+
             .btn-success {
                 background: linear-gradient(135deg, #56ab2f, #a8e6cf);
                 color: white;
             }
-            
+
             .btn-danger {
                 background: linear-gradient(135deg, #f093fb, #f5576c);
                 color: white;
             }
-            
+
             .btn-outline {
                 background: transparent;
                 border: 2px solid #667eea;
                 color: #667eea;
             }
-            
+
             .btn-outline:hover {
                 background: #667eea;
                 color: white;
             }
-            
+
             .progress-container {
                 background: rgba(0, 0, 0, 0.1);
                 border-radius: 15px;
@@ -269,7 +269,7 @@
                 overflow: hidden;
                 margin-top: 20px;
             }
-            
+
             .progress-bar {
                 height: 100%;
                 background: linear-gradient(90deg, #667eea, #764ba2);
@@ -281,7 +281,7 @@
                 font-weight: 600;
                 transition: width 0.3s ease;
             }
-            
+
             .chart-placeholder {
                 height: 200px;
                 background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
@@ -293,32 +293,32 @@
                 font-style: italic;
                 margin-bottom: 20px;
             }
-            
+
             @media (max-width: 768px) {
                 .main-content {
                     margin-left: 0;
                     padding: 20px;
                 }
-                
+
                 .stats-grid {
                     grid-template-columns: 1fr;
                 }
-                
+
                 .card-header {
                     flex-direction: column;
                     gap: 15px;
                     align-items: flex-start;
                 }
-                
+
                 .table-responsive {
                     overflow-x: auto;
                 }
             }
-            
+
             .fade-in {
                 animation: fadeIn 0.6s ease-in;
             }
-            
+
             @keyframes fadeIn {
                 from {
                     opacity: 0;
@@ -356,7 +356,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-futbol"></i>
                     </div>
-                    <div class="stat-title">Sân Vận Động</div>
+                    <div class="stat-title">Sân Bóng Hoạt Động</div>
                     <div class="stat-value">45</div>
                     <div class="stat-change">↗ +3 sân mới</div>
                 </div>
@@ -364,90 +364,9 @@
                     <div class="stat-icon">
                         <i class="fas fa-dollar-sign"></i>
                     </div>
-                    <div class="stat-title">Doanh Thu Hôm Nay</div>
-                    <div class="stat-value">₫2.5M</div>
-                    <div class="stat-change">↗ +25% so với hôm qua</div>
-                </div>
-                <div class="stat-card danger">
-                    <div class="stat-icon">
-                        <i class="fas fa-calendar-plus"></i>
-                    </div>
-                    <div class="stat-title">Đơn Mới Nhất</div>
-                    <div class="stat-value">12</div>
-                    <div class="stat-change">↗ +4 đơn trong giờ qua</div>
-                </div>
-            </div>
-
-            <!-- Đơn đặt sân gần đây -->
-            <div class="card fade-in">
-                <div class="card-header">
-                    <h5><i class="fas fa-calendar-check"></i> Đơn Đặt Sân Mới Nhất</h5>
-                    <a href="#" class="btn btn-outline">Xem tất cả</a>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Khách Hàng</th>
-                                    <th>Sân</th>
-                                    <th>Thời Gian</th>
-                                    <th>Trạng Thái</th>
-                                    <th>Hành Động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>#1001</strong></td>
-                                    <td>
-                                        <div><strong>Nguyễn Văn A</strong><br><small>a@example.com</small></div>
-                                    </td>
-                                    <td>Sân Cầu Lông ABC</td>
-                                    <td>15:00 - 17:00<br><small>10/10/2024</small></td>
-                                    <td><span class="badge success">Hoàn Tất</span></td>
-                                    <td>
-                                        <button class="btn btn-info">Chi tiết</button>
-                                        <button class="btn btn-danger">Hủy</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>#1002</strong></td>
-                                    <td>
-                                        <div><strong>Lê Thị B</strong><br><small>b@example.com</small></div>
-                                    </td>
-                                    <td>Sân Bóng Nguyễn Huệ</td>
-                                    <td>18:00 - 20:00<br><small>10/10/2024</small></td>
-                                    <td><span class="badge pending">Chờ Xác Nhận</span></td>
-                                    <td>
-                                        <button class="btn btn-info">Chi tiết</button>
-                                        <button class="btn btn-success">Duyệt</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Biểu đồ doanh thu -->
-            <div class="card fade-in">
-                <div class="card-header">
-                    <h5><i class="fas fa-chart-line"></i> Thống Kê Doanh Thu Tuần Này</h5>
-                </div>
-                <div class="card-body">
-                    <div class="chart-placeholder">
-                        <i class="fas fa-chart-area fa-3x" style="opacity: 0.3;"></i>
-                        <div style="margin-left: 20px;">
-                            <div>Biểu đồ doanh thu sẽ được hiển thị tại đây</div>
-                            <small>Tích hợp Chart.js hoặc D3.js để hiển thị dữ liệu</small>
-                        </div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 75%">
-                            Đạt 75% mục tiêu tuần
-                        </div>
-                    </div>
+                    <div class="stat-title">Đơn chờ duyệt</div>
+                    <div class="stat-value">23</div>
+                    <div class="stat-change">↗ +21 đơn so với hôm qua</div>
                 </div>
             </div>
 
@@ -501,10 +420,10 @@
             </div>
         </div>
 
-        <!-- JS Ripple Animation -->
+      
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // Ripple effect on button click
+         
                 const buttons = document.querySelectorAll('.btn');
                 buttons.forEach(btn => {
                     btn.addEventListener('click', function (e) {
@@ -533,7 +452,7 @@
                 });
             });
 
-            // Animation keyframes
+         
             const style = document.createElement('style');
             style.textContent = `
                 @keyframes ripple {
