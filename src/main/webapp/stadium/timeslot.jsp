@@ -61,6 +61,10 @@
         .time-slot {
             font-weight: bold;
         }
+        .booked label {
+            background-color: #ffd6d6;
+            color: #a33;
+        }
     </style>
 </head>
 <body>
@@ -108,14 +112,22 @@
                             .getOrDefault(time, Collections.emptyList());
                 %>
                 <div class="day-column">
-                    <% for (TimeSlot slot : slots) { %>
-                        <div class="booking-item">
-                            <label>
-                                <input type="checkbox" name="timeSlotIds" value="<%= slot.getTimeSlotID() %>" />
-                                <%= slot.getFieldName() %> - <%= String.format("%.0f đ", slot.getPrice()) %>
-                            </label>
-                        </div>
-                    <% } %>
+                <% for (TimeSlot slot : slots) {
+                       boolean disabled = slot.isTrulyBooked(); %>
+                    <div class="booking-item <%= disabled ? "booked" : "" %>">
+                        <label>
+                            <input type="checkbox" name="timeSlotIds" value="<%= slot.getTimeSlotID() %>"
+                                   <%= disabled ? "disabled" : "" %> />
+                            <%= slot.getFieldName() %> - 
+                            <%= String.format("%.0f đ", slot.getPrice()) %>
+                            <% if (disabled) { %>
+                                <span style="color: red;">
+                                    (<%= "Confirmed".equalsIgnoreCase(slot.getBookingStatus()) ? "Đã đặt" : "Đang giữ chỗ" %>)
+                                </span>
+                            <% } %>
+                        </label>
+                    </div>
+                <% } %>
                 </div>
                 <% } %>
             <% } %>
