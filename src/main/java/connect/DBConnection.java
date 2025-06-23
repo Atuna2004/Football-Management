@@ -40,6 +40,7 @@ public class DBConnection {
         }
     }
 
+
     public static void main(String[] args) {
         Connection testConn = getConnection();
         if (testConn != null) {

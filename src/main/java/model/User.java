@@ -85,7 +85,7 @@ public class User {
         if (roles == null || roles.isEmpty()) {
             return false;
         }
-        return roles.stream().anyMatch(r -> "field_owner".equalsIgnoreCase(r.getRoleName()));
+        return roles.stream().anyMatch(r -> "owner".equalsIgnoreCase(r.getRoleName()));
     }
 
     public boolean isUser() {

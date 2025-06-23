@@ -5,6 +5,7 @@ import model.TimeSlot;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,11 +15,13 @@ public class TimeSlotDAO {
         List<TimeSlot> list = new ArrayList<>();
 
         String sql =
-            "SELECT ts.*, f.fieldName " +
+            "SELECT ts.*, f.fieldName, " +
+            "       b.Status AS bookingStatus, b.CreatedAt AS bookingCreatedAt " +
             "FROM TimeSlot ts " +
             "JOIN Field f ON ts.fieldID = f.fieldID " +
-            "WHERE f.stadiumID = ? " +
-            "AND ts.date BETWEEN ? AND ? " +
+            "LEFT JOIN BookingTimeSlot bts ON ts.TimeSlotID = bts.TimeSlotID " +
+            "LEFT JOIN Booking b ON bts.BookingID = b.BookingID " +
+            "WHERE f.stadiumID = ? AND ts.date BETWEEN ? AND ? " +
             "ORDER BY ts.date, ts.startTime";
 
         try (Connection conn = DBConnection.getConnection();
@@ -38,6 +41,19 @@ public class TimeSlotDAO {
                 ts.setEndTime(rs.getTime("endTime").toLocalTime());
                 ts.setPrice(rs.getDouble("price"));
                 ts.setFieldName(rs.getString("fieldName"));
+
+                String bookingStatus = rs.getString("bookingStatus");
+                Timestamp createdAt = rs.getTimestamp("bookingCreatedAt");
+
+                // Nếu có booking => mark as booked
+                if (bookingStatus != null && createdAt != null) {
+                    ts.setBooked(true);
+                    ts.setBookingStatus(bookingStatus);
+                    ts.setBookingCreatedAt(createdAt.toLocalDateTime());
+                } else {
+                    ts.setBooked(false); // Không bị đặt
+                }
+
                 list.add(ts);
             }
 
@@ -48,7 +64,7 @@ public class TimeSlotDAO {
         return list;
     }
 
-    // ✅ Hàm mới: Lấy giá theo TimeSlotID
+    // ✅ Hàm tiện ích: Lấy giá theo TimeSlotID
     public double getPriceByTimeSlotId(int timeSlotId) {
         String sql = "SELECT price FROM TimeSlot WHERE timeSlotID = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -64,6 +80,6 @@ public class TimeSlotDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 0.0; // Trả về 0 nếu không tìm thấy hoặc lỗi
+        return 0.0;
     }
 }

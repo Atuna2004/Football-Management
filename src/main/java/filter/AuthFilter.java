@@ -1,3 +1,4 @@
+
 package filter;
 
 import jakarta.servlet.*;
@@ -10,7 +11,9 @@ import model.User;
 public class AuthFilter implements Filter {
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
+    public void init(FilterConfig filterConfig) throws ServletException {
+      
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -25,6 +28,12 @@ public class AuthFilter implements Filter {
         // Lấy currentUser từ session
         User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
 
+        // Chuyển hướng từ "/" hoặc "/home.jsp" sang dashboard nếu là admin
+        if ((path.equals("/") || path.equals("/home.jsp")) && currentUser != null && currentUser.isAdmin()) {
+            res.sendRedirect(req.getContextPath() + "/admin/adminPage.jsp");
+            return;
+        }
+
         // Cho phép truy cập /about mà không cần login
         if (path.equals("/about")) {
             chain.doFilter(request, response);
@@ -34,7 +43,15 @@ public class AuthFilter implements Filter {
         // Kiểm tra nếu là đường dẫn trong /admin/*
         if (path.startsWith("/admin")) {
             if (currentUser == null || !currentUser.isAdmin()) {
-                res.sendRedirect(req.getContextPath() + "/account/login.jsp");
+                res.sendRedirect(req.getContextPath() + "/unauthorized.jsp");
+                return;
+            }
+        }
+        
+        // Kiểm tra nếu là đường dẫn trong /fieldOwner/*
+        if (path.startsWith("/fieldOwner")) {
+            if (currentUser == null || !currentUser.isFieldOwner()) {
+                res.sendRedirect(req.getContextPath() + "/unauthorized.jsp");
                 return;
             }
         }
@@ -44,5 +61,6 @@ public class AuthFilter implements Filter {
     }
 
     @Override
-    public void destroy() {}
-}
+    public void destroy() {
+        // Dọn dẹp nếu cần
+    }
