@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        * {
+* {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -355,14 +355,6 @@
     </style>
 </head>
 <body>
-    <!-- Animated background -->
-    <div class="bg-animation">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-    </div>
 
     <div class="confirm-container">
         <div class="confirm-box">
@@ -375,37 +367,88 @@
             </div>
 
             <div class="amount-summary">
-                <div class="amount-item">
-                    <div class="amount-label">
-                        <i class="fas fa-ticket-alt amount-icon" style="color: #e17055;"></i>
-                        <span>Giá vé sân</span>
+                <!-- Giá vé sân (đã giảm nếu có) -->
+                <c:choose>
+                    <c:when test="${not empty discountedTicketPrice}">
+                        <div class="amount-item">
+                            <div class="amount-label">
+                                <i class="fas fa-ticket-alt amount-icon" style="color: #0984e3;"></i>
+                                <span>Giá vé sân (đã giảm)</span>
+                            </div>
+                            <div class="amount-value">
+                                <fmt:formatNumber value="${discountedTicketPrice}" type="number" groupingUsed="true" /> đ
+                            </div>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="amount-item">
+                            <div class="amount-label">
+                                <i class="fas fa-ticket-alt amount-icon" style="color: #e17055;"></i>
+                                <span>Giá vé sân</span>
+                            </div>
+                            <div class="amount-value">
+                                <fmt:formatNumber value="${ticketPrice}" type="number" groupingUsed="true" /> đ
+                            </div>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+
+                <!-- Giá đồ ăn -->
+                <!-- Giá đồ ăn (đã giảm nếu có) -->
+                <c:choose>
+                    <c:when test="${not empty discountedFoodPrice}">
+                        <div class="amount-item">
+                            <div class="amount-label">
+                                <i class="fas fa-hamburger amount-icon" style="color: #fdcb6e;"></i>
+                                <span>Giá đồ ăn (đã giảm)</span>
+                            </div>
+                            <div class="amount-value">
+                                <fmt:formatNumber value="${discountedFoodPrice}" type="number" groupingUsed="true" /> đ
+                            </div>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="amount-item">
+                            <div class="amount-label">
+                                <i class="fas fa-hamburger amount-icon" style="color: #fdcb6e;"></i>
+                                <span>Giá đồ ăn</span>
+                            </div>
+                            <div class="amount-value">
+                                <fmt:formatNumber value="${foodPrice}" type="number" groupingUsed="true" /> đ
+                            </div>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+
+                <!-- Form áp dụng mã giảm giá -->
+                <form action="${pageContext.request.contextPath}/apply-discount" method="post" class="mb-4">
+                    <input type="hidden" name="bookingId" value="${bookingId}" />
+                    <input type="hidden" name="stadiumId" value="${stadiumId}" />
+                    <div class="input-group">
+                        <input type="text" name="discountCode" class="form-control" placeholder="Nhập mã giảm giá..." required>
+                        <button type="submit" class="btn btn-primary">Áp dụng</button>
                     </div>
-                    <div class="amount-value">
-                        <fmt:formatNumber value="${ticketPrice}" type="number" groupingUsed="true" /> đ
-                    </div>
-                </div>
-                
-                <div class="amount-item">
-                    <div class="amount-label">
-                        <i class="fas fa-hamburger amount-icon" style="color: #fdcb6e;"></i>
-                        <span>Giá đồ ăn</span>
-                    </div>
-                    <div class="amount-value">
-                        <fmt:formatNumber value="${foodPrice}" type="number" groupingUsed="true" /> đ
-                    </div>
-                </div>
-                
+                    <c:if test="${not empty discountMessage}">
+                        <div class="mt-2 text-success">${discountMessage}</div>
+                    </c:if>
+                    <c:if test="${not empty discountError}">
+                        <div class="mt-2 text-danger">${discountError}</div>
+                    </c:if>
+                </form>
+
+                <!-- Tổng cộng -->
                 <div class="amount-item">
                     <div class="amount-label">
                         <i class="fas fa-wallet amount-icon" style="color: #00b894;"></i>
                         <span>Tổng cộng</span>
                     </div>
                     <div class="amount-value">
-                        <fmt:formatNumber value="${totalAmount}" type="number" groupingUsed="true" /> đ
+                        <fmt:formatNumber value="${discountedTotalAmount != null ? discountedTotalAmount : totalAmount}" type="number" groupingUsed="true" /> đ
                     </div>
                 </div>
             </div>
 
+            <!-- Phương thức thanh toán -->
             <div class="payment-options">
                 <!-- Thanh toán tại sân -->
                 <div class="payment-form">
@@ -420,12 +463,12 @@
                     </form>
                 </div>
 
-                <!-- Thanh toán qua VNPay -->
+                <!-- Thanh toán VNPay -->
                 <div class="payment-form">
                     <form id="vnpayForm" action="${pageContext.request.contextPath}/payment" method="post">
                         <input type="hidden" name="stadiumId" value="${stadiumId}" />
                         <input type="hidden" name="bookingId" value="${bookingId}" />
-                        <input type="hidden" name="totalAmount" value="${totalAmount}" />
+                        <input type="hidden" name="totalAmount" value="${discountedTotalAmount != null ? discountedTotalAmount : totalAmount}" />
                         <input type="hidden" name="method" value="vnpay" />
                         <button type="submit" onclick="return confirmVNPayPayment()" class="payment-btn btn-vnpay">
                             <i class="fab fa-cc-visa btn-icon"></i>
@@ -437,51 +480,15 @@
         </div>
     </div>
 
-    <!-- JavaScript xác nhận -->
+    <!-- Xác nhận JS -->
     <script>
-        
-
         function confirmCashPayment() {
-            const confirmMsg = "💰 Bạn có chắc muốn thanh toán tại sân?\n\nBạn sẽ cần thanh toán trực tiếp khi đến sân.";
-            if (confirm(confirmMsg)) {
-                showNotification('Đang xử lý yêu cầu thanh toán tại sân...', 'info');
-                return true;
-            }
-            return false;
+            return confirm("💰 Bạn có chắc muốn thanh toán tại sân?\n\nBạn sẽ cần thanh toán trực tiếp khi đến sân.");
         }
 
         function confirmVNPayPayment() {
-            const confirmMsg = "🏦 Bạn có chắc muốn thanh toán qua VNPay?\n\nBạn sẽ được chuyển đến cổng thanh toán VNPay.";
-            if (confirm(confirmMsg)) {
-                showNotification('Đang chuyển đến cổng thanh toán VNPay...', 'info');
-                return true;
-            }
-            return false;
+            return confirm("🏦 Bạn có chắc muốn thanh toán qua VNPay?\n\nBạn sẽ được chuyển đến cổng thanh toán.");
         }
-
-        // Ripple effect
-        document.querySelectorAll('.payment-btn').forEach(button => {
-            button.addEventListener('click', function(e) {
-                const ripple = document.createElement('span');
-                const rect = this.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                const x = e.clientX - rect.left - size / 2;
-                const y = e.clientY - rect.top - size / 2;
-                
-                ripple.style.width = ripple.style.height = size + 'px';
-                ripple.style.left = x + 'px';
-                ripple.style.top = y + 'px';
-                ripple.classList.add('ripple');
-                
-                this.appendChild(ripple);
-                
-                setTimeout(() => {
-                    if (this.contains(ripple)) {
-                        ripple.remove();
-                    }
-                }, 600);
-            });
-        });
     </script>
 </body>
-</html>
+</html>  

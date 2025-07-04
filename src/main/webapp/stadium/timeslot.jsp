@@ -37,29 +37,16 @@
     <title>Lịch Đặt Sân</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/timeSlot.css"/>
     <style>
-        .booking-form {
-            width: 100%;
-        }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: center; }
+        th { background-color: #f0f0f0; }
         .booking-item label {
             display: block;
-            padding: 8px;
-            border: 1px solid #ccc;
-            margin: 3px;
-            background-color: #f0f0f0;
-            cursor: pointer;
-        }
-        .booking-item input[type="checkbox"] {
-            margin-right: 10px;
-        }
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: 100px repeat(7, 1fr);
-        }
-        .day-header, .time-slot, .day-column {
-            padding: 5px;
-        }
-        .time-slot {
-            font-weight: bold;
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin: 3px 0;
         }
         .booked label {
             background-color: #ffd6d6;
@@ -88,50 +75,71 @@
         </div>
     </div>
 
-    <!-- Form bao toàn bộ TimeSlot -->
     <form action="create-booking" method="get" class="booking-form">
         <input type="hidden" name="stadiumId" value="<%= stadiumId %>" />
 
-        <div class="calendar-grid">
-            <div class="time-column"></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Giờ</th>
+                    <th>Sân</th>
+                    <% for (int i = 0; i < 7; i++) {
+                        LocalDate date = startOfWeek.plusDays(i); %>
+                        <th><%= dayNamesVi[i] %><br><%= date.format(dayFormatter) %></th>
+                    <% } %>
+                </tr>
+            </thead>
+            <tbody>
+            <% for (LocalTime time : allTimes) {
+                   // Lấy tất cả sân có timeslot vào giờ này
+                   Set<String> fieldNames = new LinkedHashSet<>();
+                   for (int i = 0; i < 7; i++) {
+                       LocalDate date = startOfWeek.plusDays(i);
+                       List<TimeSlot> slots = groupedSlots.getOrDefault(date, Collections.emptyMap()).getOrDefault(time, Collections.emptyList());
+                       for (TimeSlot slot : slots) {
+                           fieldNames.add(slot.getFieldName());
+                       }
+                   }
 
-            <% for (int i = 0; i < 7; i++) {
-                LocalDate date = startOfWeek.plusDays(i); %>
-                <div class="day-header">
-                    <div class="day-name"><%= dayNamesVi[i] %></div>
-                    <div class="day-date"><%= date.format(dayFormatter) %></div>
-                </div>
-            <% } %>
+                   int rowSpan = fieldNames.size();
+                   int index = 0;
 
-            <% for (LocalTime time : allTimes) { %>
-                <div class="time-slot"><%= time.format(timeFormatter) %></div>
-                <% for (int i = 0; i < 7; i++) {
-                    LocalDate date = startOfWeek.plusDays(i);
-                    List<TimeSlot> slots = groupedSlots
-                            .getOrDefault(date, Collections.emptyMap())
-                            .getOrDefault(time, Collections.emptyList());
-                %>
-                <div class="day-column">
-                <% for (TimeSlot slot : slots) {
-                       boolean disabled = slot.isTrulyBooked(); %>
-                    <div class="booking-item <%= disabled ? "booked" : "" %>">
-                        <label>
-                            <input type="checkbox" name="timeSlotIds" value="<%= slot.getTimeSlotID() %>"
-                                   <%= disabled ? "disabled" : "" %> />
-                            <%= slot.getFieldName() %> - 
-                            <%= String.format("%.0f đ", slot.getPrice()) %>
-                            <% if (disabled) { %>
-                                <span style="color: red;">
-                                    (<%= "Confirmed".equalsIgnoreCase(slot.getBookingStatus()) ? "Đã đặt" : "Đang giữ chỗ" %>)
-                                </span>
-                            <% } %>
-                        </label>
-                    </div>
-                <% } %>
-                </div>
-                <% } %>
-            <% } %>
-        </div>
+                   for (String fieldName : fieldNames) { %>
+                       <tr>
+                           <% if (index == 0) { %>
+                               <td rowspan="<%= rowSpan %>"><%= time.format(timeFormatter) %></td>
+                           <% } %>
+                           <td><%= fieldName %></td>
+                           <% for (int i = 0; i < 7; i++) {
+                               LocalDate date = startOfWeek.plusDays(i);
+                               List<TimeSlot> slots = groupedSlots.getOrDefault(date, Collections.emptyMap()).getOrDefault(time, Collections.emptyList());
+                               boolean found = false;
+                               for (TimeSlot slot : slots) {
+                                   if (slot.getFieldName().equals(fieldName)) {
+                                       boolean disabled = slot.isTrulyBooked(); %>
+                                       <td>
+                                           <div class="booking-item <%= disabled ? "booked" : "" %>">
+                                               <label>
+                                                   <input type="checkbox" name="timeSlotIds" value="<%= slot.getTimeSlotID() %>" <%= disabled ? "disabled" : "" %> />
+                                                   <%= String.format("%.0f đ", slot.getPrice()) %>
+                                                   <% if (disabled) { %>
+                                                       <span style="color:red;">
+                                                           (<%= "Confirmed".equalsIgnoreCase(slot.getBookingStatus()) ? "Đã đặt" : "Đang giữ chỗ" %>)
+                                                       </span>
+                                                   <% } %>
+                                               </label>
+                                           </div>
+                                       </td>
+                                   <% found = true; break; }
+                               }
+                               if (!found) { %><td><div class="booking-item empty-slot placeholder-slot"></div> </td><% }
+                           } %>
+                       </tr>
+               <% index++;
+                   }
+               } %>
+            </tbody>
+        </table>
 
         <div style="text-align:center; margin-top:20px; display: flex; justify-content: center; gap: 20px;">
             <a href="${pageContext.request.contextPath}/stadiums" class="back-button">← Quay lại chọn sân</a>
@@ -140,4 +148,4 @@
     </form>
 </div>
 </body>
-</html>
+</html>  

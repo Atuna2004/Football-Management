@@ -271,4 +271,32 @@ public class BookingDAO {
             return false;
         }
     }
+    
+    public boolean applyDiscountCode(int bookingId, int discountCodeId, double newTotal) {
+        String sql = "UPDATE Booking SET DiscountCodeID = ?, TotalAmount = ? WHERE BookingID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, discountCodeId);
+            ps.setDouble(2, newTotal);
+            ps.setInt(3, bookingId);
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                // Tăng UsedCount của mã giảm giá
+                try (PreparedStatement ps2 = conn.prepareStatement(
+                        "UPDATE DiscountCode SET UsedCount = UsedCount + 1 WHERE DiscountCodeID = ?")) {
+                    ps2.setInt(1, discountCodeId);
+                    ps2.executeUpdate();
+                }
+                return true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
 }

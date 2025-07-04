@@ -122,5 +122,54 @@ public class PaymentDAO {
         }
     }
 
+    /**
+ * Lấy tổng tiền đã giảm (áp dụng mã giảm giá) theo BookingID.
+ * Ưu tiên từ bảng Booking nếu có DiscountPercent.
+ */
+    public double getBookingTotalAmount(int bookingId) {
+    String sql = "SELECT " +
+                 "  ISNULL((" +
+                 "    SELECT SUM(ts.Price) " +
+                 "    FROM BookingTimeSlot bts " +
+                 "    JOIN TimeSlot ts ON bts.TimeSlotID = ts.TimeSlotID " +
+                 "    WHERE bts.BookingID = ?" +
+                 "  ), 0) AS TicketTotal, " +
+                 "  ISNULL((" +
+                 "    SELECT SUM(TotalAmount) FROM FoodOrder WHERE BookingID = ?" +
+                 "  ), 0) AS FoodTotal, " +
+                 "  ISNULL(dc.DiscountPercent, 0) AS DiscountPercent " +
+                 "FROM Booking b " +
+                 "LEFT JOIN DiscountCode dc ON b.DiscountCodeID = dc.DiscountCodeID " +
+                 "WHERE b.BookingID = ?";
+
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, bookingId); // For TicketTotal
+        ps.setInt(2, bookingId); // For FoodTotal
+        ps.setInt(3, bookingId); // For Booking + join
+
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            double ticket = rs.getDouble("TicketTotal");
+            double food = rs.getDouble("FoodTotal");
+            int discount = rs.getInt("DiscountPercent");
+
+            double total = ticket + food;
+            if (discount > 0) {
+                total = total - (total * discount / 100.0);
+            }
+            return total;
+        }
+
+    } catch (Exception e) {
+        System.err.println("Lỗi khi tính tổng tiền sau giảm: " + e.getMessage());
+    }
+
+    return 0;
+}
+
+
+
 
 }

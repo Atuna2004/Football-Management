@@ -57,9 +57,8 @@ public class PaymentServlet extends HttpServlet {
 
             // ✅ Lấy tổng tiền từ DB
             PaymentDAO dao = new PaymentDAO();
-            double ticketPrice = dao.getTicketPrice(bookingId);
-            double foodPrice = dao.getFoodOrderTotal(bookingId);
-            double amount = ticketPrice + foodPrice;
+            double amount = dao.getBookingTotalAmount(bookingId);
+
 
             // ✅ Gửi sang VNPay nếu chọn VNPay
             if ("vnpay".equalsIgnoreCase(method)) {
