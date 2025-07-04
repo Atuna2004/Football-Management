@@ -3,25 +3,24 @@ package model;
 import java.util.Date;
 
 public class Report {
-
     private int reportID;
-    private String type;
+    private int userID;
+    private Integer relatedBookingID;
+    private Integer relatedFoodOrderID;
+    private String title;
     private String description;
-    private String reporterEmail;
-    private Date reportedAt;
+    private Date submittedAt;
     private String status;
+    private String adminResponse;
+    private Date respondedAt;
 
-    public Report() {
-    }
+    // Các trường bổ sung để hiển thị lên giao diện
+    private String userName;
+    private String userEmail;
+    private String type;
+    private String priority;
 
-    public Report(int reportID, String type, String description, String reporterEmail, Date reportedAt, String status) {
-        this.reportID = reportID;
-        this.type = type;
-        this.description = description;
-        this.reporterEmail = reporterEmail;
-        this.reportedAt = reportedAt;
-        this.status = status;
-    }
+    // Getters và Setters
 
     public int getReportID() {
         return reportID;
@@ -31,12 +30,36 @@ public class Report {
         this.reportID = reportID;
     }
 
-    public String getType() {
-        return type;
+    public int getUserID() {
+        return userID;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setUserID(int userID) {
+        this.userID = userID;
+    }
+
+    public Integer getRelatedBookingID() {
+        return relatedBookingID;
+    }
+
+    public void setRelatedBookingID(Integer relatedBookingID) {
+        this.relatedBookingID = relatedBookingID;
+    }
+
+    public Integer getRelatedFoodOrderID() {
+        return relatedFoodOrderID;
+    }
+
+    public void setRelatedFoodOrderID(Integer relatedFoodOrderID) {
+        this.relatedFoodOrderID = relatedFoodOrderID;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {
@@ -47,20 +70,12 @@ public class Report {
         this.description = description;
     }
 
-    public String getReporterEmail() {
-        return reporterEmail;
+    public Date getSubmittedAt() {
+        return submittedAt;
     }
 
-    public void setReporterEmail(String reporterEmail) {
-        this.reporterEmail = reporterEmail;
-    }
-
-    public Date getReportedAt() {
-        return reportedAt;
-    }
-
-    public void setReportedAt(Date reportedAt) {
-        this.reportedAt = reportedAt;
+    public void setSubmittedAt(Date submittedAt) {
+        this.submittedAt = submittedAt;
     }
 
     public String getStatus() {
@@ -69,5 +84,53 @@ public class Report {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getAdminResponse() {
+        return adminResponse;
+    }
+
+    public void setAdminResponse(String adminResponse) {
+        this.adminResponse = adminResponse;
+    }
+
+    public Date getRespondedAt() {
+        return respondedAt;
+    }
+
+    public void setRespondedAt(Date respondedAt) {
+        this.respondedAt = respondedAt;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
     }
 }

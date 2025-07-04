@@ -4,9 +4,9 @@ import java.sql.*;
 import java.util.*;
 import model.User;
 import model.Role;
+import service.PasswordService; 
 
 public class AccountDAO {
-
     private Connection conn;
 
     public AccountDAO(Connection conn) {
@@ -20,9 +20,7 @@ public class AccountDAO {
                 + "LEFT JOIN UserRole ur ON u.UserID = ur.UserID "
                 + "LEFT JOIN Role r ON ur.RoleID = r.RoleID "
                 + "ORDER BY u.UserID";
-
         Map<Integer, User> userMap = new HashMap<>();
-
         try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 int id = rs.getInt("UserID");
@@ -49,7 +47,6 @@ public class AccountDAO {
                 }
             }
         }
-
         list.addAll(userMap.values());
         return list;
     }
@@ -61,10 +58,8 @@ public class AccountDAO {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             int start = (page - 1) * itemsPerPage + 1;
             int end = page * itemsPerPage;
-
             stmt.setInt(1, start);
             stmt.setInt(2, end);
-
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(extractUser(rs));
@@ -80,7 +75,6 @@ public class AccountDAO {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, "%" + keyword + "%");
             stmt.setString(2, "%" + keyword + "%");
-
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(extractUser(rs));
@@ -142,35 +136,29 @@ public class AccountDAO {
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getEmail());
-            stmt.setString(2, user.getPasswordHash());
+            stmt.setString(2, PasswordService.hashPassword(user.getPasswordHash())); // <-- Hash mật khẩu trước khi lưu
             stmt.setString(3, user.getFullName());
             stmt.setString(4, user.getPhone());
             stmt.setBoolean(5, user.isActive());
             stmt.setString(6, user.getGoogleID());
             stmt.setString(7, user.getAvatarUrl());
-
             if (user.getDateOfBirth() != null) {
                 stmt.setDate(8, new java.sql.Date(user.getDateOfBirth().getTime()));
             } else {
                 stmt.setNull(8, Types.DATE);
             }
-
             if (user.getAddress() != null && !user.getAddress().isEmpty()) {
                 stmt.setString(9, user.getAddress());
             } else {
                 stmt.setNull(9, Types.VARCHAR);
             }
-
             int affectedRows = stmt.executeUpdate();
-
             if (affectedRows == 0) {
                 return false;
             }
-
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     int userID = generatedKeys.getInt(1);
-
                     String insertUserRoleSql = "INSERT INTO UserRole (UserID, RoleID) VALUES (?, 3)";
                     try (PreparedStatement ps = conn.prepareStatement(insertUserRoleSql)) {
                         ps.setInt(1, userID);
@@ -178,7 +166,6 @@ public class AccountDAO {
                     }
                 }
             }
-
             return true;
         }
     }
@@ -193,21 +180,17 @@ public class AccountDAO {
             stmt.setBoolean(5, user.isActive());
             stmt.setString(6, user.getGoogleID());
             stmt.setString(7, user.getAvatarUrl());
-
             if (user.getDateOfBirth() != null) {
                 stmt.setDate(8, new java.sql.Date(user.getDateOfBirth().getTime()));
             } else {
                 stmt.setNull(8, Types.DATE);
             }
-
             if (user.getAddress() != null && !user.getAddress().isEmpty()) {
                 stmt.setString(9, user.getAddress());
             } else {
                 stmt.setNull(9, Types.VARCHAR);
             }
-
             stmt.setInt(10, user.getUserID());
-
             return stmt.executeUpdate() > 0;
         }
     }
@@ -231,12 +214,8 @@ public class AccountDAO {
         u.setActive(rs.getBoolean("IsActive"));
         u.setGoogleID(rs.getString("GoogleID"));
         u.setAvatarUrl(rs.getString("AvatarUrl"));
-
-        u
-                .setDateOfBirth(rs.getObject("DateOfBirth", java.sql.Date.class
-                ));
+        u.setDateOfBirth(rs.getObject("DateOfBirth", java.sql.Date.class));
         u.setAddress(rs.getString("Address"));
-
         return u;
     }
 
@@ -251,7 +230,7 @@ public class AccountDAO {
     public boolean updatePassword(String email, String pass) throws SQLException {
         String sql = "UPDATE [User] SET PasswordHash = ? WHERE Email = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, pass);
+            stmt.setString(1, PasswordService.hashPassword(pass)); // <-- Hash mật khẩu trước khi cập nhật
             stmt.setString(2, email);
             return stmt.executeUpdate() > 0;
         }
@@ -267,4 +246,26 @@ public class AccountDAO {
         }
         return list;
     }
+    public User getUserByFacebookID(String facebookID) throws SQLException {
+    String sql = "SELECT * FROM [User] WHERE FacebookID = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, facebookID);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                User user = extractUser(rs);
+                user.setRoles(getUserRoles(user.getUserID()));
+                return user;
+            }
+        }
+    }
+    return null;
+}
+    public boolean updateFacebookID(int userID, String facebookID) throws SQLException {
+    String sql = "UPDATE [User] SET FacebookID = ? WHERE UserID = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, facebookID);
+        stmt.setInt(2, userID);
+        return stmt.executeUpdate() > 0;
+    }
+}
 }
