@@ -15,6 +15,7 @@ public class User {
     private boolean isActive;
     private String googleID;
     private String avatarUrl;
+    private String facebookID;
     private Date dateOfBirth;
     private String address;
 
@@ -172,4 +173,13 @@ public class User {
     public void setAddress(String address) {
         this.address = address;
     }
+
+
+public String getFacebookID() {
+    return facebookID;
+}
+
+public void setFacebookID(String facebookID) {
+    this.facebookID = facebookID;
+}
 }

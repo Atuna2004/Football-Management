@@ -98,7 +98,7 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="./userReport.jsp" class="nav-link">
+            <a href="<%= request.getContextPath() %>/admin/reports/user" class="nav-link">
                 <i class="fas fa-flag"></i>
                 Báo Cáo Người Dùng
             </a>
