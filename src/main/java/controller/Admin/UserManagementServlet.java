@@ -11,6 +11,7 @@ import model.User;
 import connect.DBConnection;
 import java.sql.Date;
 import java.sql.SQLException;
+import org.mindrot.jbcrypt.BCrypt;
 
 @WebServlet("/admin/user-list")
 public class UserManagementServlet extends HttpServlet {
@@ -23,14 +24,9 @@ public class UserManagementServlet extends HttpServlet {
             AccountDAO accountDAO = new AccountDAO(conn);
             List<User> userList = accountDAO.getAllUsers();
 
-            // Set attribute để truyền sang JSP
             request.setAttribute("userList", userList);
-
-            // Forward sang userManagement.jsp
             request.getRequestDispatcher("/admin/userManagement.jsp").forward(request, response);
-
         } catch (Exception e) {
-            e.printStackTrace();
             throw new ServletException("Lỗi tải danh sách người dùng", e);
         }
     }
@@ -41,8 +37,8 @@ public class UserManagementServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         if (action == null || action.isEmpty()) {
-            request.setAttribute("error", "Hành động không được cung cấp");
-            doGet(request, response); // Tải lại trang nếu lỗi
+            // Chuyển hướng lại servlet thay vì gọi doGet
+            response.sendRedirect("user-list");
             return;
         }
 
@@ -61,14 +57,12 @@ public class UserManagementServlet extends HttpServlet {
                     deleteUser(request, response, accountDAO);
                     break;
                 default:
-                    request.setAttribute("error", "Hành động không hợp lệ: " + action);
-                    doGet(request, response);
+                    response.sendRedirect("user-list");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi xử lý hành động: " + e.getMessage());
-            doGet(request, response);
+            response.sendRedirect("user-list"); // Chuyển hướng khi có lỗi
         }
     }
 
@@ -89,8 +83,7 @@ public class UserManagementServlet extends HttpServlet {
             try {
                 dob = Date.valueOf(dobStr);
             } catch (IllegalArgumentException ex) {
-                request.setAttribute("error", "Ngày sinh không hợp lệ: " + dobStr);
-                doGet(request, response);
+                response.sendRedirect("user-list");
                 return;
             }
         }
@@ -104,14 +97,12 @@ public class UserManagementServlet extends HttpServlet {
         user.setAddress(address);
         user.setDateOfBirth(dob);
 
-        System.out.println("Đang thêm người dùng: " + email);
         boolean success = accountDAO.addUser(user);
 
         if (success) {
             response.sendRedirect("user-list");
         } else {
-            request.setAttribute("error", "Không thể thêm người dùng mới");
-            doGet(request, response);
+            response.sendRedirect("user-list");
         }
     }
 
@@ -119,59 +110,82 @@ public class UserManagementServlet extends HttpServlet {
             throws IOException, ServletException, SQLException {
         request.setCharacterEncoding("UTF-8");
 
-        int userID = Integer.parseInt(request.getParameter("userID"));
-        String fullName = request.getParameter("fullName");
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        boolean isActive = "on".equals(request.getParameter("isActive"));
-        String address = request.getParameter("address");
-        String dobStr = request.getParameter("dateOfBirth");
+        try {
+            int userID = Integer.parseInt(request.getParameter("userID"));
+            String fullName = request.getParameter("fullName");
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+            boolean isActive = request.getParameter("isActive") != null;
+            String address = request.getParameter("address");
+            String dobStr = request.getParameter("dateOfBirth");
 
-        Date dob = null;
-        if (dobStr != null && !dobStr.isEmpty()) {
-            dob = Date.valueOf(dobStr);
-        }
+            String googleID = request.getParameter("googleID");
+            String avatarUrl = request.getParameter("avatarUrl");
+            String password = request.getParameter("passwordHash");
 
-        User user = new User();
-        user.setUserID(userID);
-        user.setEmail(email);
-        user.setFullName(fullName);
-        user.setPhone(phone);
-        user.setActive(isActive);
-        user.setAddress(address);
-        user.setDateOfBirth(dob);
+            Date dob = null;
+            if (dobStr != null && !dobStr.isEmpty()) {
+                try {
+                    dob = Date.valueOf(dobStr);
+                } catch (IllegalArgumentException e) {
+                    response.sendRedirect("user-list");
+                    return;
+                }
+            }
 
-        boolean success = accountDAO.updateUser(user);
-        if (success) {
+            User user = new User();
+            user.setUserID(userID);
+            user.setEmail(email);
+            user.setFullName(fullName);
+            user.setPhone(phone);
+            user.setActive(isActive);
+            user.setAddress((address != null && !address.isEmpty()) ? address : null);
+            user.setDateOfBirth(dob);
+            user.setGoogleID((googleID != null && !googleID.isEmpty()) ? googleID : null);
+            user.setAvatarUrl((avatarUrl != null && !avatarUrl.isEmpty()) ? avatarUrl : null);
+
+            if (password != null && !password.trim().isEmpty()) {
+                user.setPasswordHash(hashPassword(password));
+            } else {
+
+               User existing = accountDAO.getUserById(userID);
+                if (existing != null) {
+                    user.setPasswordHash(existing.getPasswordHash());
+                } else {
+                    response.sendRedirect("user-list");
+                    return;
+                }
+            }
+            boolean success = accountDAO.updateUser(user);
+
+            if (success) {
+                response.sendRedirect("user-list");
+            } else {
+                response.sendRedirect("user-list");
+            }
+        } catch (IOException | NumberFormatException | SQLException ex) {
             response.sendRedirect("user-list");
-        } else {
-            request.setAttribute("error", "Không thể cập nhật người dùng");
-            doGet(request, response); // Tải lại trang với lỗi
         }
     }
 
+    private String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
     private void deleteUser(HttpServletRequest request, HttpServletResponse response, AccountDAO accountDAO)
-            throws IOException, ServletException {
+            throws IOException {
         String idStr = request.getParameter("id");
         if (idStr == null || !idStr.matches("\\d+")) {
-            request.setAttribute("error", "ID người dùng không hợp lệ");
-            doGet(request, response);
+            response.sendRedirect("user-list");
             return;
         }
 
         int userID = Integer.parseInt(idStr);
-        boolean success = false;
         try {
-            success = accountDAO.deleteUser(userID);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        if (success) {
+            boolean success = accountDAO.deleteUser(userID);
             response.sendRedirect("user-list");
-        } else {
-            request.setAttribute("error", "Không thể xóa người dùng");
-            doGet(request, response);
+        } catch (SQLException e) {
+            response.sendRedirect("user-list");
         }
     }
 }

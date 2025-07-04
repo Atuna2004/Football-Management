@@ -1,3 +1,4 @@
+
 package filter;
 
 import jakarta.servlet.*;
@@ -42,7 +43,15 @@ public class AuthFilter implements Filter {
         // Kiểm tra nếu là đường dẫn trong /admin/*
         if (path.startsWith("/admin")) {
             if (currentUser == null || !currentUser.isAdmin()) {
-                res.sendRedirect(req.getContextPath() + "/account/login.jsp");
+                res.sendRedirect(req.getContextPath() + "/unauthorized.jsp");
+                return;
+            }
+        }
+        
+        // Kiểm tra nếu là đường dẫn trong /fieldOwner/*
+        if (path.startsWith("/fieldOwner")) {
+            if (currentUser == null || !currentUser.isFieldOwner()) {
+                res.sendRedirect(req.getContextPath() + "/unauthorized.jsp");
                 return;
             }
         }

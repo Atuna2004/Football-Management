@@ -13,6 +13,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Connection;
+import service.EmailService;
+import service.OTPGenerator;
 
 public class ForgotPasswordServlet extends HttpServlet {
     

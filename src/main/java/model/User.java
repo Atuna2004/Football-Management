@@ -65,6 +65,16 @@ public class User {
         this.roles = roles != null ? roles : new ArrayList<>();
     }
 
+    public String getRole() {
+        if (roles == null || roles.isEmpty()) {
+            return "Chưa phân vai";
+        }
+        return roles.stream()
+                .map(Role::getRoleName)
+                .reduce((r1, r2) -> r1 + ", " + r2)
+                .orElse("Chưa phân vai");
+    }
+
     public boolean isAdmin() {
         if (roles == null || roles.isEmpty()) {
             return false;
@@ -76,7 +86,7 @@ public class User {
         if (roles == null || roles.isEmpty()) {
             return false;
         }
-        return roles.stream().anyMatch(r -> "field_owner".equalsIgnoreCase(r.getRoleName()));
+        return roles.stream().anyMatch(r -> "owner".equalsIgnoreCase(r.getRoleName()));
     }
 
     public boolean isUser() {

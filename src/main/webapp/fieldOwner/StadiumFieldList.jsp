@@ -6,12 +6,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý sân bóng - Field Manager</title>
+    <title>Danh sách sân nhỏ - Field Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/stadiumList.css">
-    
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/fieldList.css">
 </head>
 <body>
     <!-- Top Header -->
@@ -48,36 +47,22 @@
     </div>
 
     <div class="dashboard-container">
-        <!-- Left Navigation Sidebar -->
-        <%@ include file="FieldOwnerSB.jsp" %>
-
         <!-- Main Content -->
-        <main class="main-content">
+        <main class="main-content-full">
             <div class="container-fluid">
                 <!-- Header Section -->
-                <div class="row row-cols-1 row-cols-md-3 mb-4">
-                    <div class="col mt-3">
-                        <h3><i class="fas fa-building me-2"></i>Danh sách sân bóng</h3>
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <h3><i class=""></i>Danh sách sân nhỏ - ${stadiumName}</h3>
                     </div>
-                    <div class="col mt-3">
-                        <form action="<%= request.getContextPath() %>/stadium" method="get">
-                            <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Tìm kiếm sân..." 
-                                       name="search" aria-label="Search input" value="${param.search}">
-                                <button class="btn btn-outline-primary" type="submit">
-                                    <i class="fa-solid fa-magnifying-glass"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col mt-3 text-end">
-                        <a href="<%= request.getContextPath() %>/stadium/config?action=create" class="btn btn-success text-white">
+                    <div class="col-md-4 text-end">
+                        <a href="<%= request.getContextPath() %>/fieldOwner/createField.jsp?stadiumId=${stadiumId}" class="btn btn-success text-white">
                             <i class="fas fa-plus me-2"></i>Thêm sân mới
                         </a>
                     </div>
                 </div>
 
-                <!-- Stadium Table -->
+                <!-- Fields Table -->
                 <div class="card">
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -85,54 +70,47 @@
                                 <thead class="table-dark">
                                     <tr>
                                         <th scope="col">#</th>
-                                        
                                         <th scope="col">Tên sân</th>
+                                        <th scope="col">Loại sân</th>
                                         <th scope="col">Mô tả</th>
-                                        <th scope="col">Vị trí</th>
                                         <th scope="col">Trạng thái</th>
                                         <th scope="col">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <c:choose>
-                                        <c:when test="${empty stadiums}">
+                                        <c:when test="${empty fields}">
                                             <tr>
-                                                <td colspan="7" class="text-center py-5">
+                                                <td colspan="6" class="text-center py-5">
                                                     <div class="text-muted">
-                                                        <i class="fas fa-building fa-3x mb-3"></i>
-                                                        <p class="mb-0">Chưa có sân bóng nào</p>
-                                                        <small>Hãy thêm sân bóng đầu tiên của bạn!</small>
+                                                        <i class="fas fa-futbol fa-3x mb-3"></i>
+                                                        <p class="mb-0">Chưa có sân nhỏ nào</p>
+                                                        <small>Hãy thêm sân nhỏ đầu tiên cho sân này!</small>
                                                     </div>
                                                 </td>
                                             </tr>
                                         </c:when>
                                         <c:otherwise>
-                                            <c:forEach items="${stadiums}" var="stadium" varStatus="index">
-                                                <tr class="stadium-row" data-stadium-id="${stadium.stadiumID}">
-                                                    <td>${(currentPage - 1) * 10 + index.index + 1}</td>
-                                                    
+                                            <c:forEach items="${fields}" var="field" varStatus="index">
+                                                <tr class="field-row">
+                                                    <td>${index.index + 1}</td>
                                                     <td>
-                                                        <div class="stadium-name">${stadium.name}</div>
-                                                        <div class="stadium-location">
-                                                            <i class="fas fa-map-marker-alt me-1"></i>${stadium.location}
-                                                        </div>
-                                                        <c:if test="${not empty stadium.phoneNumber}">
-                                                            <div class="stadium-location">
-                                                                <i class="fas fa-phone me-1"></i>${stadium.phoneNumber}
-                                                            </div>
-                                                        </c:if>
-                                                    </td>
-                                                    <td>
-                                                        <div class="stadium-description" title="${stadium.description}">
-                                                            ${stadium.description}
+                                                        <div class="field-name">${field.fieldName}</div>
+                                                        <div class="field-type">
+                                                            <i class="fas fa-tag me-1"></i>${field.type}
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <span class="badge bg-info text-dark">${stadium.location}</span>
+                                                        <span class="badge bg-primary">${field.type}</span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="field-description" title="${field.description}">
+                                                            ${field.description}
+                                                        </div>
                                                     </td>
                                                     <td>
                                                         <c:choose>
-                                                            <c:when test="${stadium.status == 'active'}">
+                                                            <c:when test="${field.isActive}">
                                                                 <span class="badge bg-success">
                                                                     <i class="fas fa-check-circle me-1"></i>Hoạt động
                                                                 </span>
@@ -146,7 +124,7 @@
                                                     </td>
                                                     <td>
                                                         <div class="btn-group" role="group">
-                                                            <a href="<%= request.getContextPath() %>/stadium/config?action=edit&id=${stadium.stadiumID}" 
+                                                            <a href="<%= request.getContextPath() %>/field/config?action=edit&id=${field.fieldID}" 
                                                                 class="btn btn-primary btn-sm btn-action" 
                                                                 onclick="event.stopPropagation();">
                                                                  <i class="fa-solid fa-pen-to-square"></i>
@@ -155,8 +133,8 @@
                                                                     class="btn btn-danger btn-sm btn-action delete-btn" 
                                                                     data-bs-toggle="modal" 
                                                                     data-bs-target="#deleteModal" 
-                                                                    data-id="${stadium.stadiumID}"
-                                                                    data-name="${stadium.name}"
+                                                                    data-id="${field.fieldID}"
+                                                                    data-name="${field.fieldName}"
                                                                     onclick="event.stopPropagation();">
                                                                 <i class="fa-solid fa-trash-can"></i>
                                                             </button>
@@ -172,34 +150,12 @@
                     </div>
                 </div>
 
-                <!-- Pagination -->
-                <c:if test="${totalPages > 0}">
-                    <nav class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <c:if test="${currentPage > 1}">
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=${currentPage - 1}&search=${param.search}">
-                                        <i class="fas fa-chevron-left"></i> Trước
-                                    </a>
-                                </li>
-                            </c:if>
-
-                            <c:forEach begin="1" end="${totalPages}" var="i">
-                                <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                    <a class="page-link" href="?page=${i}&search=${param.search}">${i}</a>
-                                </li>
-                            </c:forEach>
-
-                            <c:if test="${currentPage < totalPages}">
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=${currentPage + 1}&search=${param.search}">
-                                        Sau <i class="fas fa-chevron-right"></i>
-                                    </a>
-                                </li>
-                            </c:if>
-                        </ul>
-                    </nav>
-                </c:if>
+                <!-- Back to Stadium List Button -->
+                <div class="mt-4">
+                    <a href="<%= request.getContextPath() %>/fieldOwner/FOSTD" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách sân
+                    </a>
+                </div>
             </div>
         </main>
     </div>
@@ -215,7 +171,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Bạn có chắc chắn muốn xóa sân bóng <strong id="stadiumName"></strong> không?</p>
+                    <p>Bạn có chắc chắn muốn xóa sân nhỏ <strong id="fieldName"></strong> không?</p>
                     <div class="alert alert-warning">
                         <i class="fas fa-info-circle me-2"></i>
                         <strong>Lưu ý:</strong> Việc xóa sân sẽ ảnh hưởng đến tất cả các booking liên quan!
@@ -227,7 +183,8 @@
                     </button>
                     <form id="deleteForm" method="post" style="display: inline;">
                         <input type="hidden" name="action" value="delete">
-                        <input type="hidden" name="stadiumId" id="deleteId">
+                        <input type="hidden" name="fieldId" id="deleteId">
+                        <input type="hidden" name="stadiumId" value="${stadiumId}">
                         <button type="submit" class="btn btn-danger">
                             <i class="fas fa-trash me-2"></i>Xóa
                         </button>
@@ -241,29 +198,44 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Handle stadium row click - navigate to stadium details
-            const stadiumRows = document.querySelectorAll('.stadium-row');
-            stadiumRows.forEach(row => {
+            // Handle field row click - navigate to field details or bookings
+            const fieldRows = document.querySelectorAll('.field-row');
+            fieldRows.forEach(row => {
                 row.addEventListener('click', function() {
-                    const stadiumId = this.getAttribute('data-stadium-id');
-                    window.location.href = '<%= request.getContextPath() %>/fieldOwner/StadiumFieldList?id=' + stadiumId;
+                    const fieldId = this.getAttribute('data-field-id');
+                    // You can customize this URL based on your requirements
+                    // For example, navigate to field bookings or field details
+                    window.location.href = '<%= request.getContextPath() %>/field/bookings?id=' + fieldId;
                 });
+
+        // Add search functionality with debounce
+        let searchTimeout;
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    // Auto-submit search after 500ms of no typing
+                    // this.form.submit();
+                }, 500);
+            });
+        }
             });
 
             // Handle delete modal
             const deleteButtons = document.querySelectorAll(".delete-btn");
             const deleteIdInput = document.getElementById("deleteId");
-            const stadiumNameSpan = document.getElementById("stadiumName");
+            const fieldNameSpan = document.getElementById("fieldName");
             const deleteForm = document.getElementById("deleteForm");
 
             deleteButtons.forEach(button => {
                 button.addEventListener("click", function () {
-                    const stadiumId = this.getAttribute("data-id");
-                    const stadiumName = this.getAttribute("data-name");
+                    const fieldId = this.getAttribute("data-id");
+                    const fieldName = this.getAttribute("data-name");
                     
-                    deleteIdInput.value = stadiumId;
-                    stadiumNameSpan.textContent = stadiumName;
-                    deleteForm.action = '<%= request.getContextPath() %>/stadium/config';
+                    deleteIdInput.value = fieldId;
+                    fieldNameSpan.textContent = fieldName;
+                    deleteForm.action = '<%= request.getContextPath() %>/field/config';
                 });
             });
 

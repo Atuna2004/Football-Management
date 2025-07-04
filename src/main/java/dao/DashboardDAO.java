@@ -72,9 +72,8 @@ public class DashboardDAO {
             // 3. Lấy tổng số sân
             String totalFieldsQuery = 
                 "SELECT COUNT(*) " +
-                "FROM Field f " +
-                "JOIN Stadium s ON f.StadiumID = s.StadiumID " +
-                "WHERE s.OwnerID = ?";
+                "FROM Stadium " +
+                "WHERE OwnerID = ?";
             
             try (PreparedStatement stmt = conn.prepareStatement(totalFieldsQuery)) {
                 stmt.setInt(1, ownerID);
