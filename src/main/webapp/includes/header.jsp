@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -56,6 +56,7 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="<%= request.getContextPath() %>/account/profile.jsp">Hồ sơ</a></li>
+                                    <li><a class="dropdown-item" href="<%= request.getContextPath() %>/booking-history">Lịch sử đặt hàng</a></li>
                                     <li><a class="dropdown-item" href="<%= request.getContextPath() %>/logout">Đăng xuất</a></li>
                                 </ul>
                             </div>

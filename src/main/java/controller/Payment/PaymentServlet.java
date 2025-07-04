@@ -1,11 +1,12 @@
 package controller.Payment;
 
+import dao.FoodOrderDAO;
 import dao.PaymentDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
+import model.CartItem;
+import model.User;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -16,22 +17,51 @@ import java.util.*;
 public class PaymentServlet extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         try {
             String method = request.getParameter("method");
             String stadiumId = request.getParameter("stadiumId");
             String bookingIdRaw = request.getParameter("bookingId");
-            String totalAmountRaw = request.getParameter("totalAmount");
 
-            if (bookingIdRaw == null || totalAmountRaw == null) {
+            if (bookingIdRaw == null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Thiếu thông tin thanh toán.");
                 return;
             }
 
             int bookingId = Integer.parseInt(bookingIdRaw);
-            double amount = Double.parseDouble(totalAmountRaw);
+            int stadiumIdInt = Integer.parseInt(stadiumId);
 
-            // VNPay logic
+            // ✅ Lấy session
+            HttpSession session = request.getSession(false);
+            List<CartItem> cart = (session != null) ? (List<CartItem>) session.getAttribute("cart") : null;
+            User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
+
+            // ✅ Ghi đơn món nếu có
+            if (cart != null && currentUser != null && !cart.isEmpty()) {
+                FoodOrderDAO foodOrderDAO = new FoodOrderDAO();
+                double cartFoodTotal = 0;
+                for (CartItem item : cart) {
+                    cartFoodTotal += item.getFoodItem().getPrice() * item.getQuantity();
+                }
+
+                int foodOrderId = foodOrderDAO.createFoodOrder(currentUser.getUserID(), stadiumIdInt, bookingId, cartFoodTotal);
+                if (foodOrderId != -1) {
+                    foodOrderDAO.insertOrderItems(foodOrderId, cart);
+                    foodOrderDAO.reduceStock(cart);
+                }
+
+                // ❌ Xoá giỏ hàng sau khi xử lý
+                session.removeAttribute("cart");
+            }
+
+            // ✅ Lấy tổng tiền từ DB
+            PaymentDAO dao = new PaymentDAO();
+            double ticketPrice = dao.getTicketPrice(bookingId);
+            double foodPrice = dao.getFoodOrderTotal(bookingId);
+            double amount = ticketPrice + foodPrice;
+
+            // ✅ Gửi sang VNPay nếu chọn VNPay
             if ("vnpay".equalsIgnoreCase(method)) {
                 String vnp_TxnRef = Config.getRandomNumber(8);
                 String vnp_IpAddr = Config.getIpAddress(request);
@@ -58,43 +88,39 @@ public class PaymentServlet extends HttpServlet {
                 calendar.add(Calendar.MINUTE, 15);
                 vnp_Params.put("vnp_ExpireDate", sdf.format(calendar.getTime()));
 
-                // Hash + tạo URL
+                // Tạo hash + query
                 List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
                 Collections.sort(fieldNames);
                 StringBuilder hashData = new StringBuilder();
                 StringBuilder query = new StringBuilder();
                 for (int i = 0; i < fieldNames.size(); i++) {
-    String name = fieldNames.get(i);
-    String value = vnp_Params.get(name);
+                    String name = fieldNames.get(i);
+                    String value = vnp_Params.get(name);
 
-    // ✅ BẢN TEST VNPay: hashData CŨNG ENCODE luôn!
-    hashData.append(name).append('=').append(URLEncoder.encode(value, "UTF-8"));
+                    hashData.append(name).append('=').append(URLEncoder.encode(value, "UTF-8"));
+                    query.append(URLEncoder.encode(name, "UTF-8"))
+                         .append('=')
+                         .append(URLEncoder.encode(value, "UTF-8"));
 
-    // ✅ query cũng ENCODE
-    query.append(URLEncoder.encode(name, "UTF-8"))
-         .append('=')
-         .append(URLEncoder.encode(value, "UTF-8"));
-
-    if (i < fieldNames.size() - 1) {
-        hashData.append('&');
-        query.append('&');
-    }
-}
-
+                    if (i < fieldNames.size() - 1) {
+                        hashData.append('&');
+                        query.append('&');
+                    }
+                }
 
                 String secureHash = Config.hmacSHA512(Config.secretKey, hashData.toString());
                 query.append("&vnp_SecureHash=").append(secureHash);
                 String paymentUrl = Config.vnp_PayUrl + "?" + query;
 
-                // Ghi DB
-                boolean saved = new PaymentDAO().createPayment(bookingId, amount, "vnpay", "Pending", vnp_TxnRef);
+                // Ghi vào DB
+                boolean saved = dao.createPayment(bookingId, amount, "vnpay", "Pending", vnp_TxnRef);
                 if (saved) {
                     response.sendRedirect(paymentUrl);
                 } else {
                     response.getWriter().write("❌ Không thể ghi thanh toán vào cơ sở dữ liệu.");
                 }
+
             } else {
-                // Trường hợp khác (offline hoặc momo)
                 response.getWriter().write("Phương thức chưa hỗ trợ.");
             }
 

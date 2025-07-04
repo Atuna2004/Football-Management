@@ -493,34 +493,52 @@
     </div>
 </div>
 
-<!-- JavaScript cho filter -->
 <script>
-    document.getElementById("searchInput").addEventListener("input", filterActivities);
-    document.getElementById("typeFilter").addEventListener("change", filterActivities);
+document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("searchInput");
+    const typeFilter = document.getElementById("typeFilter");
+    const dateFilter = document.getElementById("dateFilter");
+    const cards = document.querySelectorAll(".activity-card");
 
     function filterActivities() {
-        const search = document.getElementById("searchInput").value.toLowerCase();
-        const type = document.getElementById("typeFilter").value;
+        const searchTerm = searchInput.value.toLowerCase();
+        const type = typeFilter.value;
+        const date = dateFilter.value;
+        const now = new Date();
 
-        document.querySelectorAll(".activity-card").forEach(card => {
-            const user = card.getAttribute("data-user");
-            const desc = card.getAttribute("data-desc");
+        cards.forEach(card => {
+            const user = card.dataset.user;
+            const desc = card.dataset.desc;
+            const activityType = card.dataset.type;
+            const timestamp = new Date(card.querySelector(".activity-time").textContent.split("/").reverse().join("-")); // Simplistic parsing
 
-            let show = true;
+            let matchesSearch = user.includes(searchTerm) || desc.includes(searchTerm);
+            let matchesType = !type || activityType === type;
+            let matchesDate = true;
 
-            if (type && card.getAttribute("data-type") !== type) show = false;
-            if (search && !user.includes(search) && !desc.includes(search)) show = false;
+            if (date === "today") {
+                const isToday = timestamp.toDateString() === now.toDateString();
+                matchesDate = isToday;
+            } else if (date === "week") {
+                const startOfWeek = new Date(now);
+                startOfWeek.setDate(now.getDate() - now.getDay());
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+                matchesDate = timestamp >= startOfWeek && timestamp <= endOfWeek;
+            } else if (date === "month") {
+                matchesDate = timestamp.getMonth() === now.getMonth() && timestamp.getFullYear() === now.getFullYear();
+            }
 
-            card.style.display = show ? "block" : "none";
+            if (matchesSearch && matchesType && matchesDate) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
         });
     }
 
-    // Ripple animation
-    document.addEventListener('DOMContentLoaded', function () {
-        const buttons = document.querySelectorAll('.btn');
-        buttons.forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                const ripple = document.createElement('span');
-                const rect = this.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                ripple.style.cssText = `
+    searchInput.addEventListener("input", filterActivities);
+    typeFilter.addEventListener("change", filterActivities);
+    dateFilter.addEventListener("change", filterActivities);
+});
+</script>

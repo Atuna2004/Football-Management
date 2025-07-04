@@ -71,7 +71,7 @@
                         </form>
                     </div>
                     <div class="col mt-3 text-end">
-                        <a href="<%= request.getContextPath() %>/addstadium" class="btn btn-success text-white">
+                        <a href="<%= request.getContextPath() %>/stadium/config?action=create" class="btn btn-success text-white">
                             <i class="fas fa-plus me-2"></i>Thêm sân mới
                         </a>
                     </div>
@@ -146,11 +146,11 @@
                                                     </td>
                                                     <td>
                                                         <div class="btn-group" role="group">
-                                                            <a href="<%= request.getContextPath() %>/stadium/edit?id=${stadium.stadiumID}" 
-                                                               class="btn btn-primary btn-sm btn-action" 
-                                                               onclick="event.stopPropagation();">
-                                                                <i class="fa-solid fa-pen-to-square"></i>
-                                                            </a>
+                                                            <a href="<%= request.getContextPath() %>/stadium/config?action=edit&id=${stadium.stadiumID}" 
+                                                                class="btn btn-primary btn-sm btn-action" 
+                                                                onclick="event.stopPropagation();">
+                                                                 <i class="fa-solid fa-pen-to-square"></i>
+                                                             </a>
                                                             <button type="button" 
                                                                     class="btn btn-danger btn-sm btn-action delete-btn" 
                                                                     data-bs-toggle="modal" 
@@ -246,7 +246,7 @@
             stadiumRows.forEach(row => {
                 row.addEventListener('click', function() {
                     const stadiumId = this.getAttribute('data-stadium-id');
-                    window.location.href = '<%= request.getContextPath() %>/stadium/details?id=' + stadiumId;
+                    window.location.href = '<%= request.getContextPath() %>/fieldOwner/StadiumFieldList?id=' + stadiumId;
                 });
             });
 
@@ -263,7 +263,7 @@
                     
                     deleteIdInput.value = stadiumId;
                     stadiumNameSpan.textContent = stadiumName;
-                    deleteForm.action = '<%= request.getContextPath() %>/stadium/delete';
+                    deleteForm.action = '<%= request.getContextPath() %>/stadium/config';
                 });
             });
 

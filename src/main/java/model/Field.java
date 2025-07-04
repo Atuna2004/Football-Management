@@ -1,24 +1,25 @@
 package model;
 
-
 public class Field {
     private int fieldID;        // ID của sân nhỏ
     private int stadiumID;      // ID của sân lớn mà sân nhỏ thuộc về
     private String fieldName;   // Tên sân nhỏ (ví dụ: "Sân 5 người A1")
     private String type;        // Loại sân (ví dụ: "5 người", "7 người")
     private String description; // Mô tả chi tiết về sân nhỏ
+    private boolean isActive;   // Trạng thái hoạt động
 
     // Constructor mặc định
     public Field() {
     }
 
     // Constructor đầy đủ tham số
-    public Field(int fieldID, int stadiumID, String fieldName, String type, String description) {
+    public Field(int fieldID, int stadiumID, String fieldName, String type, String description, boolean isActive) {
         this.fieldID = fieldID;
         this.stadiumID = stadiumID;
         this.fieldName = fieldName;
         this.type = type;
         this.description = description;
+        this.isActive = isActive;
     }
 
     // Getter và Setter cho fieldID
@@ -64,5 +65,14 @@ public class Field {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    // Getter và Setter cho isActive
+    public boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
     }
 }

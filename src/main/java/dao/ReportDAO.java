@@ -1,61 +1,128 @@
 package dao;
 
 import model.Report;
-import connect.DBConnection;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReportDAO {
-
-    private Connection conn;
+    private final Connection conn;
 
     public ReportDAO(Connection conn) {
         this.conn = conn;
     }
 
-    // Lấy danh sách tất cả báo cáo
-    public List<Report> getAllReports() throws SQLException {
-        List<Report> reports = new ArrayList<>();
-        String sql = "SELECT * FROM UserReport";
+  public List<Report> getAllReports() throws SQLException {
+    List<Report> reports = new ArrayList<>();
+    String sql = "SELECT r.*, u.FullName AS UserName, u.Email AS UserEmail " +
+                 "FROM Report r " +
+                 "JOIN [User] u ON r.UserID = u.UserID " +
+                 "ORDER BY r.SubmittedAt DESC";
+    try (PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+        while (rs.next()) {
+            Report report = new Report();
+            report.setReportID(rs.getInt("ReportID"));
+            report.setUserID(rs.getInt("UserID"));
+            report.setRelatedBookingID((Integer) rs.getObject("RelatedBookingID"));
+            report.setRelatedFoodOrderID((Integer) rs.getObject("RelatedFoodOrderID"));
+            report.setTitle(rs.getString("Title"));
+            report.setDescription(rs.getString("Description"));
+            report.setSubmittedAt(rs.getTimestamp("SubmittedAt"));
+            report.setStatus(rs.getString("Status"));
+            report.setAdminResponse(rs.getString("AdminResponse"));
+            report.setRespondedAt(rs.getTimestamp("RespondedAt"));
 
-            while (rs.next()) {
-                Report report = new Report();
-                report.setReportID(rs.getInt("ReportID"));
-                report.setType(rs.getString("Type"));
-                report.setDescription(rs.getString("Description"));
-                report.setReporterEmail(rs.getString("ReporterEmail"));
-                report.setReportedAt(rs.getTimestamp("ReportedAt"));
-                report.setStatus(rs.getString("Status"));
+            // Gán thêm thông tin user
+            report.setUserName(rs.getString("UserName"));
+            report.setUserEmail(rs.getString("UserEmail"));
 
-                reports.add(report);
+            // Gán tạm type và priority nếu chưa có cột trong DB
+            report.setType("BUG");
+            report.setPriority("MEDIUM");
+
+            reports.add(report);
+        }
+    }
+    return reports;
+}
+
+
+    public Report getReportById(int id) throws SQLException {
+        String sql = "SELECT * FROM Report WHERE ReportID = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Report report = new Report();
+                    report.setReportID(rs.getInt("ReportID"));
+                    report.setUserID(rs.getInt("UserID"));
+                    report.setRelatedBookingID((Integer) rs.getObject("RelatedBookingID"));
+                    report.setRelatedFoodOrderID((Integer) rs.getObject("RelatedFoodOrderID"));
+                    report.setTitle(rs.getString("Title"));
+                    report.setDescription(rs.getString("Description"));
+                    report.setSubmittedAt(rs.getTimestamp("SubmittedAt"));
+                    report.setStatus(rs.getString("Status"));
+                    report.setAdminResponse(rs.getString("AdminResponse"));
+                    report.setRespondedAt(rs.getTimestamp("RespondedAt"));
+                    return report;
+                }
             }
         }
-        return reports;
+        return null;
     }
 
-    // Thêm mới một báo cáo
-    public boolean addReport(Report report) throws SQLException {
-        String sql = "INSERT INTO UserReport (Type, Description, ReporterEmail, Status) VALUES (?, ?, ?, 'pending')";
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, report.getType());
-            stmt.setString(2, report.getDescription());
-            stmt.setString(3, report.getReporterEmail());
-
-            return stmt.executeUpdate() > 0;
+    public void updateReportStatus(int reportID, String newStatus) throws SQLException {
+        String sql = "UPDATE Report SET Status = ?, RespondedAt = GETDATE() WHERE ReportID = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, reportID);
+            ps.executeUpdate();
         }
     }
 
-    // Cập nhật trạng thái báo cáo
-    public boolean updateReportStatus(int reportID, String newStatus) throws SQLException {
-        String sql = "UPDATE UserReport SET Status = ? WHERE ReportID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, newStatus);
-            stmt.setInt(2, reportID);
-            return stmt.executeUpdate() > 0;
+    public void respondToReport(int reportID, String response, String newStatus) throws SQLException {
+        String sql = "UPDATE Report SET AdminResponse = ?, Status = ?, RespondedAt = GETDATE() WHERE ReportID = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, response);
+            ps.setString(2, newStatus);
+            ps.setInt(3, reportID);
+            ps.executeUpdate();
         }
     }
+
+    public void createReport(Report report) throws SQLException {
+        String sql = "INSERT INTO Report (UserID, RelatedBookingID, RelatedFoodOrderID, Title, Description, SubmittedAt, Status) " +
+                     "VALUES (?, ?, ?, ?, ?, GETDATE(), ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, report.getUserID());
+            if (report.getRelatedBookingID() != null) {
+                ps.setInt(2, report.getRelatedBookingID());
+            } else {
+                ps.setNull(2, Types.INTEGER);
+            }
+            if (report.getRelatedFoodOrderID() != null) {
+                ps.setInt(3, report.getRelatedFoodOrderID());
+            } else {
+                ps.setNull(3, Types.INTEGER);
+            }
+            ps.setString(4, report.getTitle());
+            ps.setString(5, report.getDescription());
+            ps.setString(6, report.getStatus());
+            ps.executeUpdate();
+        }
+    }
+    public static void main(String[] args) {
+    try (Connection conn = connect.DBConnection.getConnection()) {
+        dao.ReportDAO dao = new dao.ReportDAO(conn);
+        List<model.Report> reports = dao.getAllReports();
+        for (model.Report report : reports) {
+            System.out.println(report.getReportID() + " - " + report.getTitle());
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
 }

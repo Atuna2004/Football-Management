@@ -2,19 +2,24 @@ package model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 public class TimeSlot {
     private int timeSlotID;
     private int stadiumID;
-    private int fieldID;            // ✅ NEW
-    private String fieldName;       // ✅ NEW
+    private int fieldID;
+    private String fieldName;
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
     private double price;
+    private boolean booked;
 
-    public TimeSlot() {
-    }
+    // 🔥 THÊM:
+    private String bookingStatus;           // "Pending", "Confirmed", v.v.
+    private LocalDateTime bookingCreatedAt; // Dùng để kiểm tra giữ chỗ có quá hạn không
+
+    public TimeSlot() {}
 
     public TimeSlot(int timeSlotID, int stadiumID, int fieldID, String fieldName,
                     LocalDate date, LocalTime startTime, LocalTime endTime, double price) {
@@ -27,6 +32,8 @@ public class TimeSlot {
         this.endTime = endTime;
         this.price = price;
     }
+
+    // =================== Getter & Setter =====================
 
     public int getTimeSlotID() {
         return timeSlotID;
@@ -90,5 +97,49 @@ public class TimeSlot {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public boolean isBooked() {
+        return booked;
+    }
+
+    public void setBooked(boolean booked) {
+        this.booked = booked;
+    }
+
+    // =================== THÊM MỚI =====================
+
+    public String getBookingStatus() {
+        return bookingStatus;
+    }
+
+    public void setBookingStatus(String bookingStatus) {
+        this.bookingStatus = bookingStatus;
+    }
+
+    public LocalDateTime getBookingCreatedAt() {
+        return bookingCreatedAt;
+    }
+
+    public void setBookingCreatedAt(LocalDateTime bookingCreatedAt) {
+        this.bookingCreatedAt = bookingCreatedAt;
+    }
+
+    // =================== Logic kiểm tra đã đặt thực sự =====================
+
+    /**
+     * Trả về true nếu slot này thực sự đã được đặt (Confirmed) hoặc đang giữ chỗ nhưng chưa hết hạn (Pending < 15 phút).
+     */
+    public boolean isTrulyBooked() {
+        if (!booked) return false;
+        if ("Confirmed".equalsIgnoreCase(bookingStatus)) return true;
+
+        // Nếu là giữ chỗ (Pending) nhưng quá 15 phút → không tính là đã đặt
+        if ("Pending".equalsIgnoreCase(bookingStatus) && bookingCreatedAt != null) {
+            LocalDateTime now = LocalDateTime.now();
+            return bookingCreatedAt.plusMinutes(5).isAfter(now);
+        }
+
+        return false;
     }
 }

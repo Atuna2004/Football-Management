@@ -5,10 +5,13 @@ import dao.AccountDAO;
 import model.User;
 import service.EmailService;
 import service.OTPGenerator;
+import service.PasswordService;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,7 +46,7 @@ public class SignupServlet extends HttpServlet {
 
             User newUser = new User();
             newUser.setEmail(email);
-            newUser.setPasswordHash(password);
+            newUser.setPasswordHash(PasswordService.hashPassword(password)); // hashed here
             newUser.setFullName(fullName);
             newUser.setPhone(phone);
             newUser.setActive(false);
@@ -52,13 +55,17 @@ public class SignupServlet extends HttpServlet {
             newUser.setAvatarUrl(null);
 
             request.getSession().setAttribute("pendingUser", newUser);
+
             String otp = OTPGenerator.generateOTP();
             EmailService emailService = new EmailService();
+
             request.getSession().setAttribute("otp", otp);
             request.getSession().setAttribute("email", email);
             request.getSession().setAttribute("otpMode", "activate");
+
             String subject = "Activate account OTP";
             emailService.sendOTPEmail(email, otp, subject);
+
             response.sendRedirect("account/confirmOTP.jsp");
 
         } catch (SQLException e) {

@@ -1,0 +1,63 @@
+/* === Form tạo và cập nhật sân bóng === */
+.card {
+    border-radius: 10px;
+}
+
+.card-header {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #343a40;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    border: 1px solid #ced4da;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 500;
+    border-radius: 8px;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 500;
+    border-radius: 8px;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.card-footer {
+    background-color: #fff;
+    border-top: none;
+}
