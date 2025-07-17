@@ -49,9 +49,23 @@ body {
 
 .social-icons {
     display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+    justify-content: center;
+    gap: 25px;
+    margin: 20px 0;
 }
+
+.social-icons a img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.social-icons a img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 
 .social-icons a {
     text-decoration: none;
