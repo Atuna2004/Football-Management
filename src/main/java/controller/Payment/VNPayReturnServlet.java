@@ -7,7 +7,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import model.User;
 import service.EmailService;
+import service.QRGenerator;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -72,9 +74,9 @@ public class VNPayReturnServlet extends HttpServlet {
         // 6. Lấy chi tiết thanh toán
         double ticketPrice = paymentDAO.getTicketPrice(bookingId);
         double foodPrice = paymentDAO.getFoodOrderTotal(bookingId);
-        double totalAfterDiscount = paymentDAO.getBookingTotalAmount(bookingId); // ✅ Số tiền cuối cùng sau giảm
+        double totalAfterDiscount = paymentDAO.getBookingTotalAmount(bookingId);
 
-        // 7. Gửi email xác nhận nếu có user
+        // 7. Gửi email xác nhận & mã QR nếu có user
         HttpSession session = req.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("currentUser") : null;
 
@@ -93,9 +95,30 @@ public class VNPayReturnServlet extends HttpServlet {
             );
 
             try {
+                // Gửi email xác nhận thường
                 EmailService.sendEmail(email, subject, body);
+
+                // Tạo mã token và URL QR check-in
+                String checkinToken = UUID.randomUUID().toString();
+                bookingDAO.updateCheckinToken(bookingId, checkinToken);
+                System.out.println("BookingID = " + bookingId + ", Token = " + checkinToken);
+
+
+                String baseUrl = req.getRequestURL().toString().replace(req.getRequestURI(), req.getContextPath());
+                String checkinUrl = baseUrl + "/checkin?token=" + checkinToken;
+
+
+                // Tạo ảnh QR
+                String qrPath = getServletContext().getRealPath("/") + "qr_checkin_" + bookingId + ".png";
+                File qrFile = QRGenerator.generateQRCodeImage(checkinUrl, qrPath);
+
+                // Gửi email có ảnh QR đính kèm
+                EmailService emailService = new EmailService();
+                emailService.sendCheckinQRCodeEmail(email, fullName, bookingId, qrFile, checkinUrl);
+
+
             } catch (Exception e) {
-                System.err.println("Lỗi khi gửi email xác nhận:");
+                System.err.println("❌ Lỗi khi gửi email xác nhận/QR:");
                 e.printStackTrace();
             }
         }

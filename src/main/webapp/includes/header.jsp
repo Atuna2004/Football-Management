@@ -1,3 +1,5 @@
+<%@ page import="model.User" %>
+
 <%@ page pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>

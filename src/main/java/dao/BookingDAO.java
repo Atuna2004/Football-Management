@@ -271,6 +271,7 @@ public class BookingDAO {
             return false;
         }
     }
+
     
     public boolean applyDiscountCode(int bookingId, int discountCodeId, double newTotal) {
         String sql = "UPDATE Booking SET DiscountCodeID = ?, TotalAmount = ? WHERE BookingID = ?";
@@ -297,6 +298,59 @@ public class BookingDAO {
         }
         return false;
     }
+    
+       public void updateCheckinToken(int bookingId, String token) {
+            String sql = "UPDATE Booking SET CheckinToken = ? WHERE BookingID = ?";
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
+                ps.setString(1, token);
+                ps.setInt(2, bookingId);
+                int rows = ps.executeUpdate();
+                System.out.println("✅ Rows affected when updating CheckinToken: " + rows);
+
+            } catch (SQLException e) {
+                System.err.println("❌ Error updating checkin_token:");
+                e.printStackTrace();
+            }
+        }
+
+
+        
+
+ 
+       public Booking getBookingByCheckinToken(String token) {
+             String sql = "SELECT * FROM Booking WHERE CheckinToken = ?";
+
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, token);
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    Booking booking = new Booking();
+                    booking.setBookingID(rs.getInt("BookingID"));
+                    booking.setUserID(rs.getInt("UserID"));
+
+                    Object discountObj = rs.getObject("DiscountCodeID");
+                    if (discountObj != null) {
+                        booking.setDiscountCodeID((Integer) discountObj);
+                    }
+
+                    booking.setStatus(rs.getString("Status"));
+                    booking.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+                    booking.setOriginalAmount(rs.getDouble("OriginalAmount"));
+                    booking.setTotalAmount(rs.getDouble("TotalAmount"));
+
+                    return booking;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
 
 }

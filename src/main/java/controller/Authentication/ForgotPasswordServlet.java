@@ -3,6 +3,8 @@ package controller.Authentication;
 import connect.DBConnection;
 import dao.AccountDAO;
 import model.User;
+import service.OTPGenerator;
+import service.EmailService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -34,10 +36,6 @@ public class ForgotPasswordServlet extends HttpServlet {
         }
     }
     
-    /**
-     * Xử lý quên mật khẩu - gửi OTP
-     * Được gọi khi action = null (lần đầu)
-     */
     private void handleForgotPassword(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
@@ -77,10 +75,7 @@ public class ForgotPasswordServlet extends HttpServlet {
         }
     }
     
-    /**
-     * Xử lý đặt lại mật khẩu mới
-     * Được gọi khi action = "reset" (sau khi xác thực OTP)
-     */
+ 
     private void handleResetPassword(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
