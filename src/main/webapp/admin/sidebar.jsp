@@ -92,13 +92,13 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="./fieldOwnerApprove.jsp" class="nav-link">
+            <a href="${pageContext.request.contextPath}/admin/pending" class="nav-link">
                 <i class="fas fa-user-check"></i>
                 Phê Duyệt Chủ Sân
             </a>
         </div>
         <div class="nav-item">
-            <a href="./userReport.jsp" class="nav-link">
+            <a href="${pageContext.request.contextPath}" class="nav-link">
                 <i class="fas fa-flag"></i>
                 Báo Cáo Người Dùng
             </a>

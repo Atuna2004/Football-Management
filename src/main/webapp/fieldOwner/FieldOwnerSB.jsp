@@ -22,13 +22,13 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/confirmedBookings" class="nav-link">
+            <a href="${pageContext.request.contextPath}/completed-payments" class="nav-link">
                 <i class="fa-solid fa-clock"></i>
                 <span>Lịch đặt sân</span>
             </a>
         </li>
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/pendingBookings" class="nav-link">
+            <a href="${pageContext.request.contextPath}/pending-payments" class="nav-link">
                 <i class="fa-solid fa-pen-to-square"></i>
                 <span>Đơn đặt sân</span>
             </a>
@@ -52,13 +52,13 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="${pageContext.request.contextPath}/fieldOwner/revenueReport.jsp" class="nav-link">
                 <i class="fas fa-dollar-sign"></i>
                 <span>Doanh thu</span>
             </a>
         </li>
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="${pageContext.request.contextPath}/fieldOwner/TimeSlotManagement.jsp" class="nav-link">
                 <i class="fa-regular fa-calendar-days"></i>
                 <span>Chỉnh sửa khung thời gian</span>
             </a>
