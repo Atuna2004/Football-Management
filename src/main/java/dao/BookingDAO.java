@@ -271,4 +271,66 @@ public class BookingDAO {
             return false;
         }
     }
+    // Add this method to your existing BookingDAO class
+
+/**
+ * Check if a user has booked a specific stadium
+ * This method checks through the booking -> timeslot -> stadium relationship
+ */
+public boolean hasUserBookedStadium(int userId, int stadiumId) throws SQLException {
+    String sql = "SELECT COUNT(*) FROM Booking b " +
+                 "JOIN BookingTimeSlot bts ON b.BookingID = bts.BookingID " +
+                 "JOIN TimeSlot ts ON bts.TimeSlotID = ts.TimeSlotID " +
+                 "WHERE b.UserID = ? AND ts.StadiumID = ?";
+    
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        ps.setInt(1, userId);
+        ps.setInt(2, stadiumId);
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                System.out.println("🔍 User " + userId + " has " + count + " bookings for stadium " + stadiumId);
+                return count > 0;
+            }
+        }
+    } catch (SQLException e) {
+        System.out.println("❌ Error checking user booking: " + e.getMessage());
+        throw e;
+    }
+    
+    return false;
+}
+
+/**
+ * Alternative method if you want to check only confirmed bookings
+ */
+public boolean hasUserBookedStadiumConfirmed(int userId, int stadiumId) throws SQLException {
+    String sql = "SELECT COUNT(*) FROM Booking b " +
+                 "JOIN BookingTimeSlot bts ON b.BookingID = bts.BookingID " +
+                 "JOIN TimeSlot ts ON bts.TimeSlotID = ts.TimeSlotID " +
+                 "WHERE b.UserID = ? AND ts.StadiumID = ? AND b.Status = 'Confirmed'";
+    
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        ps.setInt(1, userId);
+        ps.setInt(2, stadiumId);
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                System.out.println("🔍 User " + userId + " has " + count + " confirmed bookings for stadium " + stadiumId);
+                return count > 0;
+            }
+        }
+    } catch (SQLException e) {
+        System.out.println("❌ Error checking confirmed user booking: " + e.getMessage());
+        throw e;
+    }
+    
+    return false;
+}
 }
