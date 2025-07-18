@@ -262,5 +262,32 @@ public class StadiumDAO {
                 rs.getInt("OwnerID")
         );
     }
+    
+    public List<Stadium> getStadiumsByOwner(int ownerId) {
+        List<Stadium> list = new ArrayList<>();
+        String sql = "SELECT StadiumID, Name FROM Stadium WHERE OwnerID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, ownerId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Stadium stadium = new Stadium();
+                stadium.setStadiumID(rs.getInt("StadiumID"));
+                stadium.setName(rs.getString("Name"));
+                list.add(stadium);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi lấy sân theo OwnerID = " + ownerId);
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }
+
 
