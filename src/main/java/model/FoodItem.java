@@ -2,12 +2,15 @@ package model;
 
 public class FoodItem {
     private int foodItemID;
-    private int stadiumID;
     private String name;
     private String description;
     private double price;
     private int stockQuantity;
     private boolean isActive;
+    private String imageUrl;
+
+    private int stadiumID;       // dùng khi thêm/sửa
+    private String stadiumName;  // dùng khi hiển thị
 
     public FoodItem() {
     }
@@ -21,6 +24,7 @@ public class FoodItem {
         this.stockQuantity = stockQuantity;
         this.isActive = isActive;
     }
+    // ======= Getter/Setter =======
 
     public int getFoodItemID() {
         return foodItemID;
@@ -28,14 +32,6 @@ public class FoodItem {
 
     public void setFoodItemID(int foodItemID) {
         this.foodItemID = foodItemID;
-    }
-
-    public int getStadiumID() {
-        return stadiumID;
-    }
-
-    public void setStadiumID(int stadiumID) {
-        this.stadiumID = stadiumID;
     }
 
     public String getName() {
@@ -75,6 +71,31 @@ public class FoodItem {
     }
 
     public void setActive(boolean active) {
-        this.isActive = active;
+        isActive = active;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public int getStadiumID() {
+        return stadiumID;
+    }
+
+    public void setStadiumID(int stadiumID) {
+        this.stadiumID = stadiumID;
+    }
+
+    public String getStadiumName() {
+        return stadiumName;
+    }
+
+    public void setStadiumName(String stadiumName) {
+        this.stadiumName = stadiumName;
     }
 }
+

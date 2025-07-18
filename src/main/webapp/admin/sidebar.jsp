@@ -76,7 +76,7 @@
 
 <div class="sidebar">
     <div class="sidebar-header">
-        <h3 style="margin: 0"></i> Quản lí </h3>
+        <h3 style="margin: 0"> Quản lí </h3>
     </div>
     <nav class="sidebar-nav">
         <div class="nav-item">
@@ -98,7 +98,7 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="${pageContext.request.contextPath}" class="nav-link">
+            <a href="<%= request.getContextPath() %>/admin/reports/user" class="nav-link">
                 <i class="fas fa-flag"></i>
                 Báo Cáo Người Dùng
             </a>

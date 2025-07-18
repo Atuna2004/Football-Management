@@ -1,281 +1,198 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>   
 <!DOCTYPE html>
-<html>
+<html lang="vi">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Quản lý người dùng</title>
-        <link rel="stylesheet" href="assets/css/dashboard.css">
-        <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <style>
-            * {
-                font-family: 'Roboto', sans-serif;
-                box-sizing: border-box;
-            }
-
-            body {
-                margin: 0;
-                background-color: #eef1f5;
-            }
-
-            .main-container {
-                display: flex;
-            }
-
-            .user-management {
-                margin-left: 250px;
-                padding: 40px 60px;
-                width: calc(100% - 250px);
-                background-color: #f9fbfd;
-                min-height: 100vh;
-            }
-
-            .user-management h2 {
-                font-size: 28px;
-                margin-bottom: 25px;
-                color: #2c3e50;
-            }
-
-            .add-btn {
-                background: linear-gradient(135deg, #48bb78, #2b6cb0);
-                color: white;
-                padding: 10px 18px;
-                border: none;
-                border-radius: 8px;
-                margin-bottom: 20px;
-                font-size: 15px;
-                transition: all 0.3s ease;
-            }
-
-            .add-btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-            }
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                background-color: white;
-                border-radius: 10px;
-                overflow: hidden;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            }
-
-            th, td {
-                padding: 16px 20px;
-                border-bottom: 1px solid #ececec;
-                text-align: left;
-                font-size: 15px;
-            }
-
-            th {
-                background-color: #f1f2f6;
-                font-weight: 600;
-                color: #34495e;
-            }
-
-            tr:hover {
-                background-color: #f5f9fc;
-            }
-
-            .action-btn {
-                padding: 6px 12px;
-                border: none;
-                border-radius: 6px;
-                cursor: pointer;
-                font-size: 14px;
-                transition: all 0.3s ease;
-            }
-
-            .btn-edit {
-                background: linear-gradient(135deg, #f39c12, #e67e22);
-                color: white;
-            }
-
-            .btn-delete {
-                background: linear-gradient(135deg, #e74c3c, #c0392b);
-                color: white;
-            }
-
-            .status-active {
-                color: #27ae60;
-                font-weight: bold;
-            }
-
-            .status-inactive {
-                color: #7f8c8d;
-                font-style: italic;
-            }
-
-            /* Modal Styling */
-            .modal {
-                display: none;
-                position: fixed;
-                z-index: 1000;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                overflow: auto;
-                background-color: rgba(0,0,0,0.4);
-            }
-
-            .modal-content {
-                background-color: #fff;
-                margin: 5% auto;
-                padding: 20px;
-                border: 1px solid #888;
-                width: 50%;
-                border-radius: 10px;
-            }
-
-            .close {
-                color: #aaa;
-                float: right;
-                font-size: 24px;
-                font-weight: bold;
-                cursor: pointer;
-            }
-
-            .close:hover {
-                color: black;
-                text-decoration: none;
-                cursor: pointer;
-            }
-
-            label {
-                display: block;
-                margin-top: 10px;
-                font-weight: 600;
-            }
-
-            input[type="text"],
-            input[type="email"],
-            input[type="date"] {
-                width: 100%;
-                padding: 8px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-            }
-        </style>
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/userManagement.css"/>
     </head>
     <body>
-
         <div class="main-container">
             <%@ include file="sidebar.jsp" %>
 
-            <div class="user-management">
-                <h2>Quản lý người dùng</h2>
-                <button class="add-btn" onclick="openAddModal()">
-                    + Thêm người dùng
-                </button>
+            <div class="main-content">
 
-                <!-- Thông báo nếu không có dữ liệu -->
-                <c:if test="${empty userList}">
-                    <p style="color: red; font-size: 16px;">Không có người dùng nào trong hệ thống.</p>
-                </c:if>
+                <div class="header fade-in">
+                    <h2><i class="fas fa-users"></i> Quản Lý Người Dùng</h2>
+                </div>
 
-                <!-- Bảng hiển thị người dùng -->
-                <c:if test="${not empty userList}">
-                    <div class="table-container">
-                        <table id="userTable">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Họ tên</th>
-                                    <th>Email</th>
-                                    <th>Vai trò</th>
-                                    <th>Trạng thái</th>
-                                    <th>Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach var="user" items="${userList}" varStatus="loop">
-                                    <tr class="user-row" data-name="${fn:toLowerCase(user.fullName)}" data-email="${fn:toLowerCase(user.email)}">
-                                        <td>${user.userID}</td>
-                                        <td>${user.fullName}</td>
-                                        <td>${user.email}</td>
-                                        <td>
-                                            <c:forEach var="role" items="${user.roles}" varStatus="roleLoop">
-                                                ${role.roleName}${!roleLoop.last ? ', ' : ''}
-                                            </c:forEach>
-                                        </td>
-                                        <td>
-                                            <span class="${user.active ? 'status-active' : 'status-inactive'}">
-                                                ${user.active ? 'Hoạt động' : 'Tạm khóa'}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="action-btn btn-edit"
-                                                        onclick="openEditModal(${user.userID}, '${user.fullName}', '${user.email}', '${user.phone}', '${user.address}', '<fmt:formatDate value='${user.dateOfBirth}' pattern='yyyy-MM-dd'/>', ${user.active})">
-                                                    <i class="fas fa-edit"></i> Sửa
-                                                </button>
-                                                <form method="post" action="user-list" style="display:inline;" onsubmit="return confirm('Xác nhận xóa?')">
-                                                    <input type="hidden" name="action" value="delete">
-                                                    <input type="hidden" name="id" value="${user.userID}">
-                                                    <button type="submit" class="action-btn btn-delete">
-                                                        <i class="fas fa-trash"></i> Xóa
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
+
+                <div class="search-container fade-in">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên hoặc email...">
                     </div>
-                </c:if>
+                    <button class="add-btn" onclick="openAddModal()">
+                        <i class="fas fa-plus"></i>
+                        Thêm người dùng
+                    </button>
+                </div>
+
+
+                <div class="card fade-in">
+                    <c:if test="${empty userList}">
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <h3>Chưa có người dùng nào</h3>
+                            <p>Hệ thống chưa có người dùng nào được đăng ký. Hãy thêm người dùng mới để bắt đầu.</p>
+                        </div>
+                    </c:if>
+
+                    <c:if test="${not empty userList}">
+                        <div class="table-container">
+                            <table id="userTable">
+                                <thead>
+                                    <tr>
+                                        <th><i class="fas fa-hashtag"></i> ID</th>
+                                        <th><i class="fas fa-user"></i> Người dùng</th>
+                                        <th><i class="fas fa-envelope"></i> Email</th>
+                                        <th><i class="fas fa-phone"></i> Số điện thoại</th>
+                                        <th><i class="fas fa-map-marker-alt"></i> Địa chỉ</th>
+                                        <th><i class="fas fa-birthday-cake"></i> Ngày sinh</th>
+                                        <th><i class="fas fa-user-tag"></i> Vai trò</th>
+                                        <th><i class="fas fa-toggle-on"></i> Trạng thái</th>
+                                        <th><i class="fas fa-cogs"></i> Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="user" items="${userList}" varStatus="loop">
+                                        <tr class="user-row fade-in"
+                                            data-name="${fn:toLowerCase(user.fullName)}"
+                                            data-email="${fn:toLowerCase(user.email)}"
+                                            style="animation-delay: ${loop.index * 0.1}s">
+                                            <td><strong>#${user.userID}</strong></td>
+                                            <td>
+                                                <div class="user-info">
+                                                    <div class="user-avatar">
+                                                        ${fn:substring(user.fullName, 0, 1)}
+                                                    </div>
+                                                    <div class="user-name">${user.fullName}</div>
+                                                </div>
+                                            </td>
+                                            <td>${user.email}</td>
+                                            <td>${user.phone}</td>
+                                            <td>${user.address}</td>
+                                            <td>
+                                                <fmt:formatDate value="${user.dateOfBirth}" pattern="dd/MM/yyyy"/>
+                                            </td>
+                                            <td>
+                                                <c:forEach var="role" items="${user.roles}" varStatus="roleLoop">
+                                                    <span class="role-badge">${role.roleName}</span>
+                                                </c:forEach>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge ${user.active ? 'status-active' : 'status-inactive'} d-flex align-items-center">
+                                                    <i class="fas ${user.active ? 'fa-check-circle' : 'fa-times-circle'} me-2"></i>
+                                                    ${user.active ? 'Hoạt động' : 'Tạm khóa'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button type="button" class="action-btn btn-edit"
+                                                            data-userid="${user.userID}"
+                                                            data-fullname="${fn:escapeXml(user.fullName)}"
+                                                            data-email="${fn:escapeXml(user.email)}"
+                                                            data-phone="${not empty user.phone ? fn:escapeXml(user.phone) : ''}"
+                                                            data-address="${not empty user.address ? fn:escapeXml(user.address) : ''}"
+                                                            data-dob="${not empty user.dateOfBirth ? user.dateOfBirth : ''}"
+                                                            data-active="${user.active}"
+                                                            onclick="handleEditClick(this)">
+                                                        <i class="fas fa-edit"></i> Sửa
+                                                    </button>
+                                                    <form method="post" action="user-list" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa người dùng này?')">
+                                                        <input type="hidden" name="action" value="delete">
+                                                        <input type="hidden" name="id" value="${user.userID}">
+                                                        <button type="submit" class="action-btn btn-delete">
+                                                            <i class="fas fa-trash"></i> Xóa
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+                    </c:if>
+                </div>
             </div>
         </div>
 
-        <!-- Modal Thêm/Sửa Người Dùng -->
-        <div id="userModal" class="modal">
+
+        <div id="userModal" class="modal">  
             <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <h3 id="modalTitle">Thêm người dùng mới</h3>
+                <div class="modal-header">
+                    <h3 id="modalTitle"><i class="fas fa-user-plus"></i> Thêm người dùng mới</h3>
+                    <button class="close" onclick="closeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
                 <form id="userForm" method="post" action="user-list">
                     <input type="hidden" name="action" id="modalAction" value="add">
                     <input type="hidden" name="userID" id="modalUserID">
 
-                    <label for="fullName">Họ tên:</label>
-                    <input type="text" id="fullName" name="fullName" required><br/>
+                    <div class="form-group">
+                        <label for="fullName"><i class="fas fa-user"></i> Họ tên</label>
+                        <input type="text" id="fullName" name="fullName" required>
+                    </div>
 
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required><br/>
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
 
-                    <label for="phone">Số điện thoại:</label>
-                    <input type="text" id="phone" name="phone"><br/>
+                    <div class="form-group" id="passwordContainer">
+                        <label for="password"><i class="fas fa-lock"></i> Mật khẩu</label>
+                        <input type="password" id="password" name="passwordHash" required>
+                    </div>
 
-                    <label for="address">Địa chỉ:</label>
-                    <input type="text" id="address" name="address"><br/>
+                    <div class="form-group">
+                        <label for="phone"><i class="fas fa-phone"></i> Số điện thoại</label>
+                        <input type="text" id="phone" name="phone">
+                    </div>
 
-                    <label for="dob">Ngày sinh:</label>
-                    <input type="date" id="dob" name="dateOfBirth"><br/>
+                    <div class="form-group">
+                        <label for="address"><i class="fas fa-map-marker-alt"></i> Địa chỉ</label>
+                        <input type="text" id="address" name="address">
+                    </div>
 
-                    <label><input type="checkbox" id="isActive" name="isActive" checked> Hoạt động</label><br/><br/>
+                    <div class="form-group">
+                        <label for="dob"><i class="fas fa-birthday-cake"></i> Ngày sinh</label>
+                        <input type="date" id="dob" name="dateOfBirth">
+                    </div>
 
-                    <button type="submit" class="action-btn btn-edit">Lưu</button>
-                    <button type="button" class="action-btn btn-delete" onclick="closeModal()">Hủy</button>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="isActive" name="isActive" checked>
+                        <label for="isActive">Tài khoản hoạt động</label>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-cancel" onclick="closeModal()">
+                            <i class="fas fa-times"></i> Hủy bỏ
+                        </button>
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-save"></i> Lưu thay đổi
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
 
         <script>
-            // Ripple animation
+
             document.addEventListener('DOMContentLoaded', function () {
-                const buttons = document.querySelectorAll('.action-btn');
+                const buttons = document.querySelectorAll('.action-btn, .add-btn, .btn-save, .btn-cancel');
                 buttons.forEach(btn => {
                     btn.style.position = 'relative';
                     btn.style.overflow = 'hidden';
 
                     btn.addEventListener('click', function (e) {
-                        if (!this.classList.contains('no-ripple')) {
-                            e.preventDefault();
-                        }
-
                         const ripple = document.createElement('span');
                         const rect = this.getBoundingClientRect();
                         const size = Math.max(rect.width, rect.height);
@@ -295,58 +212,58 @@
                         setTimeout(() => ripple.remove(), 600);
                     });
                 });
+
+
+                const rows = document.querySelectorAll('.user-row');
+                rows.forEach((row, index) => {
+                    row.style.animationDelay = `${index * 0.1}s`;
+                });
             });
 
-            // Tự tạo animation ripple
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes ripple {
-                    to {
-                        transform: scale(2);
-                        opacity: 0;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
 
-            // Hàm mở modal thêm người dùng
             function openAddModal() {
                 document.getElementById("modalAction").value = "add";
-                document.getElementById("modalTitle").innerText = "Thêm người dùng mới";
+                document.getElementById("modalTitle").innerHTML = '<i class="fas fa-user-plus"></i> Thêm người dùng mới';
                 document.getElementById("userForm").reset();
                 document.getElementById("modalUserID").value = "";
                 document.getElementById("userModal").style.display = "block";
+                document.getElementById("passwordContainer").style.display = "block";
+                document.getElementById("password").required = true;
+                document.body.style.overflow = 'hidden';
             }
 
-            // Hàm mở modal sửa người dùng
-            function openEditModal(userID, fullName, email, phone, address, dob, isActive) {
+            function handleEditClick(button) {
                 document.getElementById("modalAction").value = "update";
-                document.getElementById("modalUserID").value = userID;
-                document.getElementById("fullName").value = fullName;
-                document.getElementById("email").value = email;
-                document.getElementById("phone").value = phone;
-                document.getElementById("address").value = address;
-                document.getElementById("dob").value = dob;
+                document.getElementById("modalUserID").value = button.dataset.userid;
+                document.getElementById("fullName").value = button.dataset.fullname || "";
+                document.getElementById("email").value = button.dataset.email || "";
+                document.getElementById("phone").value = button.dataset.phone || "";
+                document.getElementById("address").value = button.dataset.address || "";
+                const dob = button.dataset.dob;
+                document.getElementById("dob").value = dob ? dob.substring(0, 10) : "";
+                const isActive = button.dataset.active === "true" || button.dataset.active === "1";
                 document.getElementById("isActive").checked = isActive;
-
-                document.getElementById("modalTitle").innerText = "Cập nhật người dùng";
+                document.getElementById("modalTitle").innerHTML = '<i class="fas fa-user-edit"></i> Cập nhật người dùng';
                 document.getElementById("userModal").style.display = "block";
+                document.getElementById("passwordContainer").style.display = "block";
+                document.getElementById("password").required = false;
+                document.body.style.overflow = 'hidden';
             }
 
-            // Hàm đóng modal
             function closeModal() {
                 document.getElementById("userModal").style.display = "none";
+                document.body.style.overflow = 'auto';
             }
 
-            // Đóng modal khi click ra ngoài
+            // Close modal when clicking outside
             window.onclick = function (event) {
                 const modal = document.getElementById("userModal");
                 if (event.target === modal) {
-                    modal.style.display = "none";
+                    closeModal();
                 }
             };
 
-            // Tìm kiếm người dùng
+            // Search functionality
             document.getElementById("searchInput")?.addEventListener("input", function () {
                 const searchTerm = this.value.toLowerCase();
                 const rows = document.querySelectorAll(".user-row");
@@ -356,12 +273,26 @@
                     const email = row.getAttribute("data-email");
                     if (name.includes(searchTerm) || email.includes(searchTerm)) {
                         row.style.display = "";
+                        row.classList.add('fade-in');
                     } else {
                         row.style.display = "none";
+                        row.classList.remove('fade-in');
                     }
                 });
             });
-        </script>
 
+        
+            document.addEventListener('keydown', function (e) {
+                // Ctrl + N to add new user
+                if (e.ctrlKey && e.key === 'n') {
+                    e.preventDefault();
+                    openAddModal();
+                }
+                // Escape to close modal
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        </script>
     </body>
 </html>
