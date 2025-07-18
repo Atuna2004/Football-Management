@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page isELIgnored="false" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -663,53 +664,62 @@
                     <h2><i class="fas fa-exclamation-triangle"></i> Quản lý báo cáo</h2>
                 </div>
 
-                <!-- Thống kê -->
-                <div class="stats-cards">
-                    <div class="stat-card new">
-                        <div class="icon"><i class="fas fa-bell"></i></div>
-                        <div class="number">
-                            <c:set var="newCount" value="0" />
-                            <c:forEach var="report" items="${reportList}">
-                                <c:if test="${report.status == 'NEW'}">
-                                    <c:set var="newCount" value="${newCount + 1}" />
-                                </c:if>
-                            </c:forEach>
-                            ${newCount}
-                        </div>
-                        <div class="label">Báo cáo mới</div>
-                    </div>
-                    <div class="stat-card in-progress">
-                        <div class="icon"><i class="fas fa-cog"></i></div>
-                        <div class="number">
-                            <c:set var="progressCount" value="0" />
-                            <c:forEach var="report" items="${reportList}">
-                                <c:if test="${report.status == 'IN_PROGRESS'}">
-                                    <c:set var="progressCount" value="${progressCount + 1}" />
-                                </c:if>
-                            </c:forEach>
-                            ${progressCount}
-                        </div>
-                        <div class="label">Đang xử lý</div>
-                    </div>
-                    <div class="stat-card resolved">
-                        <div class="icon"><i class="fas fa-check-circle"></i></div>
-                        <div class="number">
-                            <c:set var="resolvedCount" value="0" />
-                            <c:forEach var="report" items="${reportList}">
-                                <c:if test="${report.status == 'RESOLVED'}">
-                                    <c:set var="resolvedCount" value="${resolvedCount + 1}" />
-                                </c:if>
-                            </c:forEach>
-                            ${resolvedCount}
-                        </div>
-                        <div class="label">Đã giải quyết</div>
-                    </div>
-                    <div class="stat-card closed">
-                        <div class="icon"><i class="fas fa-archive"></i></div>
-                        <div class="number">${fn:length(reportList) - newCount - progressCount - resolvedCount}</div>
-                        <div class="label">Đã đóng</div>
-                    </div>
-                </div>
+              <!-- Replace your stats cards section with this: -->
+
+<div class="stats-cards">
+    <div class="stat-card new">
+        <div class="icon"><i class="fas fa-bell"></i></div>
+        <div class="number">
+            <c:set var="pendingCount" value="0" />
+            <c:forEach var="report" items="${reportList}">
+                <c:if test="${report.status == 'Pending'}">
+                    <c:set var="pendingCount" value="${pendingCount + 1}" />
+                </c:if>
+            </c:forEach>
+            ${pendingCount}
+        </div>
+        <div class="label">Báo cáo mới</div>
+    </div>
+    <div class="stat-card in-progress">
+        <div class="icon"><i class="fas fa-cog"></i></div>
+        <div class="number">
+            <c:set var="progressCount" value="0" />
+            <c:forEach var="report" items="${reportList}">
+                <c:if test="${report.status == 'In Progress'}">
+                    <c:set var="progressCount" value="${progressCount + 1}" />
+                </c:if>
+            </c:forEach>
+            ${progressCount}
+        </div>
+        <div class="label">Đang xử lý</div>
+    </div>
+    <div class="stat-card resolved">
+        <div class="icon"><i class="fas fa-check-circle"></i></div>
+        <div class="number">
+            <c:set var="resolvedCount" value="0" />
+            <c:forEach var="report" items="${reportList}">
+                <c:if test="${report.status == 'Resolved'}">
+                    <c:set var="resolvedCount" value="${resolvedCount + 1}" />
+                </c:if>
+            </c:forEach>
+            ${resolvedCount}
+        </div>
+        <div class="label">Đã giải quyết</div>
+    </div>
+    <div class="stat-card closed">
+        <div class="icon"><i class="fas fa-archive"></i></div>
+        <div class="number">
+            <c:set var="rejectedCount" value="0" />
+            <c:forEach var="report" items="${reportList}">
+                <c:if test="${report.status == 'Rejected'}">
+                    <c:set var="rejectedCount" value="${rejectedCount + 1}" />
+                </c:if>
+            </c:forEach>
+            ${rejectedCount}
+        </div>
+        <div class="label">Đã từ chối</div>
+    </div>
+</div>
 
                 <!-- Bộ lọc -->
                 <div class="filter-section">
@@ -739,361 +749,260 @@
                     </select>
                 </div>
 
-                <!-- Danh sách báo cáo -->
-                <c:if test="${empty reportList}">
-                    <div class="reports-container">
-                        <div class="no-data">
-                            <i class="fas fa-clipboard-list"></i>
-                            <div>Chưa có báo cáo nào từ người dùng</div>
-                            <div style="font-size: 14px; margin-top: 10px; opacity: 0.7;">
-                                Các báo cáo từ người dùng sẽ hiển thị tại đây
-                            </div>
+              <!-- Danh sách báo cáo -->
+<c:if test="${empty reportList}">
+    <div class="reports-container">
+        <div class="no-data">
+            <i class="fas fa-clipboard-list"></i>
+            <div>Chưa có báo cáo nào từ người dùng</div>
+            <div style="font-size: 14px; margin-top: 10px; opacity: 0.7;">
+                Các báo cáo từ người dùng sẽ hiển thị tại đây
+            </div>
+        </div>
+    </div>
+</c:if>
+
+<!-- Replace the report card section in your JSP with this fixed version: -->
+
+<c:if test="${not empty reportList}">
+    <div class="reports-container" id="reportsContainer">
+        <c:forEach var="report" items="${reportList}">
+            <div class="report-card"
+                 data-status="${report.status}"
+                 data-type="${report.type}"
+                 data-priority="${report.priority}"
+                 data-search="${fn:toLowerCase(report.userName)} ${fn:toLowerCase(report.title)}">
+
+                <!-- ✅ FIXED: Status mapping -->
+                <div class="report-status status-${fn:toLowerCase(fn:replace(report.status, ' ', '-'))}">
+                    <c:choose>
+                        <c:when test="${report.status == 'Pending'}">Đang chờ</c:when>
+                        <c:when test="${report.status == 'In Progress'}">Đang xử lý</c:when>
+                        <c:when test="${report.status == 'Resolved'}">Đã giải quyết</c:when>
+                        <c:when test="${report.status == 'Rejected'}">Đã từ chối</c:when>
+                        <c:otherwise>${report.status}</c:otherwise>
+                    </c:choose>
+                </div>
+
+                <!-- Thông tin người dùng -->
+                <div class="report-header">
+                    <div class="user-avatar">
+                        ${fn:substring(report.userName, 0, 1)}
+                    </div>
+                    <div class="user-info">
+                        <h4>${report.userName}</h4>
+                        <p>${report.userEmail}</p>
+                    </div>
+                </div>
+
+                <!-- ✅ FIXED: Report details -->
+                <div class="report-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Tiêu đề:</span>
+                        <span class="detail-value">${report.title}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Loại báo cáo:</span>
+                        <span class="detail-value">
+                            <span class="report-type type-${fn:toLowerCase(report.type)}">
+                                <c:choose>
+                                    <c:when test="${report.type == 'REPORT'}">
+                                        <i class="fas fa-flag"></i> Báo cáo sân
+                                    </c:when>
+                                    <c:otherwise>
+                                        <i class="fas fa-file-alt"></i> ${report.type}
+                                    </c:otherwise>
+                                </c:choose>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Độ ưu tiên:</span>
+                        <span class="detail-value">
+                            <span class="priority-level priority-${fn:toLowerCase(report.priority)}">
+                                <c:choose>
+                                    <c:when test="${report.priority == 'HIGH'}">
+                                        <i class="fas fa-exclamation-triangle"></i> Cao
+                                    </c:when>
+                                    <c:when test="${report.priority == 'MEDIUM'}">
+                                        <i class="fas fa-minus"></i> Trung bình
+                                    </c:when>
+                                    <c:otherwise>
+                                        <i class="fas fa-arrow-down"></i> Thấp
+                                    </c:otherwise>
+                                </c:choose>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Ngày tạo:</span>
+                        <span class="detail-value">
+                            <fmt:formatDate value="${report.submittedAt}" pattern="dd/MM/yyyy HH:mm" />
+                        </span>
+                    </div>
+                    <c:if test="${not empty report.relatedStadiumID}">
+                        <div class="detail-row">
+                            <span class="detail-label">Sân liên quan:</span>
+                            <span class="detail-value">ID: ${report.relatedStadiumID}</span>
                         </div>
-                    </div>
-                </c:if>
+                    </c:if>
+                </div>
 
-                <c:if test="${not empty reportList}">
-                    <div class="reports-container" id="reportsContainer">
-                        <c:forEach var="report" items="${reportList}">
-                            <div class="report-card" data-status="${report.status}" data-type="${report.type}" data-priority="${report.priority}" data-search="${fn:toLowerCase(report.userName)} ${fn:toLowerCase(report.title)}">
-                                <div class="report-status status-${fn:toLowerCase(fn:replace(report.status, '_', '-'))}">
-                                    <c:choose>
-                                        <c:when test="${report.status == 'NEW'}">Mới</c:when>
-                                        <c:when test="${report.status == 'IN_PROGRESS'}">Đang xử lý</c:when>
-                                        <c:when test="${report.status == 'RESOLVED'}">Đã giải quyết</c:when>
-                                        <c:otherwise>Đã đóng</c:otherwise>
-                                    </c:choose>
-                                </div>
-                                
-                                <div class="report-header">
-                                    <div class="user-avatar">
-                                        ${fn:substring(report.userName, 0, 1)}
-                                    </div>
-                                    <div class="user-info">
-                                        <h4>${report.userName}</h4>
-                                        <p>${report.userEmail}</p>
-                                    </div>
-                                </div>
+                <!-- ✅ FIXED: Report content -->
+                <div class="report-content">
+                    <h5><i class="fas fa-file-alt"></i> Nội dung báo cáo:</h5>
+                    <p>
+                        <c:choose>
+                            <c:when test="${fn:length(report.description) > 150}">
+                                ${fn:substring(report.description, 0, 150)}...
+                            </c:when>
+                            <c:otherwise>
+                                ${report.description}
+                            </c:otherwise>
+                        </c:choose>
+                    </p>
+                </div>
 
-                                <div class="report-details">
-                                    <div class="detail-row">
-                                        <span class="detail-label">Tiêu đề:</span>
-                                        <span class="detail-value">${report.title}</span>
-                                    </div>
-                                    <div class="detail-row">
-                                        <span class="detail-label">Loại báo cáo:</span>
-                                        <span class="detail-value">
-                                            <span class="report-type type-${fn:toLowerCase(report.type)}">
-                                                <c:choose>
-                                                    <c:when test="${report.type == 'BUG'}">
-                                                        <i class="fas fa-bug"></i> Lỗi hệ thống
-                                                    </c:when>
-                                                    <c:when test="${report.type == 'FEATURE'}">
-                                                        <i class="fas fa-lightbulb"></i> Yêu cầu tính năng
-                                                    </c:when>
-                                                    <c:when test="${report.type == 'COMPLAINT'}">
-                                                        <i class="fas fa-exclamation-circle"></i> Khiếu nại
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <i class="fas fa-question-circle"></i> Khác
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </span>
-                                        </span>
-                                    </div>
-                                    <div class="detail-row">
-                                        <span class="detail-label">Độ ưu tiên:</span>
-                                        <span class="detail-value">
-                                            <span class="priority-level priority-${fn:toLowerCase(report.priority)}">
-                                                <c:choose>
-                                                    <c:when test="${report.priority == 'HIGH'}">
-                                                        <i class="fas fa-exclamation-triangle"></i> Cao
-                                                    </c:when>
-                                                    <c:when test="${report.priority == 'MEDIUM'}">
-                                                        <i class="fas fa-minus"></i> Trung bình
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <i class="fas fa-arrow-down"></i> Thấp
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </span>
-                                        </span>
-                                    </div>
-                                    <div class="detail-row">
-                                        <span class="detail-label">Ngày tạo:</span>
-                                        <span class="detail-value">
-                                            <fmt:formatDate value="${report.createdDate}" pattern="dd/MM/yyyy HH:mm" />
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Nội dung báo cáo -->
-                                <div class="report-content">
-                                    <h5><i class="fas fa-file-alt"></i> Nội dung báo cáo:</h5>
-                                    <p>${fn:length(report.description) > 150 ? fn:substring(report.description, 0, 150).concat('...') : report.description}</p>
-                                </div>
-
-                                <!-- File đính kèm -->
-                                <c:if test="${not empty report.attachments}">
-                                    <div class="attachments-section">
-                                        <div class="attachments-title">
-                                            <i class="fas fa-paperclip"></i>
-                                            File đính kèm
-                                        </div>
-                                        <div class="attachment-list">
-                                            <c:forEach var="attachment" items="${report.attachments}">
-                                                <div class="attachment-item" onclick="viewAttachment('${attachment.fileName}')">
-                                                    <i class="fas fa-file"></i>
-                                                    ${attachment.fileName}
-                                                </div>
-                                            </c:forEach>
-                                        </div>
-                                    </div>
-                                </c:if>
-
-                                <!-- Nút hành động -->
-                                <div class="action-buttons">
-                                    <button class="btn btn-view" onclick="viewReportDetails(${report.id})">
-                                        <i class="fas fa-eye"></i>
-                                        Xem chi tiết
-                                    </button>
-                                    <c:choose>
-                                        <c:when test="${report.status == 'NEW'}">
-                                                                                       <button class="btn btn-progress" onclick="updateReportStatus(${report.id}, 'IN_PROGRESS')">
-                                                <i class="fas fa-cog"></i>
-                                                Đang xử lý
-                                            </button>
-                                            <button class="btn btn-resolve" onclick="updateReportStatus(${report.id}, 'RESOLVED')">
-                                                <i class="fas fa-check"></i>
-                                                Giải quyết
-                                            </button>
-                                            <button class="btn btn-close" onclick="updateReportStatus(${report.id}, 'CLOSED')">
-                                                <i class="fas fa-archive"></i>
-                                                Đóng
-                                            </button>
-                                        </c:when>
-                                        <c:when test="${report.status == 'IN_PROGRESS'}">
-                                            <button class="btn btn-resolve" onclick="updateReportStatus(${report.id}, 'RESOLVED')">
-                                                <i class="fas fa-check"></i>
-                                                Giải quyết
-                                            </button>
-                                            <button class="btn btn-close" onclick="updateReportStatus(${report.id}, 'CLOSED')">
-                                                <i class="fas fa-archive"></i>
-                                                Đóng
-                                            </button>
-                                        </c:when>
-                                        <c:when test="${report.status == 'RESOLVED'}">
-                                            <button class="btn btn-close" onclick="updateReportStatus(${report.id}, 'CLOSED')">
-                                                <i class="fas fa-archive"></i>
-                                                Đóng
-                                            </button>
-                                        </c:when>
-                                    </c:choose>
-                                </div>
-                            </div>
-                        </c:forEach>
-                    </div>
-                </c:if>
-            </div>
-        </div>
-
-        <!-- Modal Chi tiết Báo cáo -->
-        <div id="reportModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3><i class="fas fa-exclamation-triangle"></i> Chi tiết báo cáo</h3>
-                    <span class="close" onclick="closeModal()">&times;</span>
-                </div>
-                <div class="form-group">
-                    <label for="reportTitle">Tiêu đề</label>
-                    <input type="text" id="reportTitle" class="filter-select" disabled />
-                </div>
-                <div class="form-group">
-                    <label for="reportDescription">Nội dung</label>
-                    <textarea id="reportDescription" disabled></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="reportUser">Người gửi</label>
-                    <input type="text" id="reportUser" class="filter-select" disabled />
-                </div>
-                <div class="form-group">
-                    <label for="reportDate">Ngày tạo</label>
-                    <input type="text" id="reportDate" class="filter-select" disabled />
-                </div>
-                <div class="form-group">
-                    <label for="reportType">Loại báo cáo</label>
-                    <input type="text" id="reportType" class="filter-select" disabled />
-                </div>
-                <div class="form-group">
-                    <label for="reportPriority">Độ ưu tiên</label>
-                    <input type="text" id="reportPriority" class="filter-select" disabled />
-                </div>
-                <div class="attachments-section">
-                    <div class="attachments-title">
-                        <i class="fas fa-paperclip"></i>
-                        File đính kèm
-                    </div>
-                    <div id="modalAttachments" class="attachment-list"></div>
-                </div>
-                <div class="modal-actions">
-                    <button class="btn-secondary" onclick="closeModal()">Đóng</button>
+                <!-- ✅ FIXED: Action buttons with correct status values -->
+                <div class="action-buttons">
+                    <button class="btn btn-view" onclick="viewReportDetails(${report.reportID})">
+                        <i class="fas fa-eye"></i>
+                        Xem chi tiết
+                    </button>
+                    <c:choose>
+                        <c:when test="${report.status == 'Pending'}">
+                            <button class="btn btn-progress" onclick="updateReportStatus(${report.reportID}, 'In Progress')">
+                                <i class="fas fa-cog"></i>
+                                Đang xử lý
+                            </button>
+                            <button class="btn btn-resolve" onclick="updateReportStatus(${report.reportID}, 'Resolved')">
+                                <i class="fas fa-check"></i>
+                                Giải quyết
+                            </button>
+                            <button class="btn btn-close" onclick="updateReportStatus(${report.reportID}, 'Rejected')">
+                                <i class="fas fa-times"></i>
+                                Từ chối
+                            </button>
+                        </c:when>
+                        <c:when test="${report.status == 'In Progress'}">
+                            <button class="btn btn-resolve" onclick="updateReportStatus(${report.reportID}, 'Resolved')">
+                                <i class="fas fa-check"></i>
+                                Giải quyết
+                            </button>
+                            <button class="btn btn-close" onclick="updateReportStatus(${report.reportID}, 'Rejected')">
+                                <i class="fas fa-times"></i>
+                                Từ chối
+                            </button>
+                        </c:when>
+                        <c:when test="${report.status == 'Resolved'}">
+                            <button class="btn btn-close" onclick="updateReportStatus(${report.reportID}, 'Closed')">
+                                <i class="fas fa-archive"></i>
+                                Đóng
+                            </button>
+                        </c:when>
+                    </c:choose>
                 </div>
             </div>
-        </div>
-
+        </c:forEach>
+    </div>
+</c:if>
         <!-- JavaScript xử lý Filter, Search, Modal -->
-        <script>
-            function viewReportDetails(reportId) {
-                // Dùng fetch hoặc gọi API để lấy dữ liệu chi tiết
-                // Trong ví dụ này mình giả lập bằng JS object
-                const reports = [
-                    <c:forEach var="report" items="${reportList}" varStatus="loop">
-                        {
-                            id: ${report.id},
-                            title: "${report.title}",
-                            description: "${report.description}",
-                            userName: "${report.userName}",
-                            userEmail: "${report.userEmail}",
-                            createdDate: "<fmt:formatDate value='${report.createdDate}' pattern='dd/MM/yyyy HH:mm' />",
-                            type: "${report.type}",
-                            priority: "${report.priority}",
-                            attachments: [
-                                <c:forEach var="att" items="${report.attachments}" varStatus="attLoop">
-                                    { fileName: "${att.fileName}" }<c:if test="${!attLoop.last}">,</c:if>
-                                </c:forEach>
-                            ]
-                        }<c:if test="${!loop.last}">,</c:if>
-                    </c:forEach>
-                ];
+       <script>
+    function viewReportDetails(reportID) {
+        window.location.href = "${pageContext.request.contextPath}/admin/reports/view?id=" + reportID;
+    }
 
-                const report = reports.find(r => r.id === reportId);
-                if (!report) return;
-
-                document.getElementById("reportTitle").value = report.title;
-                document.getElementById("reportDescription").value = report.description;
-                document.getElementById("reportUser").value = report.userName + " (${report.userEmail})";
-                document.getElementById("reportDate").value = report.createdDate;
-                document.getElementById("reportType").value = formatType(report.type);
-                document.getElementById("reportPriority").value = formatPriority(report.priority);
-
-                const attContainer = document.getElementById("modalAttachments");
-                attContainer.innerHTML = "";
-
-                if (report.attachments.length > 0) {
-                    report.attachments.forEach(att => {
-                        const div = document.createElement("div");
-                        div.className = "attachment-item";
-                        div.innerHTML = `<i class="fas fa-file"></i> ${att.fileName}`;
-                        attContainer.appendChild(div);
-                    });
+    function updateReportStatus(reportID, newStatus) {
+        if (confirm("Bạn có chắc muốn cập nhật trạng thái báo cáo này?")) {
+            fetch(window.location.pathname, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'reportID=' + reportID + '&newStatus=' + encodeURIComponent(newStatus)
+            }).then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
                 } else {
-                    attContainer.innerHTML = "<p>Không có file đính kèm</p>";
+                    alert('Cập nhật thành công!');
+                    window.location.reload();
                 }
-
-                document.getElementById("reportModal").style.display = "block";
-            }
-
-            function closeModal() {
-                document.getElementById("reportModal").style.display = "none";
-            }
-
-            function formatType(type) {
-                switch(type) {
-                    case "BUG": return "Lỗi hệ thống";
-                    case "FEATURE": return "Yêu cầu tính năng";
-                    case "COMPLAINT": return "Khiếu nại";
-                    default: return "Khác";
-                }
-            }
-
-            function formatPriority(priority) {
-                switch(priority) {
-                    case "HIGH": return "Cao";
-                    case "MEDIUM": return "Trung bình";
-                    case "LOW": return "Thấp";
-                    default: return "";
-                }
-            }
-
-            // Cập nhật trạng thái báo cáo
-            function updateReportStatus(reportId, newStatus) {
-                if (confirm("Bạn có chắc muốn cập nhật trạng thái?")) {
-                    window.location.href = "update-report-status?id=" + reportId + "&status=" + newStatus;
-                }
-            }
-
-            // Lọc báo cáo theo trạng thái
-            document.getElementById("statusFilter").addEventListener("change", filterReports);
-            document.getElementById("typeFilter").addEventListener("change", filterReports);
-            document.getElementById("priorityFilter").addEventListener("change", filterReports);
-            document.getElementById("searchInput").addEventListener("input", filterReports);
-
-            function filterReports() {
-                const status = document.getElementById("statusFilter").value;
-                const type = document.getElementById("typeFilter").value;
-                const priority = document.getElementById("priorityFilter").value;
-                const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-
-                document.querySelectorAll(".report-card").forEach(card => {
-                    const cardStatus = card.getAttribute("data-status");
-                    const cardType = card.getAttribute("data-type");
-                    const cardPriority = card.getAttribute("data-priority");
-                    const cardSearch = card.getAttribute("data-search");
-
-                    let show = true;
-
-                    if (status && cardStatus !== status) show = false;
-                    if (type && cardType !== type) show = false;
-                    if (priority && cardPriority !== priority) show = false;
-                    if (searchTerm && !cardSearch.includes(searchTerm)) show = false;
-
-                    card.style.display = show ? "block" : "none";
-                });
-            }
-
-            // Ripple animation (nếu bạn giữ nguyên phần này)
-            document.addEventListener('DOMContentLoaded', function () {
-                const buttons = document.querySelectorAll('.btn');
-                buttons.forEach(btn => {
-                    btn.style.position = 'relative';
-                    btn.style.overflow = 'hidden';
-
-                    btn.addEventListener('click', function (e) {
-                        if (!this.classList.contains('btn-disabled')) {
-                            e.preventDefault();
-                        }
-                        const ripple = document.createElement('span');
-                        const rect = this.getBoundingClientRect();
-                        const size = Math.max(rect.width, rect.height);
-                        ripple.style.cssText = `
-                            position: absolute;
-                            width: ${size}px;
-                            height: ${size}px;
-                            background: rgba(255, 255, 255, 0.6);
-                            border-radius: 50%;
-                            left: ${e.clientX - rect.left - size / 2}px;
-                            top: ${e.clientY - rect.top - size / 2}px;
-                            transform: scale(0);
-                            animation: ripple 0.6s ease-out;
-                            pointer-events: none;
-                        `;
-                        this.appendChild(ripple);
-                        setTimeout(() => ripple.remove(), 600);
-                    });
-                });
+            }).catch(error => {
+                alert('Lỗi khi cập nhật trạng thái.');
+                console.error(error);
             });
+        }
+    }
 
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes ripple {
-                    to {
-                        transform: scale(2);
-                        opacity: 0;
-                    }
+    // Lọc báo cáo theo trạng thái
+    document.getElementById("statusFilter").addEventListener("change", filterReports);
+    document.getElementById("typeFilter").addEventListener("change", filterReports);
+    document.getElementById("priorityFilter").addEventListener("change", filterReports);
+    document.getElementById("searchInput").addEventListener("input", filterReports);
+
+    function filterReports() {
+        const status = document.getElementById("statusFilter").value;
+        const type = document.getElementById("typeFilter").value;
+        const priority = document.getElementById("priorityFilter").value;
+        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+
+        document.querySelectorAll(".report-card").forEach(card => {
+            const cardStatus = card.getAttribute("data-status");
+            const cardType = card.getAttribute("data-type");
+            const cardPriority = card.getAttribute("data-priority");
+            const cardSearch = card.getAttribute("data-search");
+
+            let show = true;
+
+            if (status && cardStatus !== status) show = false;
+            if (type && cardType !== type) show = false;
+            if (priority && cardPriority !== priority) show = false;
+            if (searchTerm && !cardSearch.includes(searchTerm)) show = false;
+
+            card.style.display = show ? "block" : "none";
+        });
+    }
+
+    // Ripple animation (nếu bạn giữ nguyên phần này)
+    document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(btn => {
+            btn.style.position = 'relative';
+            btn.style.overflow = 'hidden';
+
+            btn.addEventListener('click', function (e) {
+                if (!this.classList.contains('btn-disabled')) {
+                    e.preventDefault();
                 }
-            `;
-            document.head.appendChild(style);
-        </script>
-    </body>
-</html>
-                                                
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: rgba(255, 255, 255, 0.6);
+                    border-radius: 50%;
+                    left: ${e.clientX - rect.left - size / 2}px;
+                    top: ${e.clientY - rect.top - size / 2}px;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                `;
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+    });
+
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes ripple {
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>              

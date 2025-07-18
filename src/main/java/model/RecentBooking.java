@@ -17,6 +17,7 @@ public class RecentBooking {
     private Date bookingDate;
     private Time startTime;
     private Time endTime;
+    private String orderedFoods; 
     private double totalAmount;
     private String status;
     private Timestamp createdAt;
@@ -24,10 +25,26 @@ public class RecentBooking {
     // Constructors
     public RecentBooking() {}
     
-    public RecentBooking(int bookingID, String customerName, String customerEmail, 
-                        String customerPhone, String stadiumName, String fieldName, 
-                        String fieldType, Date bookingDate, Time startTime, Time endTime, 
-                        double totalAmount, String status, Timestamp createdAt) {
+//    public RecentBooking(int bookingID, String customerName, String customerEmail, 
+//                        String customerPhone, String stadiumName, String fieldName, 
+//                        String fieldType, Date bookingDate, Time startTime, Time endTime, 
+//                        double totalAmount, String status, Timestamp createdAt) {
+//        this.bookingID = bookingID;
+//        this.customerName = customerName;
+//        this.customerEmail = customerEmail;
+//        this.customerPhone = customerPhone;
+//        this.stadiumName = stadiumName;
+//        this.fieldName = fieldName;
+//        this.fieldType = fieldType;
+//        this.bookingDate = bookingDate;
+//        this.startTime = startTime;
+//        this.endTime = endTime;
+//        this.totalAmount = totalAmount;
+//        this.status = status;
+//        this.createdAt = createdAt;
+//    }
+
+    public RecentBooking(int bookingID, String customerName, String customerEmail, String customerPhone, String stadiumName, String fieldName, String fieldType, Date bookingDate, Time startTime, Time endTime, String orderedFoods, double totalAmount, String status, Timestamp createdAt) {
         this.bookingID = bookingID;
         this.customerName = customerName;
         this.customerEmail = customerEmail;
@@ -38,6 +55,7 @@ public class RecentBooking {
         this.bookingDate = bookingDate;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.orderedFoods = orderedFoods;
         this.totalAmount = totalAmount;
         this.status = status;
         this.createdAt = createdAt;
@@ -123,6 +141,14 @@ public class RecentBooking {
     public void setEndTime(Time endTime) {
         this.endTime = endTime;
     }
+
+    public String getOrderedFoods() {
+        return orderedFoods;
+    }
+
+    public void setOrderedFoods(String orderedFoods) {
+        this.orderedFoods = orderedFoods;
+    }
     
     public double getTotalAmount() {
         return totalAmount;
@@ -161,6 +187,7 @@ public class RecentBooking {
                 ", bookingDate=" + bookingDate +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
+                ", orderedFoods='" + orderedFoods + '\'' +
                 ", totalAmount=" + totalAmount +
                 ", status='" + status + '\'' +
                 ", createdAt=" + createdAt +
