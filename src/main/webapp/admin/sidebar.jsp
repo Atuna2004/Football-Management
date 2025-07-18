@@ -76,7 +76,7 @@
 
 <div class="sidebar">
     <div class="sidebar-header">
-        <h3 style="margin: 0"></i> Quản lí </h3>
+        <h3 style="margin: 0"> Quản lí </h3>
     </div>
     <nav class="sidebar-nav">
         <div class="nav-item">
@@ -92,7 +92,7 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="./fieldOwnerApprove.jsp" class="nav-link">
+            <a href="${pageContext.request.contextPath}/admin/pending" class="nav-link">
                 <i class="fas fa-user-check"></i>
                 Phê Duyệt Chủ Sân
             </a>

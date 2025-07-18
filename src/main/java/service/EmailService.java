@@ -14,8 +14,8 @@ import java.util.Properties;
 
 public class EmailService {
 
-    public static final String EMAIL_SENDER = "nguyenphananh49@gmail.com";
-    public static final String EMAIL_PASSWORD = "zvgp xvve cpnz gryc";
+    public static final String EMAIL_SENDER = "xxx";
+    public static final String EMAIL_PASSWORD = "xxx";
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final int SMTP_PORT = 587;
 

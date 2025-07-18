@@ -21,7 +21,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.util.logging.Logger;
-
 import org.json.JSONObject;
 
 public class LoginFacebookServlet extends HttpServlet {

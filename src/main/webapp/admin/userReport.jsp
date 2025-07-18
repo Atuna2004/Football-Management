@@ -664,53 +664,62 @@
                     <h2><i class="fas fa-exclamation-triangle"></i> Quản lý báo cáo</h2>
                 </div>
 
-                <!-- Thống kê -->
-                <div class="stats-cards">
-                    <div class="stat-card new">
-                        <div class="icon"><i class="fas fa-bell"></i></div>
-                        <div class="number">
-                            <c:set var="newCount" value="0" />
-                            <c:forEach var="report" items="${reportList}">
-                                <c:if test="${report.status == 'NEW'}">
-                                    <c:set var="newCount" value="${newCount + 1}" />
-                                </c:if>
-                            </c:forEach>
-                            ${newCount}
-                        </div>
-                        <div class="label">Báo cáo mới</div>
-                    </div>
-                    <div class="stat-card in-progress">
-                        <div class="icon"><i class="fas fa-cog"></i></div>
-                        <div class="number">
-                            <c:set var="progressCount" value="0" />
-                            <c:forEach var="report" items="${reportList}">
-                                <c:if test="${report.status == 'IN_PROGRESS'}">
-                                    <c:set var="progressCount" value="${progressCount + 1}" />
-                                </c:if>
-                            </c:forEach>
-                            ${progressCount}
-                        </div>
-                        <div class="label">Đang xử lý</div>
-                    </div>
-                    <div class="stat-card resolved">
-                        <div class="icon"><i class="fas fa-check-circle"></i></div>
-                        <div class="number">
-                            <c:set var="resolvedCount" value="0" />
-                            <c:forEach var="report" items="${reportList}">
-                                <c:if test="${report.status == 'RESOLVED'}">
-                                    <c:set var="resolvedCount" value="${resolvedCount + 1}" />
-                                </c:if>
-                            </c:forEach>
-                            ${resolvedCount}
-                        </div>
-                        <div class="label">Đã giải quyết</div>
-                    </div>
-                    <div class="stat-card closed">
-                        <div class="icon"><i class="fas fa-archive"></i></div>
-                        <div class="number">${fn:length(reportList) - newCount - progressCount - resolvedCount}</div>
-                        <div class="label">Đã đóng</div>
-                    </div>
-                </div>
+              <!-- Replace your stats cards section with this: -->
+
+<div class="stats-cards">
+    <div class="stat-card new">
+        <div class="icon"><i class="fas fa-bell"></i></div>
+        <div class="number">
+            <c:set var="pendingCount" value="0" />
+            <c:forEach var="report" items="${reportList}">
+                <c:if test="${report.status == 'Pending'}">
+                    <c:set var="pendingCount" value="${pendingCount + 1}" />
+                </c:if>
+            </c:forEach>
+            ${pendingCount}
+        </div>
+        <div class="label">Báo cáo mới</div>
+    </div>
+    <div class="stat-card in-progress">
+        <div class="icon"><i class="fas fa-cog"></i></div>
+        <div class="number">
+            <c:set var="progressCount" value="0" />
+            <c:forEach var="report" items="${reportList}">
+                <c:if test="${report.status == 'In Progress'}">
+                    <c:set var="progressCount" value="${progressCount + 1}" />
+                </c:if>
+            </c:forEach>
+            ${progressCount}
+        </div>
+        <div class="label">Đang xử lý</div>
+    </div>
+    <div class="stat-card resolved">
+        <div class="icon"><i class="fas fa-check-circle"></i></div>
+        <div class="number">
+            <c:set var="resolvedCount" value="0" />
+            <c:forEach var="report" items="${reportList}">
+                <c:if test="${report.status == 'Resolved'}">
+                    <c:set var="resolvedCount" value="${resolvedCount + 1}" />
+                </c:if>
+            </c:forEach>
+            ${resolvedCount}
+        </div>
+        <div class="label">Đã giải quyết</div>
+    </div>
+    <div class="stat-card closed">
+        <div class="icon"><i class="fas fa-archive"></i></div>
+        <div class="number">
+            <c:set var="rejectedCount" value="0" />
+            <c:forEach var="report" items="${reportList}">
+                <c:if test="${report.status == 'Rejected'}">
+                    <c:set var="rejectedCount" value="${rejectedCount + 1}" />
+                </c:if>
+            </c:forEach>
+            ${rejectedCount}
+        </div>
+        <div class="label">Đã từ chối</div>
+    </div>
+</div>
 
                 <!-- Bộ lọc -->
                 <div class="filter-section">
@@ -753,6 +762,8 @@
     </div>
 </c:if>
 
+<!-- Replace the report card section in your JSP with this fixed version: -->
+
 <c:if test="${not empty reportList}">
     <div class="reports-container" id="reportsContainer">
         <c:forEach var="report" items="${reportList}">
@@ -762,13 +773,14 @@
                  data-priority="${report.priority}"
                  data-search="${fn:toLowerCase(report.userName)} ${fn:toLowerCase(report.title)}">
 
-                <!-- Trạng thái -->
-                <div class="report-status status-${fn:toLowerCase(fn:replace(report.status, '_', '-'))}">
+                <!-- ✅ FIXED: Status mapping -->
+                <div class="report-status status-${fn:toLowerCase(fn:replace(report.status, ' ', '-'))}">
                     <c:choose>
-                        <c:when test="${report.status == 'NEW'}">Mới</c:when>
-                        <c:when test="${report.status == 'IN_PROGRESS'}">Đang xử lý</c:when>
-                        <c:when test="${report.status == 'RESOLVED'}">Đã giải quyết</c:when>
-                        <c:otherwise>Đã đóng</c:otherwise>
+                        <c:when test="${report.status == 'Pending'}">Đang chờ</c:when>
+                        <c:when test="${report.status == 'In Progress'}">Đang xử lý</c:when>
+                        <c:when test="${report.status == 'Resolved'}">Đã giải quyết</c:when>
+                        <c:when test="${report.status == 'Rejected'}">Đã từ chối</c:when>
+                        <c:otherwise>${report.status}</c:otherwise>
                     </c:choose>
                 </div>
 
@@ -783,7 +795,7 @@
                     </div>
                 </div>
 
-                <!-- Chi tiết báo cáo -->
+                <!-- ✅ FIXED: Report details -->
                 <div class="report-details">
                     <div class="detail-row">
                         <span class="detail-label">Tiêu đề:</span>
@@ -794,17 +806,11 @@
                         <span class="detail-value">
                             <span class="report-type type-${fn:toLowerCase(report.type)}">
                                 <c:choose>
-                                    <c:when test="${report.type == 'BUG'}">
-                                        <i class="fas fa-bug"></i> Lỗi hệ thống
-                                    </c:when>
-                                    <c:when test="${report.type == 'FEATURE'}">
-                                        <i class="fas fa-lightbulb"></i> Yêu cầu tính năng
-                                    </c:when>
-                                    <c:when test="${report.type == 'COMPLAINT'}">
-                                        <i class="fas fa-exclamation-circle"></i> Khiếu nại
+                                    <c:when test="${report.type == 'REPORT'}">
+                                        <i class="fas fa-flag"></i> Báo cáo sân
                                     </c:when>
                                     <c:otherwise>
-                                        <i class="fas fa-question-circle"></i> Khác
+                                        <i class="fas fa-file-alt"></i> ${report.type}
                                     </c:otherwise>
                                 </c:choose>
                             </span>
@@ -831,70 +837,65 @@
                     <div class="detail-row">
                         <span class="detail-label">Ngày tạo:</span>
                         <span class="detail-value">
-                            <fmt:formatDate value="${report.createdDate}" pattern="dd/MM/yyyy HH:mm" />
+                            <fmt:formatDate value="${report.submittedAt}" pattern="dd/MM/yyyy HH:mm" />
                         </span>
                     </div>
+                    <c:if test="${not empty report.relatedStadiumID}">
+                        <div class="detail-row">
+                            <span class="detail-label">Sân liên quan:</span>
+                            <span class="detail-value">ID: ${report.relatedStadiumID}</span>
+                        </div>
+                    </c:if>
                 </div>
 
-                <!-- Nội dung báo cáo -->
+                <!-- ✅ FIXED: Report content -->
                 <div class="report-content">
                     <h5><i class="fas fa-file-alt"></i> Nội dung báo cáo:</h5>
                     <p>
-                        ${fn:length(report.description) > 150 ? fn:substring(report.description, 0, 150).concat('...') : report.description}
+                        <c:choose>
+                            <c:when test="${fn:length(report.description) > 150}">
+                                ${fn:substring(report.description, 0, 150)}...
+                            </c:when>
+                            <c:otherwise>
+                                ${report.description}
+                            </c:otherwise>
+                        </c:choose>
                     </p>
                 </div>
 
-                <!-- File đính kèm -->
-                <c:if test="${not empty report.attachments}">
-                    <div class="attachments-section">
-                        <div class="attachments-title">
-                            <i class="fas fa-paperclip"></i>
-                            File đính kèm
-                        </div>
-                        <div class="attachment-list">
-                            <c:forEach var="attachment" items="${report.attachments}">
-                                <div class="attachment-item" onclick="viewAttachment('${attachment.fileName}')">
-                                    <i class="fas fa-file"></i>
-                                    ${attachment.fileName}
-                                </div>
-                            </c:forEach>
-                        </div>
-                    </div>
-                </c:if>
-
-                <!-- Nút hành động -->
+                <!-- ✅ FIXED: Action buttons with correct status values -->
                 <div class="action-buttons">
                     <button class="btn btn-view" onclick="viewReportDetails(${report.reportID})">
                         <i class="fas fa-eye"></i>
                         Xem chi tiết
                     </button>
                     <c:choose>
-                        <c:when test="${report.status == 'NEW'}">
-                            <button class="btn btn-progress" onclick="updateReportStatus(${report.reportID}, 'IN_PROGRESS')">
+                        <c:when test="${report.status == 'Pending'}">
+                            <button class="btn btn-progress" onclick="updateReportStatus(${report.reportID}, 'In Progress')">
                                 <i class="fas fa-cog"></i>
                                 Đang xử lý
                             </button>
-                            <button class="btn btn-resolve" onclick="updateReportStatus(${report.reportID}, 'RESOLVED')">
+                            <button class="btn btn-resolve" onclick="updateReportStatus(${report.reportID}, 'Resolved')">
                                 <i class="fas fa-check"></i>
                                 Giải quyết
                             </button>
-                            <button class="btn btn-close" onclick="updateReportStatus(${report.reportID}, 'CLOSED')">
-                                <i class="fas fa-archive"></i>
-                                Đóng
+                            <button class="btn btn-close" onclick="updateReportStatus(${report.reportID}, 'Rejected')">
+                                <i class="fas fa-times"></i>
+                                Từ chối
                             </button>
                         </c:when>
-                        <c:when test="${report.status == 'IN_PROGRESS'}">
-                            <button class="btn btn-resolve" onclick="updateReportStatus(${report.reportID}, 'RESOLVED')">
+                        <c:when test="${report.status == 'In Progress'}">
+                            <button class="btn btn-resolve" onclick="updateReportStatus(${report.reportID}, 'Resolved')">
                                 <i class="fas fa-check"></i>
                                 Giải quyết
                             </button>
-                            <button class="btn btn-close" onclick="updateReportStatus(${report.reportID}, 'CLOSED')">
-                                <i class="fas fa-archive"></i>
-                                Đóng
+                            <button class="btn btn-close" onclick="updateReportStatus(${report.reportID}, 'Rejected')">
+                                <i class="fas fa-times"></i>
+                                Từ chối
                             </button>
                         </c:when>
-                        <c:when test="${report.status == 'RESOLVED'}">
-                            <button class="btn btn-close" onclick="updateReportStatus(${report.reportID}, 'CLOSED')">
+                        <c:when test="${report.status == 'Resolved'}">
+                            <button class="btn btn-close" onclick="updateReportStatus(${report.reportID}, 'Closed')">
                                 <i class="fas fa-archive"></i>
                                 Đóng
                             </button>
@@ -902,9 +903,9 @@
                     </c:choose>
                 </div>
             </div>
-        </c:forEach> 
+        </c:forEach>
+    </div>
 </c:if>
-
         <!-- JavaScript xử lý Filter, Search, Modal -->
        <script>
     function viewReportDetails(reportID) {
