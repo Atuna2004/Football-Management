@@ -23,11 +23,11 @@ public class BookingHistoryServlet extends HttpServlet {
             return;
         }
 
-        // Lấy danh sách booking có kèm thông tin tiền sân + tiền đồ ăn
+        // Get list of bookings including field cost and food cost information
         List<Booking> bookings = new BookingDAO().getBookingsByUserId(user.getUserID());
         req.setAttribute("bookings", bookings);
 
-        // Forward tới trang hiển thị
+        // Forward to the display page
         req.getRequestDispatcher("/account/bookingHistory.jsp").forward(req, resp);
     }
 }

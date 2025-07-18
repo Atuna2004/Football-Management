@@ -13,6 +13,7 @@ import java.util.List;
 
 @WebServlet("/fieldOwner/StadiumFieldList")
 public class StadiumFieldListServlet extends HttpServlet {
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String stadiumIdStr = request.getParameter("id");
@@ -24,14 +25,14 @@ public class StadiumFieldListServlet extends HttpServlet {
             FieldDAO fieldDAO = new FieldDAO(conn);
             List<Field> fields = fieldDAO.getFieldsByStadiumId(stadiumId);
 
-            // Lấy thông tin sân từ StadiumDAO
+            // Get stadium information from StadiumDAO
             StadiumDAO stadiumDAO = new StadiumDAO();
             Stadium stadium = stadiumDAO.getStadiumById(stadiumId);
 
-            // Set dữ liệu vào request để gửi sang JSP
+            // Set data into request to send to JSP
             request.setAttribute("fields", fields);
             request.setAttribute("stadiumId", stadiumId);
-            request.setAttribute("stadiumName", stadium.getName()); // <-- đây là phần bạn cần
+            request.setAttribute("stadiumName", stadium.getName());
 
             RequestDispatcher dispatcher = request.getRequestDispatcher("/fieldOwner/StadiumFieldList.jsp");
             dispatcher.forward(request, response);

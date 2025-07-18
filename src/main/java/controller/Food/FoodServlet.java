@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.FoodItem;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/food")
@@ -19,10 +18,10 @@ public class FoodServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String stadiumIdRaw = request.getParameter("stadiumId");
-        String bookingIdRaw = request.getParameter("bookingId"); // bookingId được tạo từ servlet trước đó
+        String bookingIdRaw = request.getParameter("bookingId"); // bookingId created from previous servlet
 
         if (stadiumIdRaw == null || bookingIdRaw == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Thiếu thông tin timeslot hoặc sân.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing timeslot or stadium information.");
             return;
         }
 
@@ -32,15 +31,15 @@ public class FoodServlet extends HttpServlet {
             stadiumId = Integer.parseInt(stadiumIdRaw);
             bookingId = Integer.parseInt(bookingIdRaw);
         } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Tham số không hợp lệ.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters.");
             return;
         }
 
-        // Lấy danh sách món ăn theo sân
+        // Retrieve food items by stadium ID
         FoodItemDAO foodDao = new FoodItemDAO();
         List<FoodItem> foodList = foodDao.getFoodItemsByStadium(stadiumId);
 
-        // Gửi dữ liệu sang JSP
+        // Pass data to JSP
         request.setAttribute("foodList", foodList);
         request.setAttribute("stadiumId", stadiumId);
         request.setAttribute("bookingId", bookingId);
@@ -48,9 +47,9 @@ public class FoodServlet extends HttpServlet {
         // Logging
         System.out.println("stadiumId = " + stadiumId);
         System.out.println("bookingId = " + bookingId);
-        System.out.println("Số món ăn lấy được: " + foodList.size());
+        System.out.println("Number of food items retrieved: " + foodList.size());
 
-        // Forward sang food.jsp
+        // Forward to food.jsp
         request.getRequestDispatcher("food.jsp").forward(request, response);
     }
 }

@@ -25,19 +25,19 @@ public class PaymentServlet extends HttpServlet {
             String bookingIdRaw = request.getParameter("bookingId");
 
             if (bookingIdRaw == null) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Thiếu thông tin thanh toán.");
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing payment information.");
                 return;
             }
 
             int bookingId = Integer.parseInt(bookingIdRaw);
             int stadiumIdInt = Integer.parseInt(stadiumId);
 
-            // ✅ Lấy session
+            // ✅ Retrieve session
             HttpSession session = request.getSession(false);
             List<CartItem> cart = (session != null) ? (List<CartItem>) session.getAttribute("cart") : null;
             User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
 
-            // ✅ Ghi đơn món nếu có
+            // ✅ Save food order if present
             if (cart != null && currentUser != null && !cart.isEmpty()) {
                 FoodOrderDAO foodOrderDAO = new FoodOrderDAO();
                 double cartFoodTotal = 0;
@@ -51,17 +51,17 @@ public class PaymentServlet extends HttpServlet {
                     foodOrderDAO.reduceStock(cart);
                 }
 
-                // ❌ Xoá giỏ hàng sau khi xử lý
+                // ❌ Clear cart after processing
                 session.removeAttribute("cart");
             }
 
-            // ✅ Lấy tổng tiền từ DB
+            // ✅ Get total amount from DB
             PaymentDAO dao = new PaymentDAO();
             double ticketPrice = dao.getTicketPrice(bookingId);
             double foodPrice = dao.getFoodOrderTotal(bookingId);
             double amount = ticketPrice + foodPrice;
 
-            // ✅ Gửi sang VNPay nếu chọn VNPay
+            // ✅ Redirect to VNPay if chosen
             if ("vnpay".equalsIgnoreCase(method)) {
                 String vnp_TxnRef = Config.getRandomNumber(8);
                 String vnp_IpAddr = Config.getIpAddress(request);
@@ -80,7 +80,7 @@ public class PaymentServlet extends HttpServlet {
                 vnp_Params.put("vnp_ReturnUrl", Config.vnp_ReturnUrl);
                 vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
-                // Thời gian tạo + hết hạn
+                // Set creation and expiry time
                 Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                 String createDate = sdf.format(calendar.getTime());
@@ -88,7 +88,7 @@ public class PaymentServlet extends HttpServlet {
                 calendar.add(Calendar.MINUTE, 15);
                 vnp_Params.put("vnp_ExpireDate", sdf.format(calendar.getTime()));
 
-                // Tạo hash + query
+                // Generate hash and query
                 List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
                 Collections.sort(fieldNames);
                 StringBuilder hashData = new StringBuilder();
@@ -112,21 +112,21 @@ public class PaymentServlet extends HttpServlet {
                 query.append("&vnp_SecureHash=").append(secureHash);
                 String paymentUrl = Config.vnp_PayUrl + "?" + query;
 
-                // Ghi vào DB
+                // Save to DB
                 boolean saved = dao.createPayment(bookingId, amount, "vnpay", "Pending", vnp_TxnRef);
                 if (saved) {
                     response.sendRedirect(paymentUrl);
                 } else {
-                    response.getWriter().write("❌ Không thể ghi thanh toán vào cơ sở dữ liệu.");
+                    response.getWriter().write("❌ Unable to save payment to database.");
                 }
 
             } else {
-                response.getWriter().write("Phương thức chưa hỗ trợ.");
+                response.getWriter().write("Unsupported payment method.");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendError(500, "❌ Lỗi server: " + e.getMessage());
+            response.sendError(500, "❌ Server error: " + e.getMessage());
         }
     }
 }

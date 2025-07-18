@@ -34,7 +34,7 @@ public class UpdateCartServlet extends HttpServlet {
             }
         }
 
-        // ✅ Sửa từ timeSlotId thành bookingId
+        // ✅ Changed from timeSlotId to bookingId
         String stadiumId = request.getParameter("stadiumId");
         String bookingId = request.getParameter("bookingId");
 

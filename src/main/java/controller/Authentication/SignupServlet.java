@@ -1,13 +1,10 @@
 package controller.Authentication;
 
-import connect.DBConnection;
 import dao.AccountDAO;
 import model.User;
 import service.EmailService;
 import service.OTPGenerator;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -27,16 +24,16 @@ public class SignupServlet extends HttpServlet {
         String phone = request.getParameter("phone");
 
         if (!password.equals(confirmPassword)) {
-            request.setAttribute("error", "Mật khẩu xác nhận không khớp!");
+            request.setAttribute("error", "Confirm password does not match!");
             request.getRequestDispatcher("account/register.jsp").forward(request, response);
             return;
         }
 
-        try (Connection conn = DBConnection.getConnection()) {
-            AccountDAO userDAO = new AccountDAO(conn);
+        try {
+            AccountDAO userDAO = new AccountDAO();
 
             if (userDAO.getUserByEmail(email) != null) {
-                request.setAttribute("error", "Email đã tồn tại!");
+                request.setAttribute("error", "Email already exists!");
                 request.getRequestDispatcher("account/register.jsp").forward(request, response);
                 return;
             }
@@ -52,17 +49,19 @@ public class SignupServlet extends HttpServlet {
             newUser.setAvatarUrl(null);
 
             request.getSession().setAttribute("pendingUser", newUser);
+
             String otp = OTPGenerator.generateOTP();
             EmailService emailService = new EmailService();
             request.getSession().setAttribute("otp", otp);
             request.getSession().setAttribute("email", email);
             request.getSession().setAttribute("otpMode", "activate");
-            String subject = "Activate account OTP";
+            String subject = "Activate Your Account - OTP";
             emailService.sendOTPEmail(email, otp, subject);
+
             response.sendRedirect("account/confirmOTP.jsp");
 
-        } catch (SQLException e) {
-            throw new ServletException("Lỗi cơ sở dữ liệu", e);
+        } catch (Exception e) {
+            throw new ServletException("Database error", e);
         }
     }
 }

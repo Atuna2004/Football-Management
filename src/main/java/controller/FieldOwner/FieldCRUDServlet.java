@@ -1,6 +1,5 @@
 package controller.FieldOwner;
 
-
 import connect.DBConnection;
 import dao.FieldDAO;
 import model.Field;
@@ -10,7 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet("/field/config") // <-- DÙNG ĐƯỜNG DẪN NÀY TRONG JSP
+@WebServlet("/field/config") // <-- USE THIS PATH IN JSP
 public class FieldCRUDServlet extends HttpServlet {
     private DBConnection connection;
     private FieldDAO fieldDAO;
@@ -33,7 +32,7 @@ public class FieldCRUDServlet extends HttpServlet {
                 request.setAttribute("field", field);
                 request.getRequestDispatcher("/fieldOwner/updateField.jsp").forward(request, response);
             } catch (SQLException | NumberFormatException e) {
-                throw new ServletException("Lỗi khi tải thông tin sân nhỏ", e);
+                throw new ServletException("Error loading field information", e);
             }
         }
     }
@@ -75,7 +74,7 @@ public class FieldCRUDServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/fieldOwner/StadiumFieldList?id=" + stadiumId);
 
         } catch (SQLException | NumberFormatException e) {
-            throw new ServletException("Lỗi xử lý yêu cầu", e);
+            throw new ServletException("Error processing request", e);
         }
     }
 }

@@ -1,24 +1,22 @@
 package controller.Authentication;
 
-import connect.DBConnection;
 import dao.AccountDAO;
 import model.User;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.Random;
 import model.GoogleAccount;
 import service.GoogleLogin;
 
 public class LoginServlet extends HttpServlet {
 
+    // Utility method to generate a random password
     private String generateRandomPassword(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%";
         StringBuilder password = new StringBuilder();
@@ -36,34 +34,25 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        try (Connection conn = DBConnection.getConnection()) {
-
-            AccountDAO dao = new AccountDAO(conn);
+        try {
+            AccountDAO dao = new AccountDAO();
             User user = dao.getUserByEmail(email);
 
-            if (user != null) {
-                if (user.getPasswordHash().equals(password)) {
-                    HttpSession session = request.getSession();
-                    session.setAttribute("currentUser", user);
-                    response.sendRedirect(request.getContextPath() + "/home.jsp");
-                    return;
-                } else {
-                    HttpSession session = request.getSession();
-                    session.setAttribute("errorMessage", "Sai email hoặc mật khẩu.");
-                    response.sendRedirect(request.getContextPath() + "/account/login.jsp");
-                    return;
-                }
+            if (user != null && user.getPasswordHash().equals(password)) {
+                HttpSession session = request.getSession();
+                session.setAttribute("currentUser", user);
+                session.setAttribute("userID", user.getUserID());
+                response.sendRedirect(request.getContextPath() + "/home.jsp");
             } else {
                 HttpSession session = request.getSession();
-                session.setAttribute("errorMessage", "Sai email hoặc mật khẩu.");
+                session.setAttribute("errorMessage", "Incorrect email or password.");
                 response.sendRedirect(request.getContextPath() + "/account/login.jsp");
-                return;
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             HttpSession session = request.getSession();
-            session.setAttribute("errorMessage", "Lỗi hệ thống. Vui lòng thử lại sau.");
+            session.setAttribute("errorMessage", "System error. Please try again later.");
             response.sendRedirect(request.getContextPath() + "/account/login.jsp");
         }
     }
@@ -77,7 +66,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        try (Connection conn = DBConnection.getConnection()) {
+        try {
             GoogleLogin gg = new GoogleLogin();
             String accessToken = gg.getToken(code);
             GoogleAccount acc = gg.getUserInfo(accessToken);
@@ -87,9 +76,10 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
 
-            AccountDAO dao = new AccountDAO(conn);
+            AccountDAO dao = new AccountDAO();
             User user = dao.getUserByEmail(acc.getEmail());
 
+            // Register user if not exists
             if (user == null) {
                 user = new User();
                 user.setEmail(acc.getEmail());
@@ -107,11 +97,12 @@ public class LoginServlet extends HttpServlet {
 
             HttpSession session = request.getSession();
             session.setAttribute("currentUser", user);
+            session.setAttribute("userID", user.getUserID());
             response.sendRedirect(request.getContextPath() + "/home.jsp");
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.getSession().setAttribute("errorMessage", "Lỗi đăng nhập bằng Google. Vui lòng thử lại.");
+            request.getSession().setAttribute("errorMessage", "Google login error. Please try again.");
             response.sendRedirect(request.getContextPath() + "/account/login.jsp");
         }
     }

@@ -19,15 +19,13 @@ public class UserManagementServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            Connection conn = DBConnection.getConnection();
-            AccountDAO accountDAO = new AccountDAO(conn);
+        try (Connection conn = DBConnection.getConnection()) {
+            AccountDAO accountDAO = new AccountDAO();
             List<User> userList = accountDAO.getAllUsers();
-
             request.setAttribute("userList", userList);
             request.getRequestDispatcher("/admin/userManagement.jsp").forward(request, response);
         } catch (Exception e) {
-            throw new ServletException("Lỗi tải danh sách người dùng", e);
+            throw new ServletException("Error loading user list", e);
         }
     }
 
@@ -37,14 +35,12 @@ public class UserManagementServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         if (action == null || action.isEmpty()) {
-            // Chuyển hướng lại servlet thay vì gọi doGet
             response.sendRedirect("user-list");
             return;
         }
 
-        try {
-            Connection conn = DBConnection.getConnection();
-            AccountDAO accountDAO = new AccountDAO(conn);
+        try (Connection conn = DBConnection.getConnection()) {
+            AccountDAO accountDAO = new AccountDAO();
 
             switch (action) {
                 case "add":
@@ -59,10 +55,9 @@ public class UserManagementServlet extends HttpServlet {
                 default:
                     response.sendRedirect("user-list");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("user-list"); // Chuyển hướng khi có lỗi
+            response.sendRedirect("user-list");
         }
     }
 
@@ -71,7 +66,7 @@ public class UserManagementServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         String email = request.getParameter("email");
-        String passwordHash = request.getParameter("passwordHash");
+        String password = request.getParameter("password"); // Get raw password from form
         String fullName = request.getParameter("fullName");
         String phone = request.getParameter("phone");
         boolean isActive = "on".equals(request.getParameter("isActive"));
@@ -90,7 +85,7 @@ public class UserManagementServlet extends HttpServlet {
 
         User user = new User();
         user.setEmail(email);
-        user.setPasswordHash(passwordHash);
+        user.setPasswordHash(hashPassword(password)); // Hash password here
         user.setFullName(fullName);
         user.setPhone(phone);
         user.setActive(isActive);
@@ -98,12 +93,7 @@ public class UserManagementServlet extends HttpServlet {
         user.setDateOfBirth(dob);
 
         boolean success = accountDAO.addUser(user);
-
-        if (success) {
-            response.sendRedirect("user-list");
-        } else {
-            response.sendRedirect("user-list");
-        }
+        response.sendRedirect("user-list");
     }
 
     private void updateUser(HttpServletRequest request, HttpServletResponse response, AccountDAO accountDAO)
@@ -118,10 +108,9 @@ public class UserManagementServlet extends HttpServlet {
             boolean isActive = request.getParameter("isActive") != null;
             String address = request.getParameter("address");
             String dobStr = request.getParameter("dateOfBirth");
-
             String googleID = request.getParameter("googleID");
             String avatarUrl = request.getParameter("avatarUrl");
-            String password = request.getParameter("passwordHash");
+            String password = request.getParameter("password");
 
             Date dob = null;
             if (dobStr != null && !dobStr.isEmpty()) {
@@ -147,8 +136,7 @@ public class UserManagementServlet extends HttpServlet {
             if (password != null && !password.trim().isEmpty()) {
                 user.setPasswordHash(hashPassword(password));
             } else {
-
-               User existing = accountDAO.getUserById(userID);
+                User existing = accountDAO.getUserById(userID);
                 if (existing != null) {
                     user.setPasswordHash(existing.getPasswordHash());
                 } else {
@@ -156,13 +144,9 @@ public class UserManagementServlet extends HttpServlet {
                     return;
                 }
             }
-            boolean success = accountDAO.updateUser(user);
 
-            if (success) {
-                response.sendRedirect("user-list");
-            } else {
-                response.sendRedirect("user-list");
-            }
+            boolean success = accountDAO.updateUser(user);
+            response.sendRedirect("user-list");
         } catch (IOException | NumberFormatException | SQLException ex) {
             response.sendRedirect("user-list");
         }
@@ -183,9 +167,9 @@ public class UserManagementServlet extends HttpServlet {
         int userID = Integer.parseInt(idStr);
         try {
             boolean success = accountDAO.deleteUser(userID);
-            response.sendRedirect("user-list");
         } catch (SQLException e) {
-            response.sendRedirect("user-list");
+            e.printStackTrace();
         }
+        response.sendRedirect("user-list");
     }
 }

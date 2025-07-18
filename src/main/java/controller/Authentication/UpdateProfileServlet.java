@@ -26,82 +26,92 @@ public class UpdateProfileServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
+
         try {
             String userIdStr = request.getParameter("userId");
             if (userIdStr == null || userIdStr.trim().isEmpty()) {
                 HttpSession session = request.getSession();
-                session.setAttribute("errorMessage", "Không tìm thấy ID người dùng.");
+                session.setAttribute("errorMessage", "User ID not found.");
                 response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
                 return;
             }
+
             int userId;
             try {
                 userId = Integer.parseInt(userIdStr);
             } catch (NumberFormatException e) {
                 HttpSession session = request.getSession();
-                session.setAttribute("errorMessage", "ID người dùng không hợp lệ.");
+                session.setAttribute("errorMessage", "Invalid user ID.");
                 response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
                 return;
             }
+
             String fullName = request.getParameter("fullName");
             String phone = request.getParameter("phone");
             String address = request.getParameter("address");
             String birthdateStr = request.getParameter("birthdate");
             Date dateOfBirth = null;
+
             if (birthdateStr != null && !birthdateStr.isEmpty()) {
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                     dateOfBirth = sdf.parse(birthdateStr);
                 } catch (ParseException e) {
                     HttpSession session = request.getSession();
-                    session.setAttribute("errorMessage", "Định dạng ngày sinh không đúng.");
+                    session.setAttribute("errorMessage", "Invalid birth date format.");
                     response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
                     return;
                 }
             }
+
             phone = phone.replaceAll("\\D+", "");
             if (phone.isEmpty()) {
                 HttpSession session = request.getSession();
-                session.setAttribute("errorMessage", "Số điện thoại không thể để trống.");
+                session.setAttribute("errorMessage", "Phone number cannot be empty.");
                 response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
                 return;
             }
+
             if (!phone.startsWith("0")) {
                 HttpSession session = request.getSession();
-                session.setAttribute("errorMessage", "Số điện thoại phải bắt đầu bằng số 0.");
+                session.setAttribute("errorMessage", "Phone number must start with 0.");
                 response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
                 return;
             }
+
             if (phone.length() < 10) {
                 HttpSession session = request.getSession();
-                session.setAttribute("errorMessage", "Số điện thoại phải có ít nhất 10 chữ số.");
+                session.setAttribute("errorMessage", "Phone number must be at least 10 digits.");
                 response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
                 return;
             }
-            Connection conn = DBConnection.getConnection();
-            AccountDAO accountDAO = new AccountDAO(conn);
+
+            AccountDAO accountDAO = new AccountDAO();
             User user = accountDAO.getUserById(userId);
             if (user == null) {
                 HttpSession session = request.getSession();
-                session.setAttribute("errorMessage", "Người dùng không tồn tại.");
+                session.setAttribute("errorMessage", "User does not exist.");
                 response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
                 return;
             }
+
             user.setFullName(fullName);
             user.setPhone(phone);
             user.setDateOfBirth(dateOfBirth);
             user.setAddress(address);
+
             HttpSession session = request.getSession();
             if (accountDAO.updateUser(user)) {
                 session.setAttribute("currentUser", user);
-                session.setAttribute("successMessage", "Cập nhật hồ sơ thành công!");
+                session.setAttribute("successMessage", "Profile updated successfully!");
                 response.sendRedirect(request.getContextPath() + "/account/successProfile.jsp");
             } else {
-                session.setAttribute("errorMessage", "Không thể cập nhật hồ sơ. Vui lòng thử lại.");
+                session.setAttribute("errorMessage", "Unable to update profile. Please try again.");
                 response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
             }
+
         } catch (SQLException e) {
-            throw new ServletException("Lỗi hệ thống khi cập nhật hồ sơ: " + e.getMessage());
+            throw new ServletException("System error while updating profile: " + e.getMessage());
         }
     }
 }

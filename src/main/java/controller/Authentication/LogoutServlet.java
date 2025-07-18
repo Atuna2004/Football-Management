@@ -14,13 +14,13 @@ public class LogoutServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
 
-        // Hủy session hiện tại (xóa thông tin người dùng)
-        HttpSession session = request.getSession(false); // false: không tạo session mới nếu chưa có
+        // Invalidate the current session (remove user information)
+        HttpSession session = request.getSession(false); // false: do not create a new session if one doesn't exist
         if (session != null) {
             session.invalidate();
         }
 
-        // Chuyển hướng về trang đăng nhập hoặc trang chủ
+        // Redirect to the login page or home page
         response.sendRedirect(request.getContextPath() + "/home.jsp");
     }
 }

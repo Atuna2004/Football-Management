@@ -21,7 +21,7 @@ public class RemoveFromCartServlet extends HttpServlet {
             String bookingId = request.getParameter("bookingId");
 
             if (stadiumId == null || bookingId == null) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Thiếu tham số stadiumId hoặc bookingId.");
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing stadiumId or bookingId parameter.");
                 return;
             }
 
@@ -38,11 +38,11 @@ public class RemoveFromCartServlet extends HttpServlet {
                 }
             }
 
-            // Redirect chính xác đến cart.jsp với bookingId
+            // Redirect back to cart.jsp with correct bookingId
             response.sendRedirect(request.getContextPath() + "/stadium/cart.jsp?stadiumId=" + stadiumId + "&bookingId=" + bookingId);
 
         } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID không hợp lệ.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID.");
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("error.jsp");

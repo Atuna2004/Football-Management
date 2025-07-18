@@ -31,7 +31,7 @@ public class BookingServlet extends HttpServlet {
         String stadiumIdParam = request.getParameter("stadiumId");
 
         if (stadiumIdParam == null || timeSlotIds == null || timeSlotIds.length == 0) {
-            request.setAttribute("errorMessage", "Vui lòng chọn ít nhất một khung giờ để đặt sân.");
+            request.setAttribute("errorMessage", "Please select at least one time slot to book.");
             request.setAttribute("stadiumId", stadiumIdParam);
             request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
@@ -41,7 +41,7 @@ public class BookingServlet extends HttpServlet {
         try {
             stadiumId = Integer.parseInt(stadiumIdParam);
         } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "ID sân không hợp lệ.");
+            request.setAttribute("errorMessage", "Invalid stadium ID.");
             request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
@@ -62,14 +62,14 @@ public class BookingServlet extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Đã xảy ra lỗi khi tính tổng tiền đặt sân.");
+            request.setAttribute("errorMessage", "An error occurred while calculating total booking cost.");
             request.setAttribute("stadiumId", stadiumIdParam);
             request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
 
         BookingDAO dao = new BookingDAO();
-        // ✅ Đặt status = 'Pending' mặc định trong hàm DAO
+        // ✅ Default status is set to 'Pending' inside the DAO method
         int bookingId = dao.createBooking(userId, totalPrice, totalPrice);
 
         if (bookingId != -1) {
@@ -79,16 +79,16 @@ public class BookingServlet extends HttpServlet {
                     dao.insertBookingTimeSlot(bookingId, tsId);
                 }
             } catch (NumberFormatException e) {
-                request.setAttribute("errorMessage", "TimeSlot ID không hợp lệ.");
+                request.setAttribute("errorMessage", "Invalid TimeSlot ID.");
                 request.setAttribute("stadiumId", stadiumIdParam);
                 request.getRequestDispatcher("/error.jsp").forward(request, response);
                 return;
             }
 
-            // ✅ Sau khi booking xong, chuyển sang đặt món (nếu có)
+            // ✅ After booking, redirect to food selection (if any)
             response.sendRedirect("food?stadiumId=" + stadiumId + "&bookingId=" + bookingId);
         } else {
-            request.setAttribute("errorMessage", "Không thể tạo đơn đặt sân.");
+            request.setAttribute("errorMessage", "Unable to create booking.");
             request.setAttribute("stadiumId", stadiumIdParam);
             request.getRequestDispatcher("/error.jsp").forward(request, response);
         }

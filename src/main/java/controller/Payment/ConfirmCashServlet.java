@@ -61,7 +61,7 @@ public class ConfirmCashServlet extends HttpServlet {
         boolean success = paymentDAO.createPayment(bookingId, totalAmount, "CashOnArrival", "Pending", null);
 
         if (!success) {
-            throw new RuntimeException("Không thể ghi dữ liệu thanh toán");
+            throw new RuntimeException("Failed to record payment data");
         }
 
         request.setAttribute("ticketPrice", ticketPrice);

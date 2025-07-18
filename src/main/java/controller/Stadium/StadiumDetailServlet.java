@@ -22,10 +22,10 @@ public class StadiumDetailServlet extends HttpServlet {
 
         int stadiumId = Integer.parseInt(idStr);
         StadiumDAO dao = new StadiumDAO();
-        Stadium stadium = dao.getStadiumById(stadiumId); // bạn cần có hàm này
+        Stadium stadium = dao.getStadiumById(stadiumId); // you need to have this method
 
         if (stadium == null) {
-            request.setAttribute("errorMessage", "Không tìm thấy sân bóng.");
+            request.setAttribute("errorMessage", "Stadium not found.");
             request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }

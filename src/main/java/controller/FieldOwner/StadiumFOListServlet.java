@@ -25,16 +25,16 @@ public class StadiumFOListServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("currentUser");
 
-        // Kiểm tra nếu chưa đăng nhập hoặc không phải là chủ sân
+        // Check if not logged in or not a field owner
         if (currentUser == null) {
-            session.setAttribute("errorMessage", "Vui lòng đăng nhập để tiếp tục.");
+            session.setAttribute("errorMessage", "Please log in to continue.");
             response.sendRedirect(request.getContextPath() + "/account/login.jsp");
             return;
         }
 
         Integer ownerId = currentUser.getUserID();
 
-        // Xử lý phân trang
+        // Handle pagination
         int page = 1;
         String pageParam = request.getParameter("page");
         if (pageParam != null) {
@@ -48,7 +48,7 @@ public class StadiumFOListServlet extends HttpServlet {
 
         StadiumDAO stadiumDAO = new StadiumDAO();
 
-        // Lấy tổng số sân của owner này
+        // Get total number of stadiums owned by this user
         int totalStadiums = stadiumDAO.getTotalStadiumCountByOwnerId(ownerId);
         int totalPages = (int) Math.ceil((double) totalStadiums / RECORDS_PER_PAGE);
 
@@ -56,15 +56,15 @@ public class StadiumFOListServlet extends HttpServlet {
             page = totalPages;
         }
 
-        // Lấy danh sách sân bóng của owner và phân trang
+        // Get paginated list of stadiums for the owner
         List<Stadium> pagedStadiums = stadiumDAO.getStadiumsByOwnerIdAndPage(ownerId, page, RECORDS_PER_PAGE);
 
-        // Truyền dữ liệu sang JSP
+        // Pass data to JSP
         request.setAttribute("stadiums", pagedStadiums);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
 
-        // Forward tới JSP
+        // Forward to JSP
         request.getRequestDispatcher("/fieldOwner/StadiumList.jsp").forward(request, response);
     }
 }

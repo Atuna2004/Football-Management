@@ -46,11 +46,11 @@ public class CheckoutServlet extends HttpServlet {
             cartFoodTotal += item.getFoodItem().getPrice() * item.getQuantity();
         }
 
-        // ✅ Kiểm tra tổng tiền món đã được đặt trước đó
+        // Check total price of previously ordered food
         FoodOrderDAO foodOrderDAO = new FoodOrderDAO();
         double existingFoodTotal = foodOrderDAO.getFoodOrderTotal(bookingId);
 
-        // ✅ Ghi đơn món mới nếu có trong giỏ hàng
+        // Insert new food order if the cart is not empty
         if (!cart.isEmpty()) {
             int foodOrderId = foodOrderDAO.createFoodOrder(userId, stadiumId, bookingId, cartFoodTotal);
             if (foodOrderId != -1) {
@@ -68,26 +68,26 @@ public class CheckoutServlet extends HttpServlet {
             );
 
             if (!success) {
-                throw new RuntimeException("Không thể ghi nhận thanh toán");
+                throw new RuntimeException("Failed to record payment");
             }
 
-            // ✅ Cập nhật trạng thái booking sang Confirmed
+            // Update booking status to Confirmed
             bookingDAO.updateBookingStatus(bookingId, "Confirmed");
 
-            // ✅ Gửi email xác nhận
+            // Send confirmation email
             try {
                 String email = currentUser.getEmail();
-                String subject = "Xác nhận đơn đặt sân #" + bookingId;
+                String subject = "Booking Confirmation #" + bookingId;
 
                 String message = String.format(
-                    "Chào %s,\n\n" +
-                    "Bạn đã đặt sân thành công!\n\n" +
-                    "➤ Mã đặt sân: #%d\n" +
-                    "➤ Giá vé sân: %,.0f đ\n" +
-                    "➤ Tổng tiền đồ ăn: %,.0f đ\n" +
-                    "➤ Tổng thanh toán: %,.0f đ\n\n" +
-                    "Hình thức thanh toán: Thanh toán tại sân (CashOnArrival)\n\n" +
-                    "Cảm ơn bạn đã sử dụng dịch vụ!",
+                    "Hello %s,\n\n" +
+                    "Your booking has been confirmed!\n\n" +
+                    "➤ Booking ID: #%d\n" +
+                    "➤ Field Ticket Price: %,.0f VND\n" +
+                    "➤ Food Total: %,.0f VND\n" +
+                    "➤ Total Payment: %,.0f VND\n\n" +
+                    "Payment Method: Pay at the field (CashOnArrival)\n\n" +
+                    "Thank you for using our service!",
                     currentUser.getFullName(),
                     bookingId,
                     ticketPrice,
@@ -97,10 +97,10 @@ public class CheckoutServlet extends HttpServlet {
 
                 EmailService.sendEmail(email, subject, message);
             } catch (Exception e) {
-                e.printStackTrace(); // hoặc dùng logger
+                e.printStackTrace();
             }
 
-            // ✅ Hiển thị trang kết quả
+            // Show success page
             request.setAttribute("ticketPrice", ticketPrice);
             request.setAttribute("foodPrice", existingFoodTotal + cartFoodTotal);
             request.setAttribute("totalAmount", totalAmount);
@@ -114,7 +114,7 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        // Nếu là VNPay hoặc phương thức khác → sang trang xác nhận
+        // For VNPay or other methods, go to confirmation page
         request.setAttribute("ticketPrice", ticketPrice);
         request.setAttribute("foodPrice", existingFoodTotal + cartFoodTotal);
         request.setAttribute("totalAmount", totalAmount);

@@ -16,18 +16,18 @@ public class AddToCartServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
 
         try {
-            // Lấy tham số từ form
+            // Get parameters from the form
             String foodItemIdRaw = request.getParameter("foodItemId");
             String stadiumIdRaw = request.getParameter("stadiumId");
             String bookingIdRaw = request.getParameter("bookingId");
             String quantityRaw = request.getParameter("quantity");
 
-            // Kiểm tra null
+            // Null check
             if (foodItemIdRaw == null || stadiumIdRaw == null || bookingIdRaw == null) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Thiếu tham số cần thiết.");
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing required parameters.");
                 return;
             }
 
@@ -35,15 +35,18 @@ public class AddToCartServlet extends HttpServlet {
             int stadiumId = Integer.parseInt(stadiumIdRaw);
             int bookingId = Integer.parseInt(bookingIdRaw);
 
-            int quantity = 1; // Giá trị mặc định
+            int quantity = 1; // Default value
             if (quantityRaw != null) {
                 try {
                     quantity = Integer.parseInt(quantityRaw);
-                    if (quantity < 1) quantity = 1;
-                } catch (NumberFormatException ignored) {}
+                    if (quantity < 1) {
+                        quantity = 1;
+                    }
+                } catch (NumberFormatException ignored) {
+                }
             }
 
-            // Lấy session giỏ hàng
+            // Get cart from session
             HttpSession session = request.getSession();
             List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
 
@@ -70,11 +73,11 @@ public class AddToCartServlet extends HttpServlet {
 
             session.setAttribute("cart", cart);
 
-            // Quay lại trang food với tham số đúng
+            // Redirect back to food page with correct parameters
             response.sendRedirect("food?stadiumId=" + stadiumId + "&bookingId=" + bookingId);
 
         } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Tham số không hợp lệ.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters.");
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("error.jsp");
