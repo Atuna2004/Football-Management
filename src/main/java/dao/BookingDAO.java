@@ -304,11 +304,9 @@ public class BookingDAO {
 
             ps.setString(1, token);
             ps.setInt(2, bookingId);
-            int rows = ps.executeUpdate();
-            System.out.println("✅ Rows affected when updating CheckinToken: " + rows);
+            ps.executeUpdate();
 
         } catch (SQLException e) {
-            System.err.println("❌ Error updating checkin_token:");
             e.printStackTrace();
         }
     }
@@ -362,12 +360,10 @@ public class BookingDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int count = rs.getInt(1);
-                    System.out.println("🔍 User " + userId + " has " + count + " bookings for stadium " + stadiumId);
                     return count > 0;
                 }
             }
         } catch (SQLException e) {
-            System.out.println("❌ Error checking user booking: " + e.getMessage());
             throw e;
         }
 
@@ -389,12 +385,10 @@ public class BookingDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int count = rs.getInt(1);
-                    System.out.println("🔍 User " + userId + " has " + count + " confirmed bookings for stadium " + stadiumId);
                     return count > 0;
                 }
             }
         } catch (SQLException e) {
-            System.out.println("❌ Error checking confirmed user booking: " + e.getMessage());
             throw e;
         }
 
