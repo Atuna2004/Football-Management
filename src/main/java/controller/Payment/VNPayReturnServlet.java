@@ -7,7 +7,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import model.User;
 import service.EmailService;
+import service.QRGenerator;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -21,18 +23,18 @@ public class VNPayReturnServlet extends HttpServlet {
 
         System.out.println("===== VNPayReturnServlet START =====");
 
-        // Bước 1: Lấy tham số từ VNPay & log ra
+        // 1. Lấy tham số từ VNPay & log
         Map<String, String> fields = new HashMap<>();
         req.getParameterMap().forEach((k, v) -> {
-            System.out.println(k + " = " + v[0]);
             if (!"vnp_SecureHash".equals(k) && !"vnp_SecureHashType".equals(k)) {
                 fields.put(k, v[0]);
             }
+            System.out.println(k + " = " + v[0]);
         });
 
         String vnpHash = req.getParameter("vnp_SecureHash");
 
-        // Bước 2: Tạo lại hashData
+        // 2. Tạo lại hash để kiểm tra chữ ký
         List<String> keys = new ArrayList<>(fields.keySet());
         Collections.sort(keys);
         StringBuilder hashData = new StringBuilder();
@@ -43,7 +45,6 @@ public class VNPayReturnServlet extends HttpServlet {
             if (i < keys.size() - 1) hashData.append("&");
         }
 
-        // Bước 3: So sánh chữ ký
         String calculatedHash = Config.hmacSHA512(Config.secretKey, hashData.toString());
         if (!calculatedHash.equalsIgnoreCase(vnpHash)) {
             req.setAttribute("message", "⚠️ Sai chữ ký!");
@@ -51,31 +52,31 @@ public class VNPayReturnServlet extends HttpServlet {
             return;
         }
 
-        // Bước 4: Kiểm tra kết quả thanh toán từ VNPay
+        // 3. Kiểm tra trạng thái giao dịch
         if (!"00".equals(fields.get("vnp_ResponseCode"))) {
             req.setAttribute("message", "❌ Thanh toán thất bại!");
             forward(req, resp);
             return;
         }
 
-        // Bước 5: Parse dữ liệu
-        String orderInfo = fields.get("vnp_OrderInfo");
+        // 4. Parse thông tin đơn hàng
+        String orderInfo = fields.get("vnp_OrderInfo"); // ví dụ: BookingID:123
         int bookingId = Integer.parseInt(orderInfo.split(":")[1].trim());
         String txnRef = fields.get("vnp_TxnRef");
 
-        // Bước 6: Cập nhật trạng thái thanh toán
-        PaymentDAO dao = new PaymentDAO();
-        dao.updatePaymentStatusByTxnRef(txnRef, "Completed");
+        // 5. Cập nhật thanh toán & trạng thái đơn
+        PaymentDAO paymentDAO = new PaymentDAO();
+        paymentDAO.updatePaymentStatusByTxnRef(txnRef, "Completed");
 
-        double ticketPrice = dao.getTicketPrice(bookingId);
-        double foodPrice = dao.getFoodOrderTotal(bookingId);
-        double totalAmount = ticketPrice + foodPrice;
-
-        // ✅ Cập nhật trạng thái đơn đặt sân sang Confirmed
         BookingDAO bookingDAO = new BookingDAO();
         bookingDAO.updateBookingStatus(bookingId, "Confirmed");
 
-        // ✅ Gửi email xác nhận sau thanh toán thành công
+        // 6. Lấy chi tiết thanh toán
+        double ticketPrice = paymentDAO.getTicketPrice(bookingId);
+        double foodPrice = paymentDAO.getFoodOrderTotal(bookingId);
+        double totalAfterDiscount = paymentDAO.getBookingTotalAmount(bookingId);
+
+        // 7. Gửi email xác nhận & mã QR nếu có user
         HttpSession session = req.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("currentUser") : null;
 
@@ -88,23 +89,45 @@ public class VNPayReturnServlet extends HttpServlet {
                 "Chào %s,\n\nBạn đã thanh toán thành công đơn đặt sân #%d.\n\n" +
                 "➤ Giá vé sân: %,.0f đ\n" +
                 "➤ Đồ ăn: %,.0f đ\n" +
-                "➤ Tổng cộng: %,.0f đ\n\n" +
+                "➤ Tổng sau giảm giá: %,.0f đ\n\n" +
                 "Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!",
-                fullName, bookingId, ticketPrice, foodPrice, totalAmount
+                fullName, bookingId, ticketPrice, foodPrice, totalAfterDiscount
             );
 
             try {
+                // Gửi email xác nhận thường
                 EmailService.sendEmail(email, subject, body);
+
+                // Tạo mã token và URL QR check-in
+                String checkinToken = UUID.randomUUID().toString();
+                bookingDAO.updateCheckinToken(bookingId, checkinToken);
+                System.out.println("BookingID = " + bookingId + ", Token = " + checkinToken);
+
+
+                String baseUrl = req.getRequestURL().toString().replace(req.getRequestURI(), req.getContextPath());
+                String checkinUrl = baseUrl + "/checkin?token=" + checkinToken;
+
+
+                // Tạo ảnh QR
+                String qrPath = getServletContext().getRealPath("/") + "qr_checkin_" + bookingId + ".png";
+                File qrFile = QRGenerator.generateQRCodeImage(checkinUrl, qrPath);
+
+                // Gửi email có ảnh QR đính kèm
+                EmailService emailService = new EmailService();
+                emailService.sendCheckinQRCodeEmail(email, fullName, bookingId, qrFile, checkinUrl);
+
+
             } catch (Exception e) {
+                System.err.println("❌ Lỗi khi gửi email xác nhận/QR:");
                 e.printStackTrace();
             }
         }
 
-        // ✅ Truyền dữ liệu sang JSP hiển thị kết quả
+        // 8. Hiển thị ra JSP
         req.setAttribute("paymentMethod", "vnpay");
         req.setAttribute("ticketPrice", ticketPrice);
         req.setAttribute("foodPrice", foodPrice);
-        req.setAttribute("totalAmount", totalAmount);
+        req.setAttribute("totalAmount", totalAfterDiscount);
         req.setAttribute("message", "✅ Thanh toán thành công!");
 
         forward(req, resp);
