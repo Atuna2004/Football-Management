@@ -221,27 +221,26 @@ public class AccountDAO {
     }
 
     public List<User> getRecentUsers(int limit) throws SQLException {
-    List<User> list = new ArrayList<>();
-    String sql = "SELECT TOP (?) u.*, r.RoleName FROM [User] u "
-               + "LEFT JOIN UserRole ur ON u.UserID = ur.UserID "
-               + "LEFT JOIN Role r ON ur.RoleID = r.RoleID "
-               + "ORDER BY u.CreatedAt DESC";
-    try (
-        Connection conn = DBConnection.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, limit);
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                User u = extractUser(rs);
-                Role role = new Role();
-                role.setRoleName(rs.getString("RoleName"));
-                u.setRoles(List.of(role));
-                list.add(u);
+        List<User> list = new ArrayList<>();
+        String sql = "SELECT TOP (?) u.*, r.RoleName FROM [User] u "
+                + "LEFT JOIN UserRole ur ON u.UserID = ur.UserID "
+                + "LEFT JOIN Role r ON ur.RoleID = r.RoleID "
+                + "ORDER BY u.CreatedAt DESC";
+        try (
+                Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User u = extractUser(rs);
+                    Role role = new Role();
+                    role.setRoleName(rs.getString("RoleName"));
+                    u.setRoles(List.of(role));
+                    list.add(u);
+                }
             }
         }
+        return list;
     }
-    return list;
-}
 
     public boolean activateUser(String email) throws SQLException {
         String sql = "UPDATE [User] SET IsActive=1 WHERE Email=?";
