@@ -1,15 +1,20 @@
 package controller.Authentication;
 
+import connect.DBConnection;
 import dao.AccountDAO;
 import model.User;
+import service.OTPGenerator;
+import service.EmailService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
-import service.EmailService;
-import service.OTPGenerator;
+import java.sql.Connection;
+import java.sql.SQLException;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class ForgotPasswordServlet extends HttpServlet {
 
@@ -34,8 +39,8 @@ public class ForgotPasswordServlet extends HttpServlet {
 
         String email = request.getParameter("email");
 
-        try {
-            AccountDAO accountDAO = new AccountDAO();
+        try (Connection conn = DBConnection.getConnection()) {
+            AccountDAO accountDAO = new AccountDAO(conn);
 
             User user = accountDAO.getUserByEmail(email);
             if (user == null) {
@@ -55,7 +60,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 
             response.sendRedirect(request.getContextPath() + "/account/confirmOTP.jsp");
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("error", "System error. Please try again.");
             request.getRequestDispatcher("/account/forgotPassword.jsp").forward(request, response);
@@ -72,7 +77,7 @@ public class ForgotPasswordServlet extends HttpServlet {
         String confirmPassword = request.getParameter("confirmPassword");
 
         if (!"reset".equals(otpMode) || email == null) {
-            request.setAttribute("error", "Invalid session. Please start the process again.");
+            session.setAttribute("error", "Invalid session. Please start the process again.");
             response.sendRedirect(request.getContextPath() + "/account/forgotPassword.jsp");
             return;
         }
@@ -83,9 +88,12 @@ public class ForgotPasswordServlet extends HttpServlet {
             return;
         }
 
-        try {
-            AccountDAO accountDAO = new AccountDAO();
-            accountDAO.updatePassword(email, newPassword);
+        try (Connection conn = DBConnection.getConnection()) {
+            AccountDAO accountDAO = new AccountDAO(conn);
+
+            // Mã hóa mật khẩu bằng BCrypt
+            String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+            accountDAO.updatePassword(email, hashedPassword);
 
             session.removeAttribute("email");
             session.removeAttribute("otp");
@@ -95,7 +103,7 @@ public class ForgotPasswordServlet extends HttpServlet {
             session.setAttribute("successMessage", "Password has been successfully reset!");
             response.sendRedirect(request.getContextPath() + "/account/login.jsp");
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("error", "Error occurred while updating the password.");
             request.getRequestDispatcher("/account/resetPassword.jsp").forward(request, response);

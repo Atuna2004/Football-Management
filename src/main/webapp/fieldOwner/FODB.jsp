@@ -242,7 +242,7 @@
                     <h5>Đặt sân gần đây</h5>
                     <small class="text-muted">
                         <% if (recentBookings != null && !recentBookings.isEmpty()) { %>
-                            <%= recentBookings.size() %> booking gần nhất
+                            5 booking gần nhất
                         <% } else { %>
                             Chưa có dữ liệu
                         <% } %>
@@ -266,12 +266,15 @@
                                 </thead>
                                 <tbody>
                                     <%
+                                        int count = 0; 
+                                            
                                         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                                         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
                                         SimpleDateFormat datetimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                                         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
                                         
                                         for (RecentBooking booking : recentBookings) {
+                                        if (count >= 5) break;
                                     %>
                                         <tr>
                                             <td><strong>#<%= booking.getBookingID() %></strong></td>
@@ -333,7 +336,10 @@
                                                 </small>
                                             </td>
                                         </tr>
-                                    <% } %>
+                                    <% 
+                                        count ++;
+                                        }
+                                    %>
                                 </tbody>
                             </table>
                         </div>

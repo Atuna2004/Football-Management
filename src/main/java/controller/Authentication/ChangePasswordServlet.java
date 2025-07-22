@@ -1,5 +1,6 @@
 package controller.Authentication;
 
+import connect.DBConnection; // ✅ Import DBConnection
 import dao.AccountDAO;
 import model.User;
 
@@ -11,6 +12,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 @WebServlet(name = "ChangePasswordServlet", urlPatterns = {"/changePassword"})
 public class ChangePasswordServlet extends HttpServlet {
@@ -44,8 +47,16 @@ public class ChangePasswordServlet extends HttpServlet {
             return;
         }
 
+        Connection conn = null;
         try {
-            AccountDAO accountDAO = new AccountDAO();
+            // ✅ 1. Lấy kết nối từ DBConnection
+            conn = DBConnection.getConnection();
+            if (conn == null) {
+                throw new SQLException("Cannot establish database connection.");
+            }
+
+            // ✅ 2. Truyền kết nối vào AccountDAO qua constructor
+            AccountDAO accountDAO = new AccountDAO(conn);
 
             User freshUser = accountDAO.getUserById(currentUser.getUserID());
             if (freshUser == null) {
@@ -54,13 +65,14 @@ public class ChangePasswordServlet extends HttpServlet {
                 return;
             }
 
+            // Giả sử bạn đang so sánh mật khẩu chưa hash (sẽ cải thiện sau)
             if (!freshUser.getPasswordHash().equals(currentPassword)) {
                 request.setAttribute("errorMessage", "Current password is incorrect.");
                 request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
                 return;
             }
 
-            // TODO: hash the new password before saving
+            // TODO: hash newPassword trước khi lưu
             freshUser.setPasswordHash(newPassword);
 
             boolean updated = accountDAO.updateUser(freshUser);
@@ -71,9 +83,23 @@ public class ChangePasswordServlet extends HttpServlet {
                 request.setAttribute("errorMessage", "Failed to change password.");
             }
 
+        } catch (SQLException e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Database error: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "System error: " + e.getMessage());
+        } finally {
+            // ✅ 3. Đóng kết nối
+            if (conn != null) {
+                try {
+                    if (!conn.isClosed()) {
+                        DBConnection.closeConnection(conn);
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
 
         request.getRequestDispatcher("/account/profile.jsp").forward(request, response);

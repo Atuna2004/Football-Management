@@ -27,6 +27,21 @@
         <servlet-name>AvatarUploadServlet</servlet-name>
         <url-pattern>/uploadAvatar</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoginFacebookServlet</servlet-name>
+        <url-pattern>/LoginFacebookServlet</url-pattern>
+    </servlet-mapping>
+    <servlet>
+    <servlet-name>SubmitReportServlet</servlet-name>
+    <servlet-class>controller.Stadium.SubmitReportServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>SubmitReportServlet</servlet-name>
+    <url-pattern>/submit-report</url-pattern>
+</servlet-mapping>
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
     <servlet>
         <servlet-name>NewServlet</servlet-name>
         <servlet-class>controller.NewServlet</servlet-class>
@@ -47,6 +62,17 @@
         <servlet-name>ActivityLogServlet</servlet-name>
         <servlet-class>controller.Admin.ActivityLogServlet</servlet-class>
     </servlet>
+<<<<<<< HEAD
+=======
+    <servlet>
+        <servlet-name>GeneralSettingServlet</servlet-name>
+        <servlet-class>controller.Admin.GeneralSettingServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LoginFacebookServlet</servlet-name>
+        <servlet-class>controller.Authentication.LoginFacebookServlet</servlet-class>
+    </servlet>
+>>>>>>> main
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/newservlet</url-pattern>
@@ -79,9 +105,12 @@
         <servlet-name>ForgotPasswordServlet</servlet-name>
         <servlet-class>controller.Authentication.ForgotPasswordServlet</servlet-class>
     </servlet>
+<<<<<<< HEAD
     <listener>
         <listener-class>listener.OnlineUserListener</listener-class>
     </listener>
+=======
+>>>>>>> main
     <servlet-mapping>
         <servlet-name>ForgotPasswordServlet</servlet-name>
         <url-pattern>/forgotPassword</url-pattern>

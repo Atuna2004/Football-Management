@@ -22,13 +22,13 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/confirmedBookings" class="nav-link">
+            <a href="${pageContext.request.contextPath}/completed-payments" class="nav-link">
                 <i class="fa-solid fa-clock"></i>
                 <span>Lịch đặt sân</span>
             </a>
         </li>
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/pendingBookings" class="nav-link">
+            <a href="${pageContext.request.contextPath}/pending-payments" class="nav-link">
                 <i class="fa-solid fa-pen-to-square"></i>
                 <span>Đơn đặt sân</span>
             </a>
@@ -40,7 +40,14 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="${pageContext.request.contextPath}/owner/food-items" class="nav-link">
+                <i class="fas fa-hamburger"></i>
+                <span>Quản lý Món ăn</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/fieldOwner/booking-list.jsp" class="nav-link">
                 <i class="fas fa-users"></i>
                 <span>Khách hàng</span>
             </a>
@@ -52,19 +59,19 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="${pageContext.request.contextPath}/fieldOwner/revenueReport.jsp" class="nav-link">
                 <i class="fas fa-dollar-sign"></i>
                 <span>Doanh thu</span>
             </a>
         </li>
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="${pageContext.request.contextPath}/fieldOwner/TimeSlotManagement.jsp" class="nav-link">
                 <i class="fa-regular fa-calendar-days"></i>
                 <span>Chỉnh sửa khung thời gian</span>
             </a>
         </li>
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="${pageContext.request.contextPath}/tournaments" class="nav-link">
                 <i class="fas fa-trophy"></i>
                 <span>Giải đấu</span>
             </a>
@@ -100,25 +107,25 @@
 
 <!-- JavaScript xử lý active menu -->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const navLinks = document.querySelectorAll(".nav-menu .nav-link");
+    document.addEventListener("DOMContentLoaded", function () {
+        const navLinks = document.querySelectorAll(".nav-menu .nav-link");
 
-    navLinks.forEach(link => {
-        link.addEventListener("click", function (e) {
-            // Loại bỏ lớp 'active' khỏi tất cả
-            navLinks.forEach(l => l.classList.remove("active"));
+        navLinks.forEach(link => {
+            link.addEventListener("click", function (e) {
+                // Loại bỏ lớp 'active' khỏi tất cả
+                navLinks.forEach(l => l.classList.remove("active"));
 
-            // Thêm lớp 'active' cho phần tử được click
-            this.classList.add("active");
+                // Thêm lớp 'active' cho phần tử được click
+                this.classList.add("active");
+            });
+        });
+
+        // Tự động đánh dấu trang hiện tại là active khi tải trang
+        const currentUrl = window.location.href;
+        navLinks.forEach(link => {
+            if (link.href && currentUrl.includes(link.href)) {
+                link.classList.add("active");
+            }
         });
     });
-
-    // Tự động đánh dấu trang hiện tại là active khi tải trang
-    const currentUrl = window.location.href;
-    navLinks.forEach(link => {
-        if (link.href && currentUrl.includes(link.href)) {
-            link.classList.add("active");
-        }
-    });
-});
 </script>

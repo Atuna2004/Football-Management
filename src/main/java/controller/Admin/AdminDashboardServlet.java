@@ -1,5 +1,6 @@
 package controller.Admin;
 
+import connect.DBConnection;  // Import DBConnection để lấy kết nối
 import dao.AccountDAO;
 import model.User;
 
@@ -7,23 +8,17 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
 public class AdminDashboardServlet extends HttpServlet {
 
-    private AccountDAO accountDAO;
-
-    @Override
-    public void init() throws ServletException {
-
-        accountDAO = new AccountDAO();
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // 1. Kiểm tra đăng nhập
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("currentUser") == null) {
             System.out.println("[AdminDashboardServlet] Not logged in, redirecting to login.jsp");
@@ -31,8 +26,20 @@ public class AdminDashboardServlet extends HttpServlet {
             return;
         }
 
-        try {
+        Connection conn = null;
+        AccountDAO accountDAO = null;
 
+        try {
+            // 2. Lấy kết nối từ DBConnection
+            conn = DBConnection.getConnection();
+            if (conn == null) {
+                throw new SQLException("Không thể kết nối đến cơ sở dữ liệu.");
+            }
+
+            // 3. Truyền kết nối vào AccountDAO qua constructor
+            accountDAO = new AccountDAO(conn);
+
+            // 4. Lấy danh sách 10 người dùng mới nhất
             List<User> allUsers = accountDAO.getRecentUsers(10);
 
             if (allUsers.isEmpty()) {
@@ -48,6 +55,7 @@ public class AdminDashboardServlet extends HttpServlet {
 
             request.setAttribute("allUsers", allUsers);
 
+            // 5. Số người dùng đang online
             ServletContext app = getServletContext();
             Integer onlineUsers = (Integer) app.getAttribute("onlineUsers");
             if (onlineUsers == null) {
@@ -56,12 +64,29 @@ public class AdminDashboardServlet extends HttpServlet {
             System.out.println("[AdminDashboardServlet] Number of online users: " + onlineUsers);
             request.setAttribute("onlineUsers", onlineUsers);
 
+            // 6. Chuyển tiếp đến trang JSP
             System.out.println("[AdminDashboardServlet] Forwarding to /admin/adminPage.jsp");
             request.getRequestDispatcher("/admin/adminPage.jsp").forward(request, response);
 
-        } catch (ServletException | IOException | SQLException e) {
-            System.err.println("[AdminDashboardServlet] Error processing dashboard: " + e.getMessage());
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Dashboard error!");
+        } catch (SQLException e) {
+            System.err.println("[AdminDashboardServlet] Database error: " + e.getMessage());
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi cơ sở dữ liệu!");
+        } catch (Exception e) {
+            System.err.println("[AdminDashboardServlet] Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi hệ thống!");
+        } finally {
+            // 7. Luôn đóng kết nối trong block finally
+            if (conn != null) {
+                try {
+                    if (!conn.isClosed()) {
+                        DBConnection.closeConnection(conn);
+                    }
+                } catch (SQLException ex) {
+                    System.err.println("[AdminDashboardServlet] Failed to close connection: " + ex.getMessage());
+                }
+            }
         }
     }
 }

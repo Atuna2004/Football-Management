@@ -6,11 +6,13 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.sql.Connection;
-import java.util.List;
-import model.User;
-import connect.DBConnection;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import model.User;
+import connect.DBConnection;
 import org.mindrot.jbcrypt.BCrypt;
 
 @WebServlet("/admin/user-list")
@@ -20,11 +22,12 @@ public class UserManagementServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try (Connection conn = DBConnection.getConnection()) {
-            AccountDAO accountDAO = new AccountDAO();
+            AccountDAO accountDAO = new AccountDAO(conn);
             List<User> userList = accountDAO.getAllUsers();
             request.setAttribute("userList", userList);
             request.getRequestDispatcher("/admin/userManagement.jsp").forward(request, response);
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            Logger.getLogger(UserManagementServlet.class.getName()).log(Level.SEVERE, null, e);
             throw new ServletException("Error loading user list", e);
         }
     }
@@ -40,7 +43,7 @@ public class UserManagementServlet extends HttpServlet {
         }
 
         try (Connection conn = DBConnection.getConnection()) {
-            AccountDAO accountDAO = new AccountDAO();
+            AccountDAO accountDAO = new AccountDAO(conn);
 
             switch (action) {
                 case "add":
@@ -62,11 +65,11 @@ public class UserManagementServlet extends HttpServlet {
     }
 
     private void addUser(HttpServletRequest request, HttpServletResponse response, AccountDAO accountDAO)
-            throws IOException, ServletException, SQLException {
+            throws IOException, SQLException {
         request.setCharacterEncoding("UTF-8");
 
         String email = request.getParameter("email");
-        String password = request.getParameter("password"); // Get raw password from form
+        String password = request.getParameter("password");
         String fullName = request.getParameter("fullName");
         String phone = request.getParameter("phone");
         boolean isActive = "on".equals(request.getParameter("isActive"));
@@ -85,19 +88,19 @@ public class UserManagementServlet extends HttpServlet {
 
         User user = new User();
         user.setEmail(email);
-        user.setPasswordHash(hashPassword(password)); // Hash password here
+        user.setPasswordHash(hashPassword(password));
         user.setFullName(fullName);
         user.setPhone(phone);
         user.setActive(isActive);
         user.setAddress(address);
         user.setDateOfBirth(dob);
 
-        boolean success = accountDAO.addUser(user);
+        accountDAO.addUser(user);
         response.sendRedirect("user-list");
     }
 
     private void updateUser(HttpServletRequest request, HttpServletResponse response, AccountDAO accountDAO)
-            throws IOException, ServletException, SQLException {
+            throws IOException, SQLException {
         request.setCharacterEncoding("UTF-8");
 
         try {
@@ -133,6 +136,7 @@ public class UserManagementServlet extends HttpServlet {
             user.setGoogleID((googleID != null && !googleID.isEmpty()) ? googleID : null);
             user.setAvatarUrl((avatarUrl != null && !avatarUrl.isEmpty()) ? avatarUrl : null);
 
+            // Nếu người dùng nhập mật khẩu mới, hash lại
             if (password != null && !password.trim().isEmpty()) {
                 user.setPasswordHash(hashPassword(password));
             } else {
@@ -145,15 +149,11 @@ public class UserManagementServlet extends HttpServlet {
                 }
             }
 
-            boolean success = accountDAO.updateUser(user);
+            accountDAO.updateUser(user);
             response.sendRedirect("user-list");
-        } catch (IOException | NumberFormatException | SQLException ex) {
+        } catch (NumberFormatException ex) {
             response.sendRedirect("user-list");
         }
-    }
-
-    private String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
     private void deleteUser(HttpServletRequest request, HttpServletResponse response, AccountDAO accountDAO)
@@ -166,10 +166,14 @@ public class UserManagementServlet extends HttpServlet {
 
         int userID = Integer.parseInt(idStr);
         try {
-            boolean success = accountDAO.deleteUser(userID);
+            accountDAO.deleteUser(userID);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         response.sendRedirect("user-list");
+    }
+
+    private String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 }

@@ -6,14 +6,12 @@
         response.sendRedirect(request.getContextPath() + "/account/login.jsp");
         return;
     }
-
     String avatarUrl = null;
     if (currentUser.getAvatarUrl() != null && !currentUser.getAvatarUrl().isEmpty()) {
         String avatar = currentUser.getAvatarUrl();
         boolean isFullUrl = avatar.startsWith("http://") || avatar.startsWith("https://");
         avatarUrl = isFullUrl ? avatar : (request.getContextPath() + "/" + avatar);
     }
-
     String errorMessage = (String) request.getAttribute("errorMessage");
     String successMessage = (String) request.getAttribute("successMessage");
     String error = (String) session.getAttribute("error");
@@ -28,7 +26,7 @@
         <title>Hồ Sơ</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/css/profile.css" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/country-select-js@2.0.0/build/css/countrySelect.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/country-select-js @2.0.0/build/css/countrySelect.min.css" />
     </head>
     <body>
         <div class="container">
@@ -60,7 +58,6 @@
                     <% } else if (successMessage != null) { %>
                     <div class="notification success">✅ <%= successMessage %></div>
                     <% } %>
-
                     <div id="personal-info" class="section active">
                         <h2>Thông Tin Cá Nhân</h2>
                         <form id="personalInfoForm" action="<%= request.getContextPath() %>/updateProfile" method="post">
@@ -103,7 +100,6 @@
                             </div>
                         </form>
                     </div>
-
                     <div id="security" class="section">
                         <h2>Bảo Mật</h2>
                         <h4>Đổi Mật Khẩu</h4>
@@ -126,7 +122,6 @@
                         <h3>Phiên Đăng Nhập</h3>
                         <button class="btn btn-danger" onclick="alert('Tính năng này đang phát triển')">Đăng Xuất Tất Cả Phiên</button>
                     </div>
-
                     <div id="preferences" class="section">
                         <h2>Tuỳ Chọn</h2>
                         <form>
@@ -157,9 +152,8 @@
                 </div>
             </div>
         </div>
-
         <!-- JS -->
-        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery @3.6.4/dist/jquery.min.js"></script>
         <script>
                             function showSection(sectionId) {
                                 document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));

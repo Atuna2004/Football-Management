@@ -1,5 +1,6 @@
 package controller.Authentication;
 
+import connect.DBConnection; // ✅ Import DBConnection
 import config.CloudinaryUtils;
 import dao.AccountDAO;
 import jakarta.servlet.ServletException;
@@ -10,12 +11,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import model.User;
+
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 
-@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2,
-        maxFileSize = 1024 * 1024 * 10,
-        maxRequestSize = 1024 * 1024 * 50)
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+    maxFileSize = 1024 * 1024 * 10,      // 10MB
+    maxRequestSize = 1024 * 1024 * 50    // 50MB
+)
 public class AvatarUploadServlet extends HttpServlet {
 
     @Override
@@ -23,6 +28,7 @@ public class AvatarUploadServlet extends HttpServlet {
             throws ServletException, IOException {
 
         System.out.println("[AvatarUploadServlet] doPost called");
+
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
@@ -30,6 +36,7 @@ public class AvatarUploadServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/account/login.jsp");
             return;
         }
+
         Integer userID = currentUser.getUserID();
         System.out.println("[AvatarUploadServlet] UserID: " + userID);
 
@@ -45,50 +52,80 @@ public class AvatarUploadServlet extends HttpServlet {
         System.out.println("[AvatarUploadServlet] File size: " + filePart.getSize() + " bytes");
         System.out.println("[AvatarUploadServlet] Content type: " + filePart.getContentType());
 
+        // Kiểm tra loại file
         String contentType = filePart.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
-            System.out.println("[AvatarUploadServlet] File is not an image, contentType: " + contentType);
+            System.out.println("[AvatarUploadServlet] File is not an image: " + contentType);
             request.setAttribute("error", "Only image files are allowed");
             request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
             return;
         }
 
+        // Kiểm tra kích thước file
         if (filePart.getSize() > 1024 * 1024 * 10) {
-            System.out.println("[AvatarUploadServlet] File size exceeds 10MB limit: " + filePart.getSize());
+            System.out.println("[AvatarUploadServlet] File size exceeds 10MB: " + filePart.getSize());
             request.setAttribute("error", "File size exceeds the 10MB limit");
             request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
             return;
         }
 
+        Connection conn = null;
         try {
-            AccountDAO dao = new AccountDAO();
-            System.out.println("[AvatarUploadServlet] Starting Cloudinary upload for userID: " + userID);
+            // ✅ 1. Lấy kết nối từ DBConnection
+            conn = DBConnection.getConnection();
+            if (conn == null) {
+                throw new SQLException("Failed to establish database connection.");
+            }
 
+            // ✅ 2. Truyền kết nối vào AccountDAO
+            AccountDAO dao = new AccountDAO(conn);
+
+            System.out.println("[AvatarUploadServlet] Starting Cloudinary upload for userID: " + userID);
             String avatarUrl = CloudinaryUtils.uploadImage(filePart, userID);
             System.out.println("[AvatarUploadServlet] Cloudinary upload successful: " + avatarUrl);
 
+            // ✅ 3. Cập nhật avatar trong DB
             boolean updated = dao.updateAvatar(userID, avatarUrl);
             System.out.println("[AvatarUploadServlet] Avatar updated in DB: " + updated);
 
-            // Update currentUser in session
-            User updatedUser = dao.getUserById(userID);
-            System.out.println("[AvatarUploadServlet] Retrieved updated user: " + (updatedUser != null ? updatedUser.getEmail() : "null"));
-            session.setAttribute("currentUser", updatedUser);
-            session.setAttribute("avatar", avatarUrl);
-            session.setAttribute("success", "Profile picture has been updated successfully");
+            if (!updated) {
+                throw new SQLException("Failed to update avatar in database.");
+            }
 
-        } catch (IOException e) {
-            System.out.println("[AvatarUploadServlet] IOException during upload/update: " + e.getMessage());
-            e.printStackTrace(); // Print stack trace for detailed error
-            request.setAttribute("error", "An error occurred during image upload. Please try again later.");
-            request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
-            return;
+            // ✅ 4. Lấy lại thông tin người dùng mới
+            User updatedUser = dao.getUserById(userID);
+            if (updatedUser != null) {
+                session.setAttribute("currentUser", updatedUser);
+                session.setAttribute("avatar", avatarUrl);
+                session.setAttribute("success", "Profile picture has been updated successfully");
+                System.out.println("[AvatarUploadServlet] Session updated with new user data");
+            } else {
+                System.out.println("[AvatarUploadServlet] Warning: Updated user not found in DB");
+            }
+
         } catch (SQLException e) {
-            System.out.println("[AvatarUploadServlet] SQLException during DB update: " + e.getMessage());
-            e.printStackTrace(); // Print stack trace for detailed error
+            System.err.println("[AvatarUploadServlet] Database error: " + e.getMessage());
+            e.printStackTrace();
             request.setAttribute("error", "An error occurred while updating the database. Please try again later.");
             request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
             return;
+        } catch (IOException e) {
+            System.err.println("[AvatarUploadServlet] Upload error: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "An error occurred during image upload. Please try again later.");
+            request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
+            return;
+        } finally {
+            // ✅ 5. Đóng kết nối
+            if (conn != null) {
+                try {
+                    if (!conn.isClosed()) {
+                        DBConnection.closeConnection(conn);
+                    }
+                } catch (SQLException ex) {
+                    System.err.println("[AvatarUploadServlet] Failed to close connection: " + ex.getMessage());
+                }
+            }
         }
 
         System.out.println("[AvatarUploadServlet] Redirecting to profile.jsp");

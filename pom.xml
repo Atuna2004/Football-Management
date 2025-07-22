@@ -103,7 +103,17 @@
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
-      
+        <dependency>
+            <groupId>com.github.scribejava</groupId>
+            <artifactId>scribejava-apis</artifactId>
+            <version>6.9.0</version>
+
+        </dependency>
+               <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20230618</version>
+        </dependency>
     </dependencies>
     
     <build>

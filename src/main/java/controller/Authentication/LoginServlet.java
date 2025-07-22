@@ -1,19 +1,25 @@
 package controller.Authentication;
 
+import connect.DBConnection;
 import dao.AccountDAO;
 import model.User;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.Random;
+
 import model.GoogleAccount;
 import service.GoogleLogin;
+import service.PasswordService;
 
+@WebServlet("/user-login")
 public class LoginServlet extends HttpServlet {
 
     // Utility method to generate a random password
@@ -34,18 +40,17 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        try {
-            AccountDAO dao = new AccountDAO();
+        try (Connection conn = DBConnection.getConnection()) {
+            AccountDAO dao = new AccountDAO(conn);
             User user = dao.getUserByEmail(email);
 
-            if (user != null && user.getPasswordHash().equals(password)) {
+            if (user != null && PasswordService.checkPassword(password, user.getPasswordHash())) {
                 HttpSession session = request.getSession();
                 session.setAttribute("currentUser", user);
-                session.setAttribute("userID", user.getUserID());
                 response.sendRedirect(request.getContextPath() + "/home.jsp");
             } else {
                 HttpSession session = request.getSession();
-                session.setAttribute("errorMessage", "Incorrect email or password.");
+                session.setAttribute("errorMessage", "Sai email hoặc mật khẩu.");
                 response.sendRedirect(request.getContextPath() + "/account/login.jsp");
             }
 
@@ -76,29 +81,31 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
 
-            AccountDAO dao = new AccountDAO();
-            User user = dao.getUserByEmail(acc.getEmail());
+            try (Connection conn = DBConnection.getConnection()) {
+                AccountDAO dao = new AccountDAO(conn);
+                User user = dao.getUserByEmail(acc.getEmail());
 
-            // Register user if not exists
-            if (user == null) {
-                user = new User();
-                user.setEmail(acc.getEmail());
-                user.setFullName(acc.getName());
-                user.setPasswordHash(generateRandomPassword(10));
-                user.setPhone("");
-                user.setActive(true);
-                user.setGoogleID(acc.getId());
-                user.setAvatarUrl(acc.getPicture());
-                user.setCreatedAt(new java.util.Date());
+                // Register user if not exists
+                if (user == null) {
+                    user = new User();
+                    user.setEmail(acc.getEmail());
+                    user.setFullName(acc.getName());
+                    user.setPasswordHash(PasswordService.hashPassword(generateRandomPassword(10))); // hashed
+                    user.setPhone("");
+                    user.setActive(true);
+                    user.setGoogleID(acc.getId());
+                    user.setAvatarUrl(acc.getPicture());
+                    user.setCreatedAt(new java.util.Date());
 
-                dao.addUser(user);
-                user = dao.getUserByEmail(acc.getEmail());
+                    dao.addUser(user);
+                    user = dao.getUserByEmail(acc.getEmail());
+                }
+
+                HttpSession session = request.getSession();
+                session.setAttribute("currentUser", user);
+                session.setAttribute("userID", user.getUserID());
+                response.sendRedirect(request.getContextPath() + "/home.jsp");
             }
-
-            HttpSession session = request.getSession();
-            session.setAttribute("currentUser", user);
-            session.setAttribute("userID", user.getUserID());
-            response.sendRedirect(request.getContextPath() + "/home.jsp");
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,11 +1,16 @@
 package controller.Authentication;
 
+import connect.DBConnection;
 import dao.AccountDAO;
 import model.User;
 import service.EmailService;
 import service.OTPGenerator;
+import service.PasswordService;
+
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.Timestamp;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,8 +34,8 @@ public class SignupServlet extends HttpServlet {
             return;
         }
 
-        try {
-            AccountDAO userDAO = new AccountDAO();
+        try (Connection conn = DBConnection.getConnection()) {
+            AccountDAO userDAO = new AccountDAO(conn);
 
             if (userDAO.getUserByEmail(email) != null) {
                 request.setAttribute("error", "Email already exists!");
@@ -40,7 +45,7 @@ public class SignupServlet extends HttpServlet {
 
             User newUser = new User();
             newUser.setEmail(email);
-            newUser.setPasswordHash(password);
+            newUser.setPasswordHash(PasswordService.hashPassword(password)); // hashed
             newUser.setFullName(fullName);
             newUser.setPhone(phone);
             newUser.setActive(false);
@@ -48,19 +53,22 @@ public class SignupServlet extends HttpServlet {
             newUser.setGoogleID(null);
             newUser.setAvatarUrl(null);
 
+            // Lưu user chưa kích hoạt vào session (sẽ được tạo trong DB sau khi xác thực OTP)
             request.getSession().setAttribute("pendingUser", newUser);
 
+            // Gửi OTP qua email
             String otp = OTPGenerator.generateOTP();
             EmailService emailService = new EmailService();
+            emailService.sendOTPEmail(email, otp, "Activate Your Account - OTP");
+
             request.getSession().setAttribute("otp", otp);
             request.getSession().setAttribute("email", email);
             request.getSession().setAttribute("otpMode", "activate");
-            String subject = "Activate Your Account - OTP";
-            emailService.sendOTPEmail(email, otp, subject);
 
             response.sendRedirect("account/confirmOTP.jsp");
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ServletException("Database error", e);
         }
     }

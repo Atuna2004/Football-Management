@@ -17,9 +17,13 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebServlet("/updateProfile")
 public class UpdateProfileServlet extends HttpServlet {
+
+    private static final Logger LOGGER = Logger.getLogger(UpdateProfileServlet.class.getName());
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -27,7 +31,19 @@ public class UpdateProfileServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
+        // Use a try-with-resources statement to ensure the connection is closed
+        Connection conn = null;
         try {
+            conn = DBConnection.getConnection();
+            if (conn == null) {
+                HttpSession session = request.getSession();
+                session.setAttribute("errorMessage", "Database connection failed. Please try again later.");
+                response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
+                return;
+            }
+
+            AccountDAO accountDAO = new AccountDAO(conn); // Pass the connection to the DAO
+
             String userIdStr = request.getParameter("userId");
             if (userIdStr == null || userIdStr.trim().isEmpty()) {
                 HttpSession session = request.getSession();
@@ -41,7 +57,7 @@ public class UpdateProfileServlet extends HttpServlet {
                 userId = Integer.parseInt(userIdStr);
             } catch (NumberFormatException e) {
                 HttpSession session = request.getSession();
-                session.setAttribute("errorMessage", "Invalid user ID.");
+                session.setAttribute("errorMessage", "Invalid user ID format.");
                 response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
                 return;
             }
@@ -55,38 +71,37 @@ public class UpdateProfileServlet extends HttpServlet {
             if (birthdateStr != null && !birthdateStr.isEmpty()) {
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    sdf.setLenient(false); // Make date parsing strict
                     dateOfBirth = sdf.parse(birthdateStr);
                 } catch (ParseException e) {
                     HttpSession session = request.getSession();
-                    session.setAttribute("errorMessage", "Invalid birth date format.");
+                    session.setAttribute("errorMessage", "Invalid birth date format. Please use YYYY-MM-DD.");
                     response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
                     return;
                 }
             }
 
-            phone = phone.replaceAll("\\D+", "");
+            // Phone number validation
+            phone = phone.replaceAll("\\D+", ""); // Remove all non-digits
             if (phone.isEmpty()) {
                 HttpSession session = request.getSession();
                 session.setAttribute("errorMessage", "Phone number cannot be empty.");
                 response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
                 return;
             }
-
             if (!phone.startsWith("0")) {
                 HttpSession session = request.getSession();
                 session.setAttribute("errorMessage", "Phone number must start with 0.");
                 response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
                 return;
             }
-
-            if (phone.length() < 10) {
+            if (phone.length() < 10) { // Assuming a minimum of 10 digits for Vietnamese numbers
                 HttpSession session = request.getSession();
                 session.setAttribute("errorMessage", "Phone number must be at least 10 digits.");
                 response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
                 return;
             }
 
-            AccountDAO accountDAO = new AccountDAO();
             User user = accountDAO.getUserById(userId);
             if (user == null) {
                 HttpSession session = request.getSession();
@@ -95,6 +110,7 @@ public class UpdateProfileServlet extends HttpServlet {
                 return;
             }
 
+            // Update user object with new data
             user.setFullName(fullName);
             user.setPhone(phone);
             user.setDateOfBirth(dateOfBirth);
@@ -102,7 +118,7 @@ public class UpdateProfileServlet extends HttpServlet {
 
             HttpSession session = request.getSession();
             if (accountDAO.updateUser(user)) {
-                session.setAttribute("currentUser", user);
+                session.setAttribute("currentUser", user); // Update the user object in session
                 session.setAttribute("successMessage", "Profile updated successfully!");
                 response.sendRedirect(request.getContextPath() + "/account/successProfile.jsp");
             } else {
@@ -111,7 +127,13 @@ public class UpdateProfileServlet extends HttpServlet {
             }
 
         } catch (SQLException e) {
-            throw new ServletException("System error while updating profile: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Database error during profile update for user ID: " + request.getParameter("userId"), e);
+            HttpSession session = request.getSession();
+            session.setAttribute("errorMessage", "A database error occurred. Please try again or contact support.");
+            response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
+        } finally {
+            // Ensure the connection is closed even if an exception occurs
+            DBConnection.closeConnection(conn);
         }
     }
 }
