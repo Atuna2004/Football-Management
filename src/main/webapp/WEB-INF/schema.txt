@@ -1,0 +1,370 @@
+-- =============================
+-- 1. PHÂN QUYỀN NGƯỜI DÙNG
+-- =============================
+CREATE TABLE Role (
+    RoleID INT IDENTITY PRIMARY KEY,
+    RoleName NVARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE [User] (
+    UserID INT IDENTITY PRIMARY KEY,
+    Email NVARCHAR(255) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(255) NOT NULL,
+    FullName NVARCHAR(100),
+    Phone NVARCHAR(20),
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    IsActive BIT DEFAULT 1,
+    GoogleID NVARCHAR(100),
+    AvatarUrl NVARCHAR(512),
+    DateOfBirth DATE,
+    Address NVARCHAR(255)
+);
+
+CREATE TABLE UserRole (
+    UserID INT NOT NULL,
+    RoleID INT NOT NULL,
+    PRIMARY KEY (UserID, RoleID),
+    FOREIGN KEY (UserID) REFERENCES [User](UserID),
+    FOREIGN KEY (RoleID) REFERENCES Role(RoleID)
+);
+
+-- =============================
+-- 2. SÂN BÓNG (SÂN LỚN)
+-- =============================
+CREATE TABLE Stadium (
+    StadiumID INT IDENTITY PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Location NVARCHAR(255),
+    Description NVARCHAR(MAX),
+    Status NVARCHAR(20) NOT NULL DEFAULT 'Available',
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    OwnerID INT,
+    PhoneNumber NVARCHAR(20),
+    FOREIGN KEY (OwnerID) REFERENCES [User](UserID)
+);
+
+-- =============================
+-- 3. LOẠI SÂN (SÂN NHỎ)
+-- =============================
+CREATE TABLE Field (
+    FieldID INT IDENTITY PRIMARY KEY,
+    StadiumID INT NOT NULL,
+    FieldName NVARCHAR(100),         -- Ví dụ: Sân 5 người A1
+    Type NVARCHAR(50) NOT NULL,      -- '5 người', '7 người', v.v
+    Description NVARCHAR(MAX),
+    FOREIGN KEY (StadiumID) REFERENCES Stadium(StadiumID)
+);
+
+-- =============================
+-- 4. KHUNG GIỜ
+-- =============================
+CREATE TABLE TimeSlot (
+    TimeSlotID INT IDENTITY PRIMARY KEY,
+    FieldID INT NOT NULL,
+    Date DATE NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL,
+    Price DECIMAL(12,2) NOT NULL,
+    FOREIGN KEY (FieldID) REFERENCES Field(FieldID)
+);
+
+-- =============================
+-- 5. MÃ GIẢM GIÁ
+-- =============================
+CREATE TABLE DiscountCode (
+    DiscountCodeID INT IDENTITY PRIMARY KEY,
+    Code NVARCHAR(50) NOT NULL UNIQUE,
+    DiscountPercent INT NOT NULL CHECK (DiscountPercent BETWEEN 0 AND 100),
+    ExpiryDate DATE NOT NULL,
+    MaxUsage INT NOT NULL DEFAULT 0,
+    UsedCount INT NOT NULL DEFAULT 0
+);
+
+-- =============================
+-- 6. ĐẶT SÂN & THANH TOÁN
+-- =============================
+CREATE TABLE Booking (
+    BookingID INT IDENTITY PRIMARY KEY,
+    UserID INT NOT NULL,
+    DiscountCodeID INT NULL,
+    Status NVARCHAR(20) NOT NULL DEFAULT 'Pending',
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    OriginalAmount DECIMAL(12,2),
+    TotalAmount DECIMAL(12,2),
+    FOREIGN KEY (UserID) REFERENCES [User](UserID),
+    FOREIGN KEY (DiscountCodeID) REFERENCES DiscountCode(DiscountCodeID)
+);
+
+CREATE TABLE BookingTimeSlot (
+    BookingID INT NOT NULL,
+    TimeSlotID INT NOT NULL,
+    PRIMARY KEY (BookingID, TimeSlotID),
+    FOREIGN KEY (BookingID) REFERENCES Booking(BookingID),
+    FOREIGN KEY (TimeSlotID) REFERENCES TimeSlot(TimeSlotID)
+);
+
+CREATE TABLE Payment (
+    PaymentID INT IDENTITY PRIMARY KEY,
+    BookingID INT NOT NULL,
+    PaymentMethod NVARCHAR(50) NOT NULL,
+    Amount DECIMAL(12,2) NOT NULL,
+    PaymentDate DATETIME DEFAULT GETDATE(),
+    Status NVARCHAR(20) NOT NULL,
+    TransactionID NVARCHAR(100),
+    FOREIGN KEY (BookingID) REFERENCES Booking(BookingID)
+);
+
+-- =============================
+-- 7. ĐỒ ĂN & ĐẶT MÓN
+-- =============================
+CREATE TABLE FoodItem (
+    FoodItemID INT IDENTITY PRIMARY KEY,
+    StadiumID INT NOT NULL,
+    Name NVARCHAR(100) NOT NULL,
+    Description NVARCHAR(MAX),
+    Price DECIMAL(12,2) NOT NULL,
+    StockQuantity INT NOT NULL DEFAULT 0,
+    IsActive BIT DEFAULT 1,
+    FOREIGN KEY (StadiumID) REFERENCES Stadium(StadiumID)
+);
+
+CREATE TABLE FoodOrder (
+    FoodOrderID INT IDENTITY PRIMARY KEY,
+    UserID INT NOT NULL,
+    StadiumID INT NOT NULL,
+    BookingID INT NULL,
+    DiscountCodeID INT NULL,
+    Status NVARCHAR(20) NOT NULL DEFAULT 'Pending',
+    TotalAmount DECIMAL(12,2) NOT NULL,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (UserID) REFERENCES [User](UserID),
+    FOREIGN KEY (StadiumID) REFERENCES Stadium(StadiumID),
+    FOREIGN KEY (BookingID) REFERENCES Booking(BookingID),
+    FOREIGN KEY (DiscountCodeID) REFERENCES DiscountCode(DiscountCodeID)
+);
+
+CREATE TABLE FoodOrderItem (
+    FoodOrderItemID INT IDENTITY PRIMARY KEY,
+    FoodOrderID INT NOT NULL,
+    FoodItemID INT NOT NULL,
+    Quantity INT NOT NULL,
+    Price DECIMAL(12,2) NOT NULL,
+    FOREIGN KEY (FoodOrderID) REFERENCES FoodOrder(FoodOrderID),
+    FOREIGN KEY (FoodItemID) REFERENCES FoodItem(FoodItemID)
+);
+
+-- =============================
+-- 8. GIẢI ĐẤU
+-- =============================
+CREATE TABLE Tournament (
+    TournamentID INT IDENTITY PRIMARY KEY,
+    StadiumID INT NOT NULL,
+    Name NVARCHAR(100) NOT NULL,
+    Description NVARCHAR(MAX),
+    StartDate DATE NOT NULL,
+    EndDate DATE NOT NULL,
+    CreatedBy INT NOT NULL,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (StadiumID) REFERENCES Stadium(StadiumID),
+    FOREIGN KEY (CreatedBy) REFERENCES [User](UserID)
+);
+
+CREATE TABLE TournamentTeam (
+    TeamID INT IDENTITY PRIMARY KEY,
+    TournamentID INT NOT NULL,
+    TeamName NVARCHAR(100) NOT NULL,
+    CaptainName NVARCHAR(100),
+    ContactPhone NVARCHAR(20),
+    FOREIGN KEY (TournamentID) REFERENCES Tournament(TournamentID)
+);
+
+CREATE TABLE MatchSchedule (
+    MatchID INT IDENTITY PRIMARY KEY,
+    TournamentID INT NOT NULL,
+    TeamAID INT NOT NULL,
+    TeamBID INT NOT NULL,
+    MatchDate DATE NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL,
+    Result NVARCHAR(255),
+    FOREIGN KEY (TournamentID) REFERENCES Tournament(TournamentID),
+    FOREIGN KEY (TeamAID) REFERENCES TournamentTeam(TeamID),
+    FOREIGN KEY (TeamBID) REFERENCES TournamentTeam(TeamID)
+);
+
+-- ROLES
+INSERT INTO Role (RoleName)
+VALUES (N'Admin'), (N'Owner'), (N'User');
+
+-- USERS
+INSERT INTO [User] (Email, PasswordHash, FullName, Phone)
+VALUES 
+(N'admin@example.com', N'hashed_admin', N'Admin', '0900000000'),
+(N'owner1@example.com', N'hashed_owner1', N'Chủ sân 1', '0900000001'),
+(N'owner2@example.com', N'hashed_owner2', N'Chủ sân 2', '0900000002'),
+(N'user1@example.com', N'hashed_user1', N'Người dùng 1', '0900000003'),
+(N'user2@example.com', N'hashed_user2', N'Người dùng 2', '0900000004');
+
+-- USER ROLES
+INSERT INTO UserRole (UserID, RoleID)
+SELECT U.UserID, R.RoleID FROM [User] U, Role R
+WHERE (U.Email = 'admin@example.com' AND R.RoleName = 'Admin')
+   OR (U.Email IN ('owner1@example.com', 'owner2@example.com') AND R.RoleName = 'Owner')
+   OR (U.Email IN ('user1@example.com', 'user2@example.com') AND R.RoleName = 'User');
+
+-- STADIUMS
+INSERT INTO Stadium (Name, Location, Description, OwnerID, PhoneNumber)
+SELECT N'Sân Vận Động A', N'Hà Nội', N'Sân trung tâm', UserID, '0901111111'
+FROM [User] WHERE Email = 'owner1@example.com';
+
+INSERT INTO Stadium (Name, Location, Description, OwnerID, PhoneNumber)
+SELECT N'Sân Vận Động B', N'Hồ Chí Minh', N'Sân quận 1', UserID, '0902222222'
+FROM [User] WHERE Email = 'owner2@example.com';
+
+-- FIELDS
+INSERT INTO Field (StadiumID, FieldName, Type, Description)
+VALUES 
+(1, N'Sân A - 5 người', N'5 người', N'Sân nhỏ'),
+(1, N'Sân A - 7 người', N'7 người', N'Sân trung bình'),
+(2, N'Sân B - 11 người', N'11 người', N'Sân lớn');
+
+-- TIMESLOTS (1 tiếng/lượt từ 06h đến 21h cho FieldID = 1)
+DECLARE @startTime TIME = '06:00';
+DECLARE @endTime TIME = '21:00';
+DECLARE @cur TIME = @startTime;
+WHILE (@cur < @endTime)
+BEGIN
+    INSERT INTO TimeSlot (FieldID, Date, StartTime, EndTime, Price)
+    VALUES (1, '2025-06-17', @cur, DATEADD(HOUR, 1, @cur), 150000);
+    SET @cur = DATEADD(HOUR, 1, @cur);
+END;
+
+-- ADDITIONAL TIMESLOTS cho FieldID = 2, 3
+INSERT INTO TimeSlot (FieldID, Date, StartTime, EndTime, Price)
+VALUES 
+(2, '2025-06-17', '07:00', '08:00', 200000),
+(3, '2025-06-17', '08:00', '09:00', 400000);
+
+-- DISCOUNTS
+INSERT INTO DiscountCode (Code, DiscountPercent, ExpiryDate, MaxUsage)
+VALUES 
+(N'GIAM10', 10, '2025-12-31', 100),
+(N'GIAM20', 20, '2025-12-31', 50);
+
+-- BOOKING
+INSERT INTO Booking (UserID, DiscountCodeID, Status, OriginalAmount, TotalAmount)
+SELECT U.UserID, D.DiscountCodeID, 'Confirmed', 300000, 270000
+FROM [User] U, DiscountCode D
+WHERE U.Email = 'user1@example.com' AND D.Code = 'GIAM10';
+
+-- Lưu BookingID
+DECLARE @bookingID INT = SCOPE_IDENTITY();
+
+-- BOOKING TIMESLOT
+INSERT INTO BookingTimeSlot (BookingID, TimeSlotID)
+VALUES 
+(@bookingID, 1),
+(@bookingID, 2);
+
+-- PAYMENT
+INSERT INTO Payment (BookingID, PaymentMethod, Amount, Status, TransactionID)
+VALUES 
+(@bookingID, N'VNPay', 270000, 'Completed', 'TXN123456');
+
+-- FOOD ITEMS
+INSERT INTO FoodItem (StadiumID, Name, Description, Price, StockQuantity)
+VALUES 
+(1, N'Nước suối', N'Chai 500ml', 10000, 100),
+(1, N'Bánh mì thịt', N'Bánh mì nhân thịt nướng', 20000, 50);
+
+-- FOOD ORDER
+INSERT INTO FoodOrder (UserID, StadiumID, BookingID, DiscountCodeID, Status, TotalAmount)
+SELECT U.UserID, 1, @bookingID, NULL, 'Confirmed', 40000
+FROM [User] U WHERE U.Email = 'user1@example.com';
+
+-- Lưu FoodOrderID
+DECLARE @foodOrderID INT = SCOPE_IDENTITY();
+
+-- FOOD ORDER ITEMS
+INSERT INTO FoodOrderItem (FoodOrderID, FoodItemID, Quantity, Price)
+VALUES 
+(@foodOrderID, 1, 2, 20000),
+(@foodOrderID, 2, 1, 20000);
+
+-- TOURNAMENT
+INSERT INTO Tournament (StadiumID, Name, Description, StartDate, EndDate, CreatedBy)
+SELECT 1, N'Giải Hè 2025', N'Dành cho các đội phong trào', '2025-07-01', '2025-07-10', UserID
+FROM [User] WHERE Email = 'owner1@example.com';
+
+-- TEAMS
+INSERT INTO TournamentTeam (TournamentID, TeamName, CaptainName, ContactPhone)
+VALUES 
+(1, N'Team Alpha', N'Anh A', '0901234567'),
+(1, N'Team Beta', N'Anh B', '0907654321');
+
+-- MATCH
+INSERT INTO MatchSchedule (TournamentID, TeamAID, TeamBID, MatchDate, StartTime, EndTime)
+VALUES 
+(1, 1, 2, '2025-07-02', '08:00', '09:00');
+
+CREATE PROCEDURE AutoGenerateTimeSlots
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @Today DATE = CAST(GETDATE() AS DATE);
+
+    -- XÓA CÁC TIMESLOT CŨ chưa được đặt
+    DELETE FROM TimeSlot
+    WHERE Date < @Today
+      AND TimeSlotID NOT IN (
+          SELECT TimeSlotID FROM BookingTimeSlot
+      );
+
+    -- TẠO MỚI TIMESLOT CHO 30 NGÀY TỚI CHO MỖI FIELD
+    DECLARE @FieldID INT;
+    DECLARE field_cursor CURSOR FOR
+        SELECT FieldID FROM Field;
+
+    OPEN field_cursor;
+    FETCH NEXT FROM field_cursor INTO @FieldID;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        DECLARE @i INT = 0;
+
+        WHILE @i < 30
+        BEGIN
+            DECLARE @date DATE = DATEADD(DAY, @i, @Today);
+            DECLARE @startTime TIME = '06:00';
+            DECLARE @endTime TIME = '21:00';
+            DECLARE @cur TIME = @startTime;
+
+            WHILE (@cur < @endTime)
+            BEGIN
+                -- Kiểm tra đã tồn tại chưa
+                IF NOT EXISTS (
+                    SELECT 1 FROM TimeSlot 
+                    WHERE FieldID = @FieldID AND Date = @date 
+                      AND StartTime = @cur AND EndTime = DATEADD(HOUR, 1, @cur)
+                )
+                BEGIN
+                    INSERT INTO TimeSlot (FieldID, Date, StartTime, EndTime, Price)
+                    VALUES (@FieldID, @date, @cur, DATEADD(HOUR, 1, @cur), 150000);
+                END
+
+                SET @cur = DATEADD(HOUR, 1, @cur);
+            END
+
+            SET @i = @i + 1;
+        END
+
+        FETCH NEXT FROM field_cursor INTO @FieldID;
+    END
+
+    CLOSE field_cursor;
+    DEALLOCATE field_cursor;
+END;
+
+EXEC AutoGenerateTimeSlots;
+

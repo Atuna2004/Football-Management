@@ -1,4 +1,3 @@
-
 package filter;
 
 import jakarta.servlet.*;
@@ -12,7 +11,7 @@ public class AuthFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-      
+
     }
 
     @Override
@@ -25,30 +24,25 @@ public class AuthFilter implements Filter {
 
         String path = req.getRequestURI().substring(req.getContextPath().length());
 
-        // Lấy currentUser từ session
         User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
 
-        // Chuyển hướng từ "/" hoặc "/home.jsp" sang dashboard nếu là admin
-        if ((path.equals("/") || path.equals("/home.jsp")) && currentUser != null && currentUser.isAdmin()) {
+        if (path.equals("/") && currentUser != null && currentUser.isAdmin()) {
             res.sendRedirect(req.getContextPath() + "/admin/adminPage.jsp");
             return;
         }
 
-        // Cho phép truy cập /about mà không cần login
         if (path.equals("/about")) {
             chain.doFilter(request, response);
             return;
         }
 
-        // Kiểm tra nếu là đường dẫn trong /admin/*
         if (path.startsWith("/admin")) {
             if (currentUser == null || !currentUser.isAdmin()) {
                 res.sendRedirect(req.getContextPath() + "/unauthorized.jsp");
                 return;
             }
         }
-        
-        // Kiểm tra nếu là đường dẫn trong /fieldOwner/*
+
         if (path.startsWith("/fieldOwner")) {
             if (currentUser == null || !currentUser.isFieldOwner()) {
                 res.sendRedirect(req.getContextPath() + "/unauthorized.jsp");
@@ -56,12 +50,11 @@ public class AuthFilter implements Filter {
             }
         }
 
-        // Cho phép các trang khác
         chain.doFilter(request, response);
     }
 
     @Override
     public void destroy() {
-        // Dọn dẹp nếu cần
+
     }
 }

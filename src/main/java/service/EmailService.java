@@ -7,15 +7,14 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
-import jakarta.mail.internet.MimeUtility;
 import java.io.File;
 
 import java.util.Properties;
 
 public class EmailService {
 
-    public static final String EMAIL_SENDER = "xxx";
-    public static final String EMAIL_PASSWORD = "xxx";
+    public static final String EMAIL_SENDER = "nguyenphananh49@gmail.com";
+    public static final String EMAIL_PASSWORD = "zvgp xvve cpnz gryc";
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final int SMTP_PORT = 587;
 
@@ -54,10 +53,10 @@ public class EmailService {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
             message.setSubject(subject);
             message.setContent(
-                "<h1>Yêu cầu xác thực OTP</h1>"
-                + "<p>Mã xác thực của bạn là: <strong>" + resetCode + "</strong></p>"
-                + "<p>Mã này có hiệu lực trong vòng 5 phút.</p>",
-                "text/html; charset=UTF-8"
+                    "<h1>Yêu cầu xác thực OTP</h1>"
+                    + "<p>Mã xác thực của bạn là: <strong>" + resetCode + "</strong></p>"
+                    + "<p>Mã này có hiệu lực trong vòng 5 phút.</p>",
+                    "text/html; charset=UTF-8"
             );
 
             Transport.send(message);
@@ -79,10 +78,10 @@ public class EmailService {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
             message.setSubject("Chào mừng bạn đến với Ứng dụng của chúng tôi!");
             message.setContent(
-                "<h1>Đăng ký thành công</h1>"
-                + "<p>Xin chào " + username + ",</p>"
-                + "<p>Thông tin tài khoản của bạn đã được tạo thành công.</p>",
-                "text/html; charset=UTF-8"
+                    "<h1>Đăng ký thành công</h1>"
+                    + "<p>Xin chào " + username + ",</p>"
+                    + "<p>Thông tin tài khoản của bạn đã được tạo thành công.</p>",
+                    "text/html; charset=UTF-8"
             );
 
             Transport.send(message);
@@ -104,10 +103,10 @@ public class EmailService {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
             message.setSubject("Chào mừng bạn - Đăng ký bằng Google");
             message.setContent(
-                "<h1>Đăng ký bằng Google thành công</h1>"
-                + "<p>Xin chào " + username + ",</p>"
-                + "<p>Bạn đã đăng ký tài khoản thành công bằng Google.</p>",
-                "text/html; charset=UTF-8"
+                    "<h1>Đăng ký bằng Google thành công</h1>"
+                    + "<p>Xin chào " + username + ",</p>"
+                    + "<p>Bạn đã đăng ký tài khoản thành công bằng Google.</p>",
+                    "text/html; charset=UTF-8"
             );
 
             Transport.send(message);
@@ -129,9 +128,9 @@ public class EmailService {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
             message.setSubject("Xác nhận đơn hàng");
             message.setContent(
-                "<h1>Cảm ơn bạn đã đặt hàng!</h1>"
-                + "<p>Chi tiết đơn hàng:</p><pre>" + orderDetails + "</pre>",
-                "text/html; charset=UTF-8"
+                    "<h1>Cảm ơn bạn đã đặt hàng!</h1>"
+                    + "<p>Chi tiết đơn hàng:</p><pre>" + orderDetails + "</pre>",
+                    "text/html; charset=UTF-8"
             );
 
             Transport.send(message);
