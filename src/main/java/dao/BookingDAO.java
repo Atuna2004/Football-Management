@@ -243,7 +243,7 @@ public class BookingDAO {
     }
 
     public boolean confirmBooking(int bookingId) {
-        String sql = "UPDATE Booking SET Status = 'Confirmed' WHERE BookingID = ?";
+        String sql = "UPDATE Booking SET Status = 'Completed' WHERE BookingID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -271,66 +271,127 @@ public class BookingDAO {
             return false;
         }
     }
-    // Add this method to your existing BookingDAO class
 
-/**
- * Check if a user has booked a specific stadium
- * This method checks through the booking -> timeslot -> stadium relationship
- */
-public boolean hasUserBookedStadium(int userId, int stadiumId) throws SQLException {
-    String sql = "SELECT COUNT(*) FROM Booking b " +
-                 "JOIN BookingTimeSlot bts ON b.BookingID = bts.BookingID " +
-                 "JOIN TimeSlot ts ON bts.TimeSlotID = ts.TimeSlotID " +
-                 "WHERE b.UserID = ? AND ts.StadiumID = ?";
-    
-    try (Connection conn = DBConnection.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, userId);
-        ps.setInt(2, stadiumId);
-        
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                int count = rs.getInt(1);
-                System.out.println("🔍 User " + userId + " has " + count + " bookings for stadium " + stadiumId);
-                return count > 0;
-            }
-        }
-    } catch (SQLException e) {
-        System.out.println("❌ Error checking user booking: " + e.getMessage());
-        throw e;
-    }
-    
-    return false;
-}
+    public boolean applyDiscountCode(int bookingId, int discountCodeId, double newTotal) {
+        String sql = "UPDATE Booking SET DiscountCodeID = ?, TotalAmount = ? WHERE BookingID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-/**
- * Alternative method if you want to check only confirmed bookings
- */
-public boolean hasUserBookedStadiumConfirmed(int userId, int stadiumId) throws SQLException {
-    String sql = "SELECT COUNT(*) FROM Booking b " +
-                 "JOIN BookingTimeSlot bts ON b.BookingID = bts.BookingID " +
-                 "JOIN TimeSlot ts ON bts.TimeSlotID = ts.TimeSlotID " +
-                 "WHERE b.UserID = ? AND ts.StadiumID = ? AND b.Status = 'Confirmed'";
-    
-    try (Connection conn = DBConnection.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, userId);
-        ps.setInt(2, stadiumId);
-        
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                int count = rs.getInt(1);
-                System.out.println("🔍 User " + userId + " has " + count + " confirmed bookings for stadium " + stadiumId);
-                return count > 0;
+            ps.setInt(1, discountCodeId);
+            ps.setDouble(2, newTotal);
+            ps.setInt(3, bookingId);
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                try (PreparedStatement ps2 = conn.prepareStatement(
+                        "UPDATE DiscountCode SET UsedCount = UsedCount + 1 WHERE DiscountCodeID = ?")) {
+                    ps2.setInt(1, discountCodeId);
+                    ps2.executeUpdate();
+                }
+                return true;
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        System.out.println("❌ Error checking confirmed user booking: " + e.getMessage());
-        throw e;
+        return false;
     }
-    
-    return false;
-}
+
+    public void updateCheckinToken(int bookingId, String token) {
+        String sql = "UPDATE Booking SET CheckinToken = ? WHERE BookingID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, token);
+            ps.setInt(2, bookingId);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Booking getBookingByCheckinToken(String token) {
+        String sql = "SELECT * FROM Booking WHERE CheckinToken = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, token);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Booking booking = new Booking();
+                booking.setBookingID(rs.getInt("BookingID"));
+                booking.setUserID(rs.getInt("UserID"));
+
+                Object discountObj = rs.getObject("DiscountCodeID");
+                if (discountObj != null) {
+                    booking.setDiscountCodeID((Integer) discountObj);
+                }
+
+                booking.setStatus(rs.getString("Status"));
+                booking.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+                booking.setOriginalAmount(rs.getDouble("OriginalAmount"));
+                booking.setTotalAmount(rs.getDouble("TotalAmount"));
+
+                return booking;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public boolean hasUserBookedStadium(int userId, int stadiumId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Booking b " +
+                     "JOIN BookingTimeSlot bts ON b.BookingID = bts.BookingID " +
+                     "JOIN TimeSlot ts ON bts.TimeSlotID = ts.TimeSlotID " +
+                     "WHERE b.UserID = ? AND ts.StadiumID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setInt(2, stadiumId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            throw e;
+        }
+
+        return false;
+    }
+
+    public boolean hasUserBookedStadiumConfirmed(int userId, int stadiumId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Booking b " +
+                     "JOIN BookingTimeSlot bts ON b.BookingID = bts.BookingID " +
+                     "JOIN TimeSlot ts ON bts.TimeSlotID = ts.TimeSlotID " +
+                     "WHERE b.UserID = ? AND ts.StadiumID = ? AND b.Status = 'Confirmed'";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setInt(2, stadiumId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            throw e;
+        }
+
+        return false;
+    }
 }

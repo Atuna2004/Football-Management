@@ -19,6 +19,7 @@ public class User {
     private Date dateOfBirth;
     private String address;
 
+
     private List<Role> roles = new ArrayList<>();
 
     public User() {
@@ -185,11 +186,20 @@ public class User {
     }
 
 
-public String getFacebookID() {
-    return facebookID;
+    public String getFacebookID() {
+        return facebookID;
+    }
+
+    public void setFacebookID(String facebookID) {
+        this.facebookID = facebookID;
+    }
+
+    public int getPrimaryRoleID() {
+        if (roles != null && !roles.isEmpty()) {
+            return roles.get(0).getRoleID(); // lấy role đầu tiên
+        }
+        return -1; // hoặc 3 nếu muốn default User
+    }
+
 }
 
-public void setFacebookID(String facebookID) {
-    this.facebookID = facebookID;
-}
-}
