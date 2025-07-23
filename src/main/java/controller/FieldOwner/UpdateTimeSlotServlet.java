@@ -1,7 +1,6 @@
 package controller.FieldOwner;
 
 import dao.BookingDAO;
-import dao.FoodOrderDAO;
 import dao.PaymentDAO;
 import dao.TimeSlotDAO;
 import jakarta.servlet.*;
@@ -9,17 +8,30 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import model.TimeSlot;
 import model.User;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import model.CartItem;
 
 @WebServlet("/UpdateTimeSlotServlet")
 public class UpdateTimeSlotServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
+
         String action = request.getParameter("action");
         int stadiumId = Integer.parseInt(request.getParameter("stadiumId"));
-        String week = request.getParameter("week");
+
+        HttpSession session = request.getSession(false);
+        User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
+
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/account/login.jsp");
+            return;
+        }
+
+        TimeSlotDAO timeSlotDAO = new TimeSlotDAO();
+        BookingDAO bookingDAO = new BookingDAO();
+        PaymentDAO paymentDAO = new PaymentDAO(); // Thêm đối tượng PaymentDAO
 
         if ("book".equals(action)) {
             String[] selectedTimeSlotIds = request.getParameterValues("timeSlotIds");
@@ -28,28 +40,8 @@ public class UpdateTimeSlotServlet extends HttpServlet {
                 return;
             }
 
-            HttpSession session = request.getSession(false);
-            User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
-
-            if (currentUser == null) {
-                response.sendRedirect(request.getContextPath() + "/account/login.jsp");
-                return;
-            }
-
-            int userId = currentUser.getUserID();
+            // Tính tổng giá vé sân
             double ticketPrice = 0;
-
-            TimeSlotDAO timeSlotDAO = new TimeSlotDAO();
-            BookingDAO bookingDAO = new BookingDAO();
-            PaymentDAO paymentDAO = new PaymentDAO();
-            FoodOrderDAO foodOrderDAO = new FoodOrderDAO();
-
-            // Lấy giỏ hàng (nếu có)
-            @SuppressWarnings("unchecked")
-            List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
-            if (cart == null) cart = new ArrayList<>();
-
-            // Tính tổng giá từ TimeSlot
             for (String timeSlotIdStr : selectedTimeSlotIds) {
                 int timeSlotId = Integer.parseInt(timeSlotIdStr);
                 TimeSlot ts = timeSlotDAO.getTimeSlotById(timeSlotId);
@@ -58,15 +50,10 @@ public class UpdateTimeSlotServlet extends HttpServlet {
                 }
             }
 
-            // Tính tổng giá đồ ăn từ giỏ hàng
-            double totalFood = 0;
-            for (CartItem item : cart) {
-                totalFood += item.getFoodItem().getPrice() * item.getQuantity();
-            }
-
-            double totalAmount = ticketPrice + totalFood;
+            double totalAmount = ticketPrice;
 
             // Tạo Booking mới
+            int userId = currentUser.getUserID();
             int bookingId = bookingDAO.createBooking(userId, ticketPrice, totalAmount);
             if (bookingId == -1) {
                 response.getWriter().write("Lỗi tạo đơn đặt sân.");
@@ -80,34 +67,48 @@ public class UpdateTimeSlotServlet extends HttpServlet {
                 timeSlotDAO.updateTimeSlotStatus(timeSlotId, true); // booked = true
             }
 
-            // Thêm món ăn nếu có
-            if (!cart.isEmpty()) {
-                int foodOrderId = foodOrderDAO.createFoodOrder(userId, stadiumId, bookingId, totalFood);
-                if (foodOrderId != -1) {
-                    foodOrderDAO.insertOrderItems(foodOrderId, cart);
-                    foodOrderDAO.reduceStock(cart);
-                }
-            }
+            // Cập nhật trạng thái Booking thành "Completed"
+            bookingDAO.updateBookingStatus(bookingId, "Completed");
 
-            // Cập nhật trạng thái Booking thành "Confirmed"
-            bookingDAO.updateBookingStatus(bookingId, "Confirmed");
+            // Tạo Payment
+            String paymentMethod = "Offline"; // Phương thức thanh toán
+            String status = "Completed"; // Trạng thái thanh toán
+            String transactionId = "MANUAL_BOOKING_" + bookingId; // ID giao dịch tùy chỉnh
+            boolean isPaymentCreated = paymentDAO.createPayment(bookingId, totalAmount, paymentMethod, status, transactionId);
 
-            // Tạo Payment với trạng thái "Completed"
-            boolean paymentSuccess = paymentDAO.createPaymentForManualBooking(bookingId, ticketPrice + totalFood);
-            if (!paymentSuccess) {
-                response.getWriter().write("Lỗi tạo giao dịch thanh toán.");
+            if (!isPaymentCreated) {
+                response.getWriter().write("Lỗi tạo thanh toán.");
                 return;
             }
 
-            // Xóa giỏ hàng nếu có
-            session.removeAttribute("cart");
-
-            // Chuyển hướng về lại trang quản lý TimeSlot
+            // Truyền dữ liệu sang JSP
             request.setAttribute("ticketPrice", ticketPrice);
-            request.setAttribute("foodPrice", totalFood);
             request.setAttribute("totalAmount", totalAmount);
             request.setAttribute("message", "✅ Đặt thủ công thành công!");
+
             request.getRequestDispatcher("/payment-success.jsp").forward(request, response);
+
+        } else if ("toggleActive".equals(action)) {
+            String[] selectedTimeSlotIds = request.getParameterValues("timeSlotIds");
+            if (selectedTimeSlotIds == null || selectedTimeSlotIds.length == 0) {
+                response.getWriter().write("Vui lòng chọn ít nhất một khung giờ.");
+                return;
+            }
+
+            // Lấy trạng thái hiện tại của TimeSlot đầu tiên để toggle
+            int exampleId = Integer.parseInt(selectedTimeSlotIds[0]);
+            TimeSlot exampleTS = timeSlotDAO.getTimeSlotById(exampleId);
+            boolean targetStatus = !exampleTS.isActive(); // Toggle trạng thái
+
+            // Áp dụng cho tất cả TimeSlot được chọn
+            for (String timeSlotIdStr : selectedTimeSlotIds) {
+                int timeSlotId = Integer.parseInt(timeSlotIdStr);
+                timeSlotDAO.updateTimeSlotStatus(timeSlotId, targetStatus);
+            }
+
+            // Chuyển hướng lại trang để load lại dữ liệu
+            String redirectURL = request.getContextPath() + "/LoadTimeSlotsServlet?stadiumId=" + stadiumId + "&week=current";
+            response.sendRedirect(redirectURL);
         }
     }
 }

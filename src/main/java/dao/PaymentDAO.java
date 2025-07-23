@@ -272,4 +272,20 @@ public class PaymentDAO {
             return false;
         }
     }
+    
+    // Thêm vào lớp PaymentDAO
+    public int getBookingIdByPaymentId(String paymentID) {
+        String sql = "SELECT BookingID FROM Payment WHERE PaymentID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, paymentID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("BookingID");
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi khi lấy BookingID từ PaymentID: " + e.getMessage());
+        }
+        return -1;
+    }
 }
