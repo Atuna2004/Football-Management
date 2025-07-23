@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import connect.DBConnection;
+import java.util.Calendar;
 import model.DashboardStats;
 import model.RecentBooking;
 
@@ -214,7 +215,7 @@ public class DashboardDAO {
                 + "   SELECT MONTH(fo.CreatedAt) AS Month, fo.TotalAmount AS Revenue "
                 + "   FROM FoodOrder fo "
                 + "   INNER JOIN Stadium s ON fo.StadiumID = s.StadiumID "
-                + "   WHERE fo.Status = 'Confirmed' "
+                + "   WHERE fo.Status = 'Completed' "
                 + "     AND YEAR(fo.CreatedAt) = YEAR(GETDATE()) "
                 + "     AND s.OwnerID = ? "
                 + ") AS CombinedRevenue "
@@ -313,4 +314,94 @@ public class DashboardDAO {
 //                System.out.printf("Tháng %02d: %.2f VND%n", month, revenueByMonth.get(month));
 //            }
 //        }
+    
+    /**
+    * Lấy số lượng booking theo tháng trong năm hiện tại
+    */
+   public Map<Integer, Integer> getMonthlyBookingsByOwner(int ownerId) {
+       Map<Integer, Integer> bookingsMap = new HashMap<>();
+       // Khởi tạo tất cả các tháng với giá trị 0
+       for (int i = 1; i <= 12; i++) {
+           bookingsMap.put(i, 0);
+       }
+
+       String sql = 
+           "SELECT MONTH(b.CreatedAt) AS month, COUNT(*) AS count " +
+           "FROM Booking b " +
+           "JOIN BookingTimeSlot bts ON b.BookingID = bts.BookingID " +
+           "JOIN TimeSlot ts ON bts.TimeSlotID = ts.TimeSlotID " +
+           "JOIN Field f ON ts.FieldID = f.FieldID " +
+           "JOIN Stadium s ON f.StadiumID = s.StadiumID " +
+           "WHERE s.OwnerID = ? " +
+           "  AND YEAR(b.CreatedAt) = YEAR(GETDATE()) " +
+           "  AND b.Status != 'Cancelled' " +
+           "GROUP BY MONTH(b.CreatedAt)";
+
+       try (Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+           ps.setInt(1, ownerId);
+           try (ResultSet rs = ps.executeQuery()) {
+               while (rs.next()) {
+                   int month = rs.getInt("month");
+                   int count = rs.getInt("count");
+                   bookingsMap.put(month, count);
+               }
+           }
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+       return bookingsMap;
+   }
+
+   /**
+    * Lấy số lượng booking theo ngày trong tháng hiện tại
+    */
+   public Map<Integer, Integer> getDailyBookingsByOwner(int ownerId) {
+    Map<Integer, Integer> bookingsMap = new HashMap<>();
+    
+    // Lấy số ngày của tháng hiện tại
+    Calendar cal = Calendar.getInstance();
+    int currentMonth = cal.get(Calendar.MONTH) + 1; // 1-12
+    int currentYear = cal.get(Calendar.YEAR);
+    int maxDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH); // Tự động lấy 28, 29, 30, 31
+    
+    // Khởi tạo map với số ngày thực tế của tháng
+    for (int i = 1; i <= maxDay; i++) {
+        bookingsMap.put(i, 0);
+    }
+
+    String sql =
+        "SELECT DAY(b.CreatedAt) AS day, COUNT(*) AS count " +
+        "FROM Booking b " +
+        "JOIN BookingTimeSlot bts ON b.BookingID = bts.BookingID " +
+        "JOIN TimeSlot ts ON bts.TimeSlotID = ts.TimeSlotID " +
+        "JOIN Field f ON ts.FieldID = f.FieldID " +
+        "JOIN Stadium s ON f.StadiumID = s.StadiumID " +
+        "WHERE s.OwnerID = ? " +
+        "  AND MONTH(b.CreatedAt) = ? " +
+        "  AND YEAR(b.CreatedAt) = ? " +
+        "  AND b.Status != 'Cancelled' " +
+        "GROUP BY DAY(b.CreatedAt)";
+    
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, ownerId);
+        ps.setInt(2, currentMonth);
+        ps.setInt(3, currentYear);
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                int day = rs.getInt("day");
+                int count = rs.getInt("count");
+                if (day >= 1 && day <= maxDay) { // Đảm bảo không vượt quá
+                    bookingsMap.put(day, count);
+                }
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return bookingsMap;
 }
+}
+    

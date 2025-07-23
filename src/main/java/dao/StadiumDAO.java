@@ -11,6 +11,22 @@ public class StadiumDAO {
 
     public List<Stadium> getAllStadiums() {
         List<Stadium> stadiumList = new ArrayList<>();
+        String sql = "SELECT * FROM Stadium WHERE Status = 'active'";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                stadiumList.add(mapResultSetToStadium(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stadiumList;
+    }
+    
+    public List<Stadium> getAllStadiumsForFieldOwner() {
+        List<Stadium> stadiumList = new ArrayList<>();
         String sql = "SELECT * FROM Stadium";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
