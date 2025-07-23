@@ -3,8 +3,8 @@ package constant;
 public class Iconstant {
 
     // --- GOOGLE OAUTH ---
-    public static final String GOOGLE_CLIENT_ID = "xxx";
-    public static final String GOOGLE_CLIENT_SECRET = "xxx";
+    public static final String GOOGLE_CLIENT_ID = "525166296465-4q4lifsqbuqhg7ptinpu0g5bc5tcjkqk.apps.googleusercontent.com";
+    public static final String GOOGLE_CLIENT_SECRET = "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";
     public static final String GOOGLE_REDIRECT_URI = "http://localhost:8080/FootballManagement/login";
     public static final String GOOGLE_GRANT_TYPE = "authorization_code";
     public static final String GOOGLE_LINK_GET_TOKEN = "https://accounts.google.com/o/oauth2/token";
