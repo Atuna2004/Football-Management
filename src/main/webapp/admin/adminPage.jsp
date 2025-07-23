@@ -1,4 +1,19 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List, model.User" %>
+<%
+    model.User currentUser = (model.User) session.getAttribute("currentUser");
+    if (currentUser == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+    String fullName = currentUser.getFullName();
+%>
+<%
+    Integer onlineUsers = (Integer) application.getAttribute("onlineUsers");
+    if (onlineUsers == null) {
+        onlineUsers = 0;
+    }
+%>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -194,13 +209,33 @@
             }
 
             .badge {
-                padding: 6px 12px;
-                border-radius: 20px;
-                font-size: 12px;
+                padding: 5px 12px;
+                border-radius: 15px;
+                font-size: 11px;
                 font-weight: 600;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
+                background: linear-gradient(135deg, #4facfe, #00f2fe);
+                color: white;
+                margin: 2px;
+                display: inline-block;
             }
+
+            .badge-admin {
+                background: linear-gradient(135deg, #f5576c, #f093fb);
+                color: white;
+            }
+
+            .badge-owner {
+                background: linear-gradient(135deg, #4facfe, #00f2fe);
+                color: white;
+            }
+
+            .badge-user {
+                background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+                color: white;
+            }
+
 
             .badge.success {
                 background: linear-gradient(135deg, #56ab2f, #a8e6cf);
@@ -293,7 +328,18 @@
                 font-style: italic;
                 margin-bottom: 20px;
             }
+            .header {
+                position: relative;
+            }
 
+            .header .greeting {
+                position: absolute;
+                top: 20px;
+                right: 30px;
+                font-size: 16px;
+                color: #666;
+                font-weight: 500;
+            }
             @media (max-width: 768px) {
                 .main-content {
                     margin-left: 0;
@@ -336,45 +382,45 @@
         <!-- Include Sidebar -->
         <%@ include file="sidebar.jsp" %>
 
-        <!-- Main Content -->
         <div class="main-content">
             <div class="header fade-in">
                 <h2><i class="fas fa-tachometer-alt"></i> Thống Kê Tổng Quan</h2>
+                <p class="greeting">
+                    👋 Xin chào, <strong><%= fullName %></strong>!
+                </p>
             </div>
 
-            <!-- Thống kê -->
             <div class="stats-grid fade-in">
                 <div class="stat-card primary">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
                     <div class="stat-title">Tổng Người Dùng</div>
                     <div class="stat-value">1,200</div>
                     <div class="stat-change">↗ +12% so với tháng trước</div>
                 </div>
                 <div class="stat-card success">
-                    <div class="stat-icon">
-                        <i class="fas fa-futbol"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-futbol"></i></div>
                     <div class="stat-title">Sân Bóng Hoạt Động</div>
                     <div class="stat-value">45</div>
                     <div class="stat-change">↗ +3 sân mới</div>
                 </div>
                 <div class="stat-card warning">
-                    <div class="stat-icon">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
                     <div class="stat-title">Đơn chờ duyệt</div>
                     <div class="stat-value">23</div>
                     <div class="stat-change">↗ +21 đơn so với hôm qua</div>
                 </div>
+                <div class="stat-card danger">
+                    <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
+                    <div class="stat-title">Người Dùng Online</div>
+                    <div class="stat-value"><%= onlineUsers %></div>
+                    <div class="stat-change">Đang hoạt động</div>
+                </div>
             </div>
 
-            <!-- Tài khoản đăng ký gần đây -->
             <div class="card fade-in">
                 <div class="card-header">
                     <h5><i class="fas fa-user-plus"></i> Tài Khoản Đăng Ký Gần Đây</h5>
-                    <a href="#" class="btn btn-outline">Quản Lý Người Dùng</a>
+                    <a href="${pageContext.request.contextPath}/admin/user-list" class="btn btn-outline">Quản Lý Người Dùng</a>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -389,30 +435,46 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <%
+                                    List<model.User> allUsers = (List<model.User>) request.getAttribute("allUsers");
+                                    if (allUsers != null && !allUsers.isEmpty()) {
+                                        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                                        for (model.User user : allUsers) {
+                                %>
                                 <tr>
                                     <td>
                                         <div style="display: flex; align-items: center;">
-                                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 12px;">N</div>
-                                            <strong>Nguyễn Văn A</strong>
+                                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 12px;">
+                                                <%= user.getFullName() != null && !user.getFullName().trim().isEmpty() ? user.getFullName().substring(0,1).toUpperCase() : "?" %>
+                                            </div>
+                                            <strong><%= user.getFullName() != null ? user.getFullName() : "Không tên" %></strong>
                                         </div>
                                     </td>
-                                    <td>a@example.com</td>
-                                    <td><span class="badge success">User</span></td>
-                                    <td>2024-10-05</td>
-                                    <td><i class="fas fa-circle" style="color: #28a745; font-size: 8px;"></i> Hoạt động</td>
-                                </tr>
-                                <tr>
+                                    <td><%= user.getEmail() != null ? user.getEmail() : "N/A" %></td>
                                     <td>
-                                        <div style="display: flex; align-items: center;">
-                                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #56ab2f, #a8e6cf); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 12px;">L</div>
-                                            <strong>Lê Thị B</strong>
-                                        </div>
+                                        <span class="badge 
+                                              <%= "admin".equalsIgnoreCase(user.getRole()) ? "badge-admin" : 
+                                                   "owner".equalsIgnoreCase(user.getRole()) ? "badge-owner" : 
+                                                   "badge-user" %>">
+                                            <%= user.getRole() != null ? user.getRole() : "Unknown" %>
+                                        </span>
                                     </td>
-                                    <td>b@example.com</td>
-                                    <td><span class="badge pending">Field Owner</span></td>
-                                    <td>2024-10-04</td>
-                                    <td><i class="fas fa-circle" style="color: #28a745; font-size: 8px;"></i> Hoạt động</td>
+                                    <td>
+                                        <%= user.getCreatedAt() != null ? sdf.format(user.getCreatedAt()) : "N/A" %>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-circle" style="color: <%= user.isActive() ? "#28a745" : "#dc3545" %>; font-size: 10px;"></i>
+                                        <%= user.isActive() ? "Hoạt động" : "Đã khóa" %>
+                                    </td>
                                 </tr>
+                                <%
+                                        }
+                                    } else {
+                                %>
+                                <tr>
+                                    <td colspan="5">Không có tài khoản nào gần đây.</td>
+                                </tr>
+                                <% } %>
                             </tbody>
                         </table>
                     </div>
@@ -420,10 +482,8 @@
             </div>
         </div>
 
-      
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-         
                 const buttons = document.querySelectorAll('.btn');
                 buttons.forEach(btn => {
                     btn.addEventListener('click', function (e) {
@@ -437,32 +497,30 @@
                             position: absolute;
                             width: ${size}px;
                             height: ${size}px;
-                            background: rgba(255, 255, 255, 0.6);
+                            background: rgba(255,255,255,0.6);
                             border-radius: 50%;
-                            left: ${e.clientX - rect.left - size / 2}px;
-                            top: ${e.clientY - rect.top - size / 2}px;
+                            left: ${e.clientX - rect.left - size/2}px;
+                            top: ${e.clientY - rect.top - size/2}px;
                             transform: scale(0);
                             animation: ripple 0.6s ease-out;
                             pointer-events: none;
                         `;
                         this.appendChild(ripple);
-
                         setTimeout(() => ripple.remove(), 600);
                     });
                 });
-            });
 
-         
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes ripple {
-                    to {
-                        transform: scale(2);
-                        opacity: 0;
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes ripple {
+                        to {
+                            transform: scale(2);
+                            opacity: 0;
+                        }
                     }
-                }
-            `;
-            document.head.appendChild(style);
+                `;
+                document.head.appendChild(style);
+            });
         </script>
     </body>
 </html>

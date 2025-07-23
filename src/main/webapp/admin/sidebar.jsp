@@ -80,13 +80,13 @@
     </div>
     <nav class="sidebar-nav">
         <div class="nav-item">
-            <a href="./adminPage.jsp" class="nav-link active">
+            <a href="<%= request.getContextPath() %>/adminDashboard" class="nav-link active">
                 <i class="fas fa-tachometer-alt"></i>
                 Thống Kê Tổng Quan
             </a>
         </div>
         <div class="nav-item">
-            <a href="./user-list" class="nav-link">
+             <a href="${pageContext.request.contextPath}/admin/user-list" class="nav-link">
                 <i class="fas fa-users"></i>
                 Quản Lý Người Dùng
             </a>
@@ -104,19 +104,7 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="./activityHistory.jsp" class="nav-link">
-                <i class="fas fa-history"></i>
-                Lịch Sử Hành Động
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="./setting.jsp" class="nav-link">
-                <i class="fas fa-cog"></i>
-                Cài Đặt
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="${pageContext.request.contextPath}/admin/logoutAdmin.jsp" class="nav-link">
                 <i class="fas fa-sign-out-alt"></i>
                 Đăng Xuất
             </a>

@@ -2,7 +2,7 @@ package constant;
 
 public class Iconstant {
 
-    // --- GOOGLE OAUTH ---
+   
     public static final String GOOGLE_CLIENT_ID = "xxx";
     public static final String GOOGLE_CLIENT_SECRET = "xxx";
     public static final String GOOGLE_REDIRECT_URI = "http://localhost:8080/FootballManagement/login";

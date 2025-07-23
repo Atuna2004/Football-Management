@@ -5,9 +5,10 @@ import java.sql.*;
 import java.util.*;
 import model.User;
 import model.Role;
-import service.PasswordService; 
+import service.PasswordService;
 
 public class AccountDAO {
+
     private Connection conn;
 
     public AccountDAO(Connection conn) {
@@ -21,8 +22,11 @@ public class AccountDAO {
                 + "LEFT JOIN UserRole ur ON u.UserID = ur.UserID "
                 + "LEFT JOIN Role r ON ur.RoleID = r.RoleID "
                 + "ORDER BY u.UserID";
+
         Map<Integer, User> userMap = new HashMap<>();
-        try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+        try (
+                Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 int id = rs.getInt("UserID");
                 User acc = userMap.get(id);
@@ -41,10 +45,8 @@ public class AccountDAO {
                     acc.setRoles(new ArrayList<>());
                     userMap.put(id, acc);
                 }
-
-                String roleName = rs.getString("RoleName");
-                if (roleName != null) {
-                    acc.getRoles().add(new Role(rs.getInt("RoleID"), roleName));
+                if (rs.getString("RoleName") != null) {
+                    acc.getRoles().add(new Role(rs.getInt("RoleID"), rs.getString("RoleName")));
                 }
             }
         }
@@ -56,11 +58,14 @@ public class AccountDAO {
         List<User> list = new ArrayList<>();
         String sql = "SELECT * FROM (SELECT *, ROW_NUMBER() OVER (ORDER BY UserID) AS RowNum FROM [User]) AS Sub "
                 + "WHERE RowNum BETWEEN ? AND ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (
+                Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             int start = (page - 1) * itemsPerPage + 1;
             int end = page * itemsPerPage;
+
             stmt.setInt(1, start);
             stmt.setInt(2, end);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(extractUser(rs));
@@ -73,9 +78,11 @@ public class AccountDAO {
     public List<User> searchUsers(String keyword) throws SQLException {
         List<User> list = new ArrayList<>();
         String sql = "SELECT u.UserID, u.FullName, u.Email, u.IsActive FROM [User] u WHERE u.FullName LIKE ? OR u.Email LIKE ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (
+                Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, "%" + keyword + "%");
             stmt.setString(2, "%" + keyword + "%");
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(extractUser(rs));
@@ -87,12 +94,13 @@ public class AccountDAO {
 
     public User getUserById(int id) throws SQLException {
         String sql = "SELECT * FROM [User] WHERE UserID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (
+                Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     User user = extractUser(rs);
-                    user.setRoles(getUserRoles(id));
+                    user.setRoles(getUserRoles(user.getUserID()));
                     return user;
                 }
             }
@@ -102,7 +110,8 @@ public class AccountDAO {
 
     public User getUserByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM [User] WHERE Email = ? AND IsActive = 1";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (
+                Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, email);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -118,14 +127,12 @@ public class AccountDAO {
     public List<Role> getUserRoles(int userID) throws SQLException {
         List<Role> roles = new ArrayList<>();
         String sql = "SELECT r.RoleID, r.RoleName FROM UserRole ur JOIN Role r ON ur.RoleID = r.RoleID WHERE ur.UserID = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (
+                Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Role role = new Role();
-                    role.setRoleID(rs.getInt("RoleID"));
-                    role.setRoleName(rs.getString("RoleName"));
-                    roles.add(role);
+                    roles.add(new Role(rs.getInt("RoleID"), rs.getString("RoleName")));
                 }
             }
         }
@@ -135,9 +142,10 @@ public class AccountDAO {
     public boolean addUser(User user) throws SQLException {
         String sql = "INSERT INTO [User] (Email, PasswordHash, FullName, Phone, IsActive, GoogleID, AvatarUrl, DateOfBirth, Address) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (
+                Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getEmail());
-            stmt.setString(2, PasswordService.hashPassword(user.getPasswordHash())); // <-- Hash mật khẩu trước khi lưu
+            stmt.setString(2, PasswordService.hashPassword(user.getPasswordHash())); // Hash mật khẩu trước khi lưu
             stmt.setString(3, user.getFullName());
             stmt.setString(4, user.getPhone());
             stmt.setBoolean(5, user.isActive());
@@ -153,15 +161,17 @@ public class AccountDAO {
             } else {
                 stmt.setNull(9, Types.VARCHAR);
             }
+
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 return false;
             }
+
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     int userID = generatedKeys.getInt(1);
-                    String insertUserRoleSql = "INSERT INTO UserRole (UserID, RoleID) VALUES (?, 3)";
-                    try (PreparedStatement ps = conn.prepareStatement(insertUserRoleSql)) {
+                    String insertRoleSql = "INSERT INTO UserRole (UserID, RoleID) VALUES (?, 3)";
+                    try (PreparedStatement ps = conn.prepareStatement(insertRoleSql)) {
                         ps.setInt(1, userID);
                         ps.executeUpdate();
                     }
@@ -173,7 +183,8 @@ public class AccountDAO {
 
     public boolean updateUser(User user) throws SQLException {
         String sql = "UPDATE [User] SET Email=?, PasswordHash=?, FullName=?, Phone=?, IsActive=?, GoogleID=?, AvatarUrl=?, DateOfBirth=?, Address=? WHERE UserID=?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (
+                Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.getEmail());
             stmt.setString(2, user.getPasswordHash());
             stmt.setString(3, user.getFullName());
@@ -196,12 +207,56 @@ public class AccountDAO {
         }
     }
 
+    public boolean updateAvatar(int userID, String avatarUrl) throws SQLException {
+        String sql = "UPDATE [User] SET AvatarUrl=? WHERE UserID=?";
+        try (
+                Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, avatarUrl);
+            stmt.setInt(2, userID);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
     public boolean deleteUser(int userID) throws SQLException {
-        String sql = "UPDATE [User] SET IsActive = 0 WHERE UserID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql = "UPDATE [User] SET IsActive=0 WHERE UserID=?";
+        try (
+                Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userID);
             return stmt.executeUpdate() > 0;
         }
+    }
+
+    public List<User> getRecentUsers(int limit) throws SQLException {
+
+        Map<Integer, User> userMap = new LinkedHashMap<>();
+
+        String sql = "SELECT TOP (?) u.*, r.RoleID, r.RoleName FROM [User] u "
+                + "LEFT JOIN UserRole ur ON u.UserID = ur.UserID "
+                + "LEFT JOIN Role r ON ur.RoleID = r.RoleID "
+                + "ORDER BY u.CreatedAt DESC";
+
+        try (PreparedStatement ps = this.conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("UserID");
+
+                    User user = userMap.get(id);
+
+                    if (user == null) {
+                        user = extractUser(rs);
+                        user.setRoles(new ArrayList<>());
+                        userMap.put(id, user);
+                    }
+
+                    if (rs.getString("RoleName") != null) {
+                        user.getRoles().add(new Role(rs.getInt("RoleID"), rs.getString("RoleName")));
+                    }
+                }
+            }
+        }
+
+        return new ArrayList<>(userMap.values());
     }
 
     private User extractUser(ResultSet rs) throws SQLException {
@@ -221,8 +276,9 @@ public class AccountDAO {
     }
 
     public boolean activateUser(String email) throws SQLException {
-        String sql = "UPDATE [User] SET IsActive = 1 WHERE Email = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql = "UPDATE [User] SET IsActive=1 WHERE Email=?";
+        try (
+                Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, email);
             return stmt.executeUpdate() > 0;
         }
@@ -247,26 +303,28 @@ public class AccountDAO {
         }
         return list;
     }
+
     public User getUserByFacebookID(String facebookID) throws SQLException {
-    String sql = "SELECT * FROM [User] WHERE FacebookID = ?";
-    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, facebookID);
-        try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                User user = extractUser(rs);
-                user.setRoles(getUserRoles(user.getUserID()));
-                return user;
+        String sql = "SELECT * FROM [User] WHERE FacebookID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, facebookID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    User user = extractUser(rs);
+                    user.setRoles(getUserRoles(user.getUserID()));
+                    return user;
+                }
             }
         }
+        return null;
     }
-    return null;
-}
+
     public boolean updateFacebookID(int userID, String facebookID) throws SQLException {
-    String sql = "UPDATE [User] SET FacebookID = ? WHERE UserID = ?";
-    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, facebookID);
-        stmt.setInt(2, userID);
-        return stmt.executeUpdate() > 0;
+        String sql = "UPDATE [User] SET FacebookID = ? WHERE UserID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, facebookID);
+            stmt.setInt(2, userID);
+            return stmt.executeUpdate() > 0;
+        }
     }
-}
 }
