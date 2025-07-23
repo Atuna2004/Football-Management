@@ -8,6 +8,8 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
+import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 @WebServlet("/field/config") // <-- DÙNG ĐƯỜNG DẪN NÀY TRONG JSP
@@ -54,8 +56,20 @@ public class FieldCRUDServlet extends HttpServlet {
                 field.setType(request.getParameter("type"));
                 field.setDescription(request.getParameter("description"));
                 field.setActive("on".equals(request.getParameter("isActive")));
-
+                
                 fieldDAO.createField(field);
+                
+                try (Connection conn = DBConnection.getConnection()) {
+                    CallableStatement cs = conn.prepareCall("{call AutoGenerateTimeSlots}");
+                    cs.execute();
+                    // Nếu dùng SQL Server, có thể dùng: "EXEC AutoGenerateTimeSlots"
+                    // Nhưng cú pháp chuẩn JDBC là {call ...}
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    // Không nên throw lỗi làm sập cả quá trình nếu SP lỗi
+                    // Vì Field đã tạo thành công
+                    System.err.println("Lỗi khi gọi AutoGenerateTimeSlots: " + e.getMessage());
+                }
 
             } else if ("update".equals(action)) {
                 int fieldId = Integer.parseInt(request.getParameter("fieldId"));

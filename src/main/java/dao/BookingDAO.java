@@ -243,7 +243,7 @@ public class BookingDAO {
     }
 
     public boolean confirmBooking(int bookingId) {
-        String sql = "UPDATE Booking SET Status = 'Confirmed' WHERE BookingID = ?";
+        String sql = "UPDATE Booking SET Status = 'Completed' WHERE BookingID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 

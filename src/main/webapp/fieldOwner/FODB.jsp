@@ -78,6 +78,7 @@
                     DashboardDAO dashboardDAO = null;
                     Map<Integer, Integer> monthlyBookingMap = null;
                     Map<Integer, Integer> dailyBookingMap = null;
+                    Map<Integer, Double> dailyRevenueMap = null; 
                     if (currentUser != null) {
                         try {
                             dashboardDAO = new DashboardDAO();
@@ -108,6 +109,7 @@
                             if (dashboardDAO != null) {
                                 monthlyBookingMap = dashboardDAO.getMonthlyBookingsByOwner(currentUser.getUserID());
                                 dailyBookingMap = dashboardDAO.getDailyBookingsByOwner(currentUser.getUserID());
+                                dailyRevenueMap = dashboardDAO.getDailyRevenueByOwner(currentUser.getUserID());
                             }
                         } catch (Exception e) {
                             hasError = true;
@@ -314,9 +316,9 @@
     <script>
         const monthlyRevenueData = <%= monthlyRevenueMap != null ? mapToJson(monthlyRevenueMap) : "{}" %>;
         const monthlyBookingData = <%= monthlyBookingMap != null ? intMapToJson(monthlyBookingMap) : "{}" %>;
+        const dailyRevenueData = <%= dailyRevenueMap != null ? mapToJson(dailyRevenueMap) : "{}" %>;
         const dailyBookingData = <%= dailyBookingMap != null ? intMapToJson(dailyBookingMap) : "{}" %>;
-
-        console.log("Dữ liệu biểu đồ:", { dailyBookingData, monthlyBookingData});
+        console.log("Dữ liệu biểu đồ:", { dailyBookingData, monthlyBookingData, dailyRevenueData });
 
         let chartInstance = null;
 
@@ -332,26 +334,21 @@
                 const currentMonth = today.getMonth(); // 0-11
                 const currentYear = today.getFullYear();
                 const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // 28, 29, 30, 31
+                const allDays = Array.from({ length: daysInMonth }, (_, i) => i + 1); // [1, 2, ..., 31]
 
-                const allDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+                // Chọn dữ liệu theo loại biểu đồ
+                const sourceData = type === 'revenue' ? dailyRevenueData : dailyBookingData;
+                const dataType = type === 'revenue' ? 'Doanh thu' : 'Lượt đặt sân';
 
-                const daysWithData = Object.keys(dailyBookingData)
-                    .map(Number)
-                    .filter(day => day >= 1 && day <= daysInMonth)
-                    .sort((a, b) => a - b);
+                // Luôn hiển thị tất cả các ngày trong tháng
+                labels = allDays;
+                data = allDays.map(day => sourceData[day] || 0); // 0 nếu không có dữ liệu
 
-                if (daysWithData.length === 0) {
-                    // Nếu không có dữ liệu, hiển thị tất cả ngày trong tháng (chỉ số)
-                    labels = allDays.map(day => day);
-                    data = allDays.map(day => dailyBookingData[day] || 0);
-                } else {
-                    // Chỉ hiển thị các ngày có booking (chỉ số)
-                    labels = daysWithData.map(day => day);
-                    data = daysWithData.map(day => dailyBookingData[day] || 0);
-                }
-                label = 'Lượt đặt sân';
-                borderColor = '#4facfe';
-                backgroundColor = 'rgba(79, 172, 254, 0.2)';
+                label = dataType;
+                borderColor = type === 'revenue' ? '#28a745' : '#4facfe';
+                backgroundColor = type === 'revenue' 
+                    ? 'rgba(40, 167, 69, 0.2)' 
+                    : 'rgba(79, 172, 254, 0.2)';
             }else if (range === 'monthly') {
                 labels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
                           'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];

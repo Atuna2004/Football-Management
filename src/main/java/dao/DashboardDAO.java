@@ -403,5 +403,57 @@ public class DashboardDAO {
     }
     return bookingsMap;
 }
+   
+   /**
+    * Lấy doanh thu theo ngày trong tháng hiện tại
+    */
+   public Map<Integer, Double> getDailyRevenueByOwner(int ownerId) {
+       Map<Integer, Double> revenueMap = new HashMap<>();
+
+       Calendar cal = Calendar.getInstance();
+       int currentMonth = cal.get(Calendar.MONTH) + 1;
+       int currentYear = cal.get(Calendar.YEAR);
+       int maxDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+       // Khởi tạo tất cả các ngày trong tháng = 0
+       for (int i = 1; i <= maxDay; i++) {
+           revenueMap.put(i, 0.0);
+       }
+
+       String sql = 
+           "SELECT DAY(p.PaymentDate) AS day, SUM(p.Amount) AS revenue " +
+           "FROM Payment p " +
+           "JOIN Booking b ON p.BookingID = b.BookingID " +
+           "JOIN BookingTimeSlot bts ON b.BookingID = bts.BookingID " +
+           "JOIN TimeSlot ts ON bts.TimeSlotID = ts.TimeSlotID " +
+           "JOIN Field f ON ts.FieldID = f.FieldID " +
+           "JOIN Stadium s ON f.StadiumID = s.StadiumID " +
+           "WHERE s.OwnerID = ? " +
+           "  AND MONTH(p.PaymentDate) = ? " +
+           "  AND YEAR(p.PaymentDate) = ? " +
+           "  AND p.Status = 'Completed' " +
+           "GROUP BY DAY(p.PaymentDate)";
+
+       try (Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+           ps.setInt(1, ownerId);
+           ps.setInt(2, currentMonth);
+           ps.setInt(3, currentYear);
+
+           try (ResultSet rs = ps.executeQuery()) {
+               while (rs.next()) {
+                   int day = rs.getInt("day");
+                   double revenue = rs.getDouble("revenue");
+                   if (revenueMap.containsKey(day)) {
+                       revenueMap.put(day, revenue);
+                   }
+               }
+           }
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+       return revenueMap;
+   }
+
 }
-    
