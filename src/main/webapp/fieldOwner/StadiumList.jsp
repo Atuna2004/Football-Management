@@ -60,10 +60,15 @@
                         <h3><i class="fas fa-building me-2"></i>Danh sách sân bóng</h3>
                     </div>
                     <div class="col mt-3">
-                        <form action="<%= request.getContextPath() %>/stadium" method="get">
+                        <form id="searchForm" action="<%= request.getContextPath() %>/fieldOwner/FOSTD" method="get">
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Tìm kiếm sân..." 
-                                       name="search" aria-label="Search input" value="${param.search}">
+                                <input type="text" 
+                                       class="form-control" 
+                                       placeholder="Tìm kiếm sân..." 
+                                       name="search" 
+                                       id="searchInput"
+                                       aria-label="Search input" 
+                                       value="${param.search}">
                                 <button class="btn btn-outline-primary" type="submit">
                                     <i class="fa-solid fa-magnifying-glass"></i>
                                 </button>
@@ -240,64 +245,65 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Handle stadium row click - navigate to stadium details
-            const stadiumRows = document.querySelectorAll('.stadium-row');
-            stadiumRows.forEach(row => {
-                row.addEventListener('click', function() {
-                    const stadiumId = this.getAttribute('data-stadium-id');
-                    window.location.href = '<%= request.getContextPath() %>/fieldOwner/StadiumFieldList?id=' + stadiumId;
-                });
-            });
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchInput");
+        const searchForm = document.getElementById("searchForm");
+        let searchTimeout;
 
-            // Handle delete modal
-            const deleteButtons = document.querySelectorAll(".delete-btn");
-            const deleteIdInput = document.getElementById("deleteId");
-            const stadiumNameSpan = document.getElementById("stadiumName");
-            const deleteForm = document.getElementById("deleteForm");
+        // 🔹 LIVE SEARCH: debounce 500ms
+        searchInput.addEventListener("input", function () {
+            // Xóa tham số page khi bắt đầu tìm kiếm mới
+            const url = new URL(window.location.href);
+            url.searchParams.delete("page");
+            window.history.replaceState({}, '', url);
 
-            deleteButtons.forEach(button => {
-                button.addEventListener("click", function () {
-                    const stadiumId = this.getAttribute("data-id");
-                    const stadiumName = this.getAttribute("data-name");
-                    
-                    deleteIdInput.value = stadiumId;
-                    stadiumNameSpan.textContent = stadiumName;
-                    deleteForm.action = '<%= request.getContextPath() %>/stadium/config';
-                });
-            });
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchForm.submit(); // Gửi form sau 100ms khi ngừng gõ
+            }, 100);
+        });
 
-            // Add loading state for buttons
-            const actionButtons = document.querySelectorAll('.btn-action');
-            actionButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    if (!this.classList.contains('delete-btn')) {
-                        const originalText = this.innerHTML;
-                        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                        this.disabled = true;
-                        
-                        // Re-enable after 3 seconds as fallback
-                        setTimeout(() => {
-                            this.innerHTML = originalText;
-                            this.disabled = false;
-                        }, 3000);
-                    }
-                });
+        // 🔹 Click vào dòng sân → chuyển đến danh sách sân con
+        const stadiumRows = document.querySelectorAll('.stadium-row');
+        stadiumRows.forEach(row => {
+            row.addEventListener('click', function() {
+                const stadiumId = this.getAttribute('data-stadium-id');
+                window.location.href = '<%= request.getContextPath() %>/fieldOwner/StadiumFieldList?id=' + stadiumId;
             });
         });
 
-        // Add search functionality with debounce
-        let searchTimeout;
-        const searchInput = document.querySelector('input[name="search"]');
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    // Auto-submit search after 500ms of no typing
-                    // this.form.submit();
-                }, 500);
+        // 🔹 Modal xóa sân
+        const deleteButtons = document.querySelectorAll(".delete-btn");
+        const deleteIdInput = document.getElementById("deleteId");
+        const stadiumNameSpan = document.getElementById("stadiumName");
+        const deleteForm = document.getElementById("deleteForm");
+
+        deleteButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                const stadiumId = this.getAttribute("data-id");
+                const stadiumName = this.getAttribute("data-name");
+                deleteIdInput.value = stadiumId;
+                stadiumNameSpan.textContent = stadiumName;
+                deleteForm.action = '<%= request.getContextPath() %>/stadium/config';
             });
-        }
+        });
+
+        // 🔹 Hiệu ứng loading cho nút (tùy chọn)
+        const actionButtons = document.querySelectorAll('.btn-action');
+        actionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                if (!this.classList.contains('delete-btn')) {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    this.disabled = true;
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    }, 3000);
+                }
+            });
+        });
+    });
     </script>
 </body>
 </html>
