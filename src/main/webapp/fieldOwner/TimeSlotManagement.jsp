@@ -160,7 +160,7 @@
 
     <!-- Back to Dashboard Button -->
     <div class="back-to-dashboard">
-        <a href="${pageContext.request.contextPath}/fieldOwner/FODB.jsp" class="btn btn-primary">
+        <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-primary">
             ← Quay về Dashboard
         </a>
     </div>

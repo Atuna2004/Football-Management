@@ -55,7 +55,7 @@
                             if (isOwner) {
                     %>
                                 <div class="item">
-                                    <a href="<%= request.getContextPath() %>/fieldOwner/FODB.jsp">Dành cho chủ sân</a>
+                                    <a href="${pageContext.request.contextPath}/dashboard">Dành cho chủ sân</a>
                                 </div>
                     <%
                             } else {
