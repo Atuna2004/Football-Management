@@ -60,7 +60,7 @@ public class FieldCRUDServlet extends HttpServlet {
                 fieldDAO.createField(field);
                 
                 try (Connection conn = DBConnection.getConnection()) {
-                    CallableStatement cs = conn.prepareCall("{call AutoGenerateTimeSlots}");
+                    CallableStatement cs = conn.prepareCall("{EXEC AutoGenerateTimeSlots}");
                     cs.execute();
                     // Nếu dùng SQL Server, có thể dùng: "EXEC AutoGenerateTimeSlots"
                     // Nhưng cú pháp chuẩn JDBC là {call ...}
