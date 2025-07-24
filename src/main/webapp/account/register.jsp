@@ -196,10 +196,17 @@
             cursor: pointer;
             padding: 0.5rem;
             transition: color 0.3s ease;
+            z-index: 3;
         }
 
         .toggle-password:hover {
             color: #3b82f6;
+        }
+
+        .toggle-password:focus {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+            border-radius: 4px;
         }
 
         /* Password requirements */
@@ -523,33 +530,33 @@
             <form action="${pageContext.request.contextPath}/signup" method="post" id="registerForm">
                 <div class="form-grid">
                     <div class="input-group">
-                        <input type="text" name="fullName" placeholder="Họ và tên" required />
+                        <input type="text" name="fullName" id="fullName" placeholder="Họ và tên" required />
                         <i class="fas fa-user input-icon"></i>
                     </div>
 
                     <div class="input-group">
-                        <input type="email" name="email" placeholder="Email" required />
+                        <input type="email" name="email" id="email" placeholder="Email" required />
                         <i class="fas fa-envelope input-icon"></i>
                     </div>
 
                     <div class="input-group">
-                        <input type="tel" name="phone" placeholder="Số điện thoại" required />
+                        <input type="tel" name="phone" id="phone" placeholder="Số điện thoại" required />
                         <i class="fas fa-phone input-icon"></i>
                     </div>
 
                     <div class="input-group">
-                        <input type="password" name="password" placeholder="Mật khẩu" required />
+                        <input type="password" name="password" id="password" placeholder="Mật khẩu" required />
                         <i class="fas fa-lock input-icon"></i>
-                        <button type="button" class="toggle-password" onclick="togglePassword('password')">
-                            <i class="fas fa-eye" id="toggleIcon1"></i>
+                        <button type="button" class="toggle-password" data-target="password">
+                            <i class="fas fa-eye"></i>
                         </button>
                     </div>
 
                     <div class="input-group">
-                        <input type="password" name="confirmPassword" placeholder="Xác nhận mật khẩu" required />
+                        <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Xác nhận mật khẩu" required />
                         <i class="fas fa-lock input-icon"></i>
-                        <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
-                            <i class="fas fa-eye" id="toggleIcon2"></i>
+                        <button type="button" class="toggle-password" data-target="confirmPassword">
+                            <i class="fas fa-eye"></i>
                         </button>
                     </div>
                 </div>
@@ -613,196 +620,195 @@
     </div>
 
     <script>
-        // Toggle password visibility
-       // Toggle password visibility - CORRECTED VERSION
-function togglePassword(fieldName) {
-    const passwordInput = document.querySelector(`input[name="${fieldName}"]`);
-    const toggleIcon = fieldName === 'password' ? 
-        document.getElementById('toggleIcon1') : 
-        document.getElementById('toggleIcon2');
-    
-    if (passwordInput && toggleIcon) {
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            toggleIcon.className = 'fas fa-eye-slash';
-        } else {
-            passwordInput.type = 'password';
-            toggleIcon.className = 'fas fa-eye';
-        }
-    }
-}
-
-// Alternative approach - using event delegation (more reliable)
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle password toggle buttons
-    document.querySelectorAll('.toggle-password').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password toggle functionality
+            const toggleButtons = document.querySelectorAll('.toggle-password');
             
-            // Find the input field in the same input-group
-            const inputGroup = this.closest('.input-group');
-            const passwordInput = inputGroup.querySelector('input');
-            const icon = this.querySelector('i');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.className = 'fas fa-eye-slash';
-            } else {
-                passwordInput.type = 'password';
-                icon.className = 'fas fa-eye';
-            }
-        });
-    });
-    
-    
-});
-        // Password validation
-        function validateForm(event) {
-            const email = document.forms[0]["email"].value.trim();
-            const password = document.forms[0]["password"].value.trim();
-            const confirmPassword = document.forms[0]["confirmPassword"].value.trim();
-            const fullName = document.forms[0]["fullName"].value.trim();
-            const phone = document.forms[0]["phone"].value.trim();
-
-            if (!email || !password || !confirmPassword || !fullName || !phone) {
-                showError("Vui lòng điền đầy đủ thông tin vào tất cả các trường.");
-                event.preventDefault();
-                return false;
-            }
-
-            if (password !== confirmPassword) {
-                showError("Mật khẩu xác nhận không khớp.");
-                event.preventDefault();
-                return false;
-            }
-
-            if (password.length < 8) {
-                showError("Mật khẩu phải có ít nhất 8 ký tự.");
-                event.preventDefault();
-                return false;
-            }
-
-            const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
-            if (!passwordPattern.test(password)) {
-                showError("Mật khẩu phải có ít nhất 8 ký tự, bao gồm 1 chữ hoa, 1 chữ thường và 1 số.");
-                event.preventDefault();
-                return false;
-            }
-
-            const phonePattern = /^\d{10}$/;
-            if (!phonePattern.test(phone)) {
-                showError("Số điện thoại phải gồm 10 chữ số.");
-                event.preventDefault();
-                return false;
-            }
-
-            return true;
-        }
-
-        function showError(message) {
-            // Create error popup
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-popup';
-            errorDiv.innerHTML = `
-                <i class="fas fa-exclamation-triangle"></i>
-                ${message}
-            `;
-            document.body.appendChild(errorDiv);
-
-            setTimeout(() => {
-                errorDiv.remove();
-            }, 4000);
-        }
-
-        // Real-time password validation
-        function checkPasswordRequirements(password) {
-            const length = document.getElementById('length');
-            const uppercase = document.getElementById('uppercase');
-            const lowercase = document.getElementById('lowercase');
-            const number = document.getElementById('number');
-
-            // Length check
-            if (password.length >= 8) {
-                length.classList.add('valid');
-                length.querySelector('i').className = 'fas fa-check';
-            } else {
-                length.classList.remove('valid');
-                length.querySelector('i').className = 'fas fa-times';
-            }
-
-            // Uppercase check
-            if (/[A-Z]/.test(password)) {
-                uppercase.classList.add('valid');
-                uppercase.querySelector('i').className = 'fas fa-check';
-            } else {
-                uppercase.classList.remove('valid');
-                uppercase.querySelector('i').className = 'fas fa-times';
-            }
-
-            // Lowercase check
-            if (/[a-z]/.test(password)) {
-                lowercase.classList.add('valid');
-                lowercase.querySelector('i').className = 'fas fa-check';
-            } else {
-                lowercase.classList.remove('valid');
-                lowercase.querySelector('i').className = 'fas fa-times';
-            }
-
-            // Number check
-            if (/\d/.test(password)) {
-                number.classList.add('valid');
-                number.querySelector('i').className = 'fas fa-check';
-            } else {
-                number.classList.remove('valid');
-                number.querySelector('i').className = 'fas fa-times';
-            }
-        }
-
-        // Form submission
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            if (!validateForm(e)) return;
-
-            const button = this.querySelector('.main-btn');
-            const originalText = button.textContent;
-            
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ĐANG TẠO TÀI KHOẢN...';
-            button.disabled = true;
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.disabled = false;
-            }, 5000);
-        });
-
-        // Input focus effects
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.classList.add('focused');
-                
-                // Show password hints when focusing on password field
-                if (this.name === 'password') {
-                    document.getElementById('passwordHints').style.display = 'block';
-                }
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const targetId = this.getAttribute('data-target');
+                    const passwordInput = document.getElementById(targetId);
+                    const icon = this.querySelector('i');
+                    
+                    if (passwordInput) {
+                        if (passwordInput.type === 'password') {
+                            passwordInput.type = 'text';
+                            icon.className = 'fas fa-eye-slash';
+                        } else {
+                            passwordInput.type = 'password';
+                            icon.className = 'fas fa-eye';
+                        }
+                    }
+                });
             });
-            
-            input.addEventListener('blur', function() {
-                if (!this.value) {
-                    this.parentElement.classList.remove('focused');
+
+            // Form validation
+            function validateForm(event) {
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value.trim();
+                const confirmPassword = document.getElementById('confirmPassword').value.trim();
+                const fullName = document.getElementById('fullName').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+
+                if (!email || !password || !confirmPassword || !fullName || !phone) {
+                    showError("Vui lòng điền đầy đủ thông tin vào tất cả các trường.");
+                    event.preventDefault();
+                    return false;
+                }
+
+                if (password !== confirmPassword) {
+                    showError("Mật khẩu xác nhận không khớp.");
+                    event.preventDefault();
+                    return false;
+                }
+
+                if (password.length < 8) {
+                    showError("Mật khẩu phải có ít nhất 8 ký tự.");
+                    event.preventDefault();
+                    return false;
+                }
+
+                const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
+                if (!passwordPattern.test(password)) {
+                    showError("Mật khẩu phải có ít nhất 8 ký tự, bao gồm 1 chữ hoa, 1 chữ thường và 1 số.");
+                    event.preventDefault();
+                    return false;
+                }
+
+                const phonePattern = /^\d{10}$/;
+                if (!phonePattern.test(phone)) {
+                    showError("Số điện thoại phải gồm 10 chữ số.");
+                    event.preventDefault();
+                    return false;
+                }
+
+                return true;
+            }
+
+            // Error display function
+            function showError(message) {
+                // Remove existing error popup
+                const existingError = document.querySelector('.error-popup');
+                if (existingError) {
+                    existingError.remove();
                 }
                 
-                // Hide password hints when leaving password field
-                if (this.name === 'password' && !this.value) {
-                    document.getElementById('passwordHints').style.display = 'none';
-                }
-            });
+                // Create new error popup
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-popup';
+                errorDiv.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    ${message}
+                `;
+                document.body.appendChild(errorDiv);
+
+                setTimeout(() => {
+                    if (errorDiv && errorDiv.parentNode) {
+                        errorDiv.remove();
+                    }
+                }, 4000);
+            }
 
             // Real-time password validation
-            if (input.name === 'password') {
-                input.addEventListener('input', function() {
-                    checkPasswordRequirements(this.value);
-                });
+            function checkPasswordRequirements(password) {
+                const length = document.getElementById('length');
+                const uppercase = document.getElementById('uppercase');
+                const lowercase = document.getElementById('lowercase');
+                const number = document.getElementById('number');
+
+                // Length check
+                if (password.length >= 8) {
+                    length.classList.add('valid');
+                    length.querySelector('i').className = 'fas fa-check';
+                } else {
+                    length.classList.remove('valid');
+                    length.querySelector('i').className = 'fas fa-times';
+                }
+
+                // Uppercase check
+                if (/[A-Z]/.test(password)) {
+                    uppercase.classList.add('valid');
+                    uppercase.querySelector('i').className = 'fas fa-check';
+                } else {
+                    uppercase.classList.remove('valid');
+                    uppercase.querySelector('i').className = 'fas fa-times';
+                }
+
+                // Lowercase check
+                if (/[a-z]/.test(password)) {
+                    lowercase.classList.add('valid');
+                    lowercase.querySelector('i').className = 'fas fa-check';
+                } else {
+                    lowercase.classList.remove('valid');
+                    lowercase.querySelector('i').className = 'fas fa-times';
+                }
+
+                // Number check
+                if (/\d/.test(password)) {
+                    number.classList.add('valid');
+                    number.querySelector('i').className = 'fas fa-check';
+                } else {
+                    number.classList.remove('valid');
+                    number.querySelector('i').className = 'fas fa-times';
+                }
             }
+
+            // Form submission handler
+            const registerForm = document.getElementById('registerForm');
+            registerForm.addEventListener('submit', function(e) {
+                if (!validateForm(e)) return;
+
+                const button = this.querySelector('.main-btn');
+                const originalText = button.textContent;
+                
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ĐANG TẠO TÀI KHOẢN...';
+                button.disabled = true;
+                
+                // Re-enable button after timeout (in case of form errors)
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }, 5000);
+            });
+
+            // Input focus effects
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                    
+                    // Show password hints when focusing on password field
+                    if (this.name === 'password') {
+                        document.getElementById('passwordHints').style.display = 'block';
+                    }
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        this.parentElement.classList.remove('focused');
+                    }
+                    
+                    // Hide password hints when leaving password field if empty
+                    if (this.name === 'password' && !this.value) {
+                        document.getElementById('passwordHints').style.display = 'none';
+                    }
+                });
+
+                // Real-time password validation
+                if (input.name === 'password') {
+                    input.addEventListener('input', function() {
+                        checkPasswordRequirements(this.value);
+                        
+                        // Show hints if password field has content
+                        if (this.value) {
+                            document.getElementById('passwordHints').style.display = 'block';
+                        }
+                    });
+                }
+            });
         });
     </script>
 </body>

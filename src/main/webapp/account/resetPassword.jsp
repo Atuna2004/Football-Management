@@ -193,10 +193,17 @@
             cursor: pointer;
             padding: 0.5rem;
             transition: color 0.3s ease;
+            z-index: 3;
         }
 
         .toggle-password:hover {
             color: #3b82f6;
+        }
+
+        .toggle-password:focus {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+            border-radius: 4px;
         }
 
         /* Password requirements */
@@ -427,18 +434,18 @@
             <form action="${pageContext.request.contextPath}/forgotPassword" method="post" id="resetPasswordForm">
                 <div class="form-grid">
                     <div class="input-group">
-                        <input type="password" name="password" placeholder="Nhập mật khẩu mới" required />
+                        <input type="password" name="password" id="password" placeholder="Nhập mật khẩu mới" required />
                         <i class="fas fa-lock input-icon"></i>
-                        <button type="button" class="toggle-password" onclick="togglePassword('password')">
-                            <i class="fas fa-eye" id="toggleIcon1"></i>
+                        <button type="button" class="toggle-password" data-target="password">
+                            <i class="fas fa-eye"></i>
                         </button>
                     </div>
 
                     <div class="input-group">
-                        <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu mới" required />
+                        <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Nhập lại mật khẩu mới" required />
                         <i class="fas fa-lock input-icon"></i>
-                        <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
-                            <i class="fas fa-eye" id="toggleIcon2"></i>
+                        <button type="button" class="toggle-password" data-target="confirmPassword">
+                            <i class="fas fa-eye"></i>
                         </button>
                     </div>
                 </div>
@@ -478,163 +485,190 @@
     </div>
 
     <script>
-        // Toggle password visibility
-        function togglePassword(fieldName) {
-            const passwordInput = document.querySelector(`input[name="${fieldName}"]`);
-            const toggleIcon = fieldName === 'password' ? document.getElementById('toggleIcon1') : document.getElementById('toggleIcon2');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password toggle functionality
+            const toggleButtons = document.querySelectorAll('.toggle-password');
             
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.className = 'fas fa-eye-slash';
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.className = 'fas fa-eye';
-            }
-        }
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const targetId = this.getAttribute('data-target');
+                    const passwordInput = document.getElementById(targetId);
+                    const icon = this.querySelector('i');
+                    
+                    if (passwordInput) {
+                        if (passwordInput.type === 'password') {
+                            passwordInput.type = 'text';
+                            icon.className = 'fas fa-eye-slash';
+                        } else {
+                            passwordInput.type = 'password';
+                            icon.className = 'fas fa-eye';
+                        }
+                    }
+                });
+            });
 
-        // Password validation
-        function validateForm(event) {
-            const password = document.forms[0]["password"].value.trim();
-            const confirmPassword = document.forms[0]["confirmPassword"].value.trim();
+            // Form validation
+            function validateForm(event) {
+                const password = document.getElementById('password').value.trim();
+                const confirmPassword = document.getElementById('confirmPassword').value.trim();
 
-            if (!password || !confirmPassword) {
-                showError("Vui lòng điền đầy đủ thông tin vào tất cả các trường.");
-                event.preventDefault();
-                return false;
-            }
+                if (!password || !confirmPassword) {
+                    showError("Vui lòng điền đầy đủ thông tin vào tất cả các trường.");
+                    event.preventDefault();
+                    return false;
+                }
 
-            if (password !== confirmPassword) {
-                showError("Mật khẩu xác nhận không khớp.");
-                event.preventDefault();
-                return false;
-            }
+                if (password !== confirmPassword) {
+                    showError("Mật khẩu xác nhận không khớp.");
+                    event.preventDefault();
+                    return false;
+                }
 
-            if (password.length < 8) {
-                showError("Mật khẩu phải có ít nhất 8 ký tự.");
-                event.preventDefault();
-                return false;
-            }
+                if (password.length < 8) {
+                    showError("Mật khẩu phải có ít nhất 8 ký tự.");
+                    event.preventDefault();
+                    return false;
+                }
 
-            const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
-            if (!passwordPattern.test(password)) {
-                showError("Mật khẩu phải có ít nhất 8 ký tự, bao gồm 1 chữ hoa, 1 chữ thường và 1 số.");
-                event.preventDefault();
-                return false;
-            }
+                const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
+                if (!passwordPattern.test(password)) {
+                    showError("Mật khẩu phải có ít nhất 8 ký tự, bao gồm 1 chữ hoa, 1 chữ thường và 1 số.");
+                    event.preventDefault();
+                    return false;
+                }
 
-            return true;
-        }
-
-        function showError(message) {
-            const errorMessage = document.getElementById('errorMessage');
-            const errorText = document.getElementById('errorText');
-            errorText.textContent = message;
-            errorMessage.style.display = 'flex';
-            
-            // Hide after 5 seconds
-            setTimeout(() => {
-                errorMessage.style.display = 'none';
-            }, 5000);
-        }
-
-        // Real-time password validation
-        function checkPasswordRequirements(password) {
-            const length = document.getElementById('length');
-            const uppercase = document.getElementById('uppercase');
-            const lowercase = document.getElementById('lowercase');
-            const number = document.getElementById('number');
-
-            // Length check
-            if (password.length >= 8) {
-                length.classList.add('valid');
-                length.querySelector('i').className = 'fas fa-check';
-            } else {
-                length.classList.remove('valid');
-                length.querySelector('i').className = 'fas fa-times';
+                return true;
             }
 
-            // Uppercase check
-            if (/[A-Z]/.test(password)) {
-                uppercase.classList.add('valid');
-                uppercase.querySelector('i').className = 'fas fa-check';
-            } else {
-                uppercase.classList.remove('valid');
-                uppercase.querySelector('i').className = 'fas fa-times';
-            }
-
-            // Lowercase check
-            if (/[a-z]/.test(password)) {
-                lowercase.classList.add('valid');
-                lowercase.querySelector('i').className = 'fas fa-check';
-            } else {
-                lowercase.classList.remove('valid');
-                lowercase.querySelector('i').className = 'fas fa-times';
-            }
-
-            // Number check
-            if (/\d/.test(password)) {
-                number.classList.add('valid');
-                number.querySelector('i').className = 'fas fa-check';
-            } else {
-                number.classList.remove('valid');
-                number.querySelector('i').className = 'fas fa-times';
-            }
-        }
-
-        // Form submission
-        document.getElementById('resetPasswordForm').addEventListener('submit', function(e) {
-            if (!validateForm(e)) return;
-
-            const button = this.querySelector('.main-btn');
-            const originalText = button.textContent;
-            
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ĐANG XỬ LÝ...';
-            button.disabled = true;
-            
-            // Simulate success after 2 seconds (remove in production)
-            setTimeout(() => {
-                // Show success message
-                document.getElementById('successMessage').style.display = 'flex';
+            // Error display function
+            function showError(message) {
+                const errorMessage = document.getElementById('errorMessage');
+                const errorText = document.getElementById('errorText');
+                errorText.textContent = message;
+                errorMessage.style.display = 'flex';
                 
-                // Hide form
-                this.style.display = 'none';
-                document.querySelector('.bottom-link').style.display = 'none';
-                
-                // Redirect after 3 seconds
+                // Hide after 5 seconds
                 setTimeout(() => {
-                    window.location.href = '${pageContext.request.contextPath}/account/login.jsp';
-                }, 3000);
-            }, 2000);
-        });
-
-        // Input focus effects
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.classList.add('focused');
-                
-                // Show password hints when focusing on password field
-                if (this.name === 'password') {
-                    document.getElementById('passwordHints').style.display = 'block';
-                }
-            });
-            
-            input.addEventListener('blur', function() {
-                if (!this.value) {
-                    this.parentElement.classList.remove('focused');
-                }
-                
-                // Hide password hints when leaving password field
-                if (this.name === 'password' && !this.value) {
-                    document.getElementById('passwordHints').style.display = 'none';
-                }
-            });
+                    errorMessage.style.display = 'none';
+                }, 5000);
+            }
 
             // Real-time password validation
-            if (input.name === 'password') {
-                input.addEventListener('input', function() {
-                    checkPasswordRequirements(this.value);
-                });
+            function checkPasswordRequirements(password) {
+                const length = document.getElementById('length');
+                const uppercase = document.getElementById('uppercase');
+                const lowercase = document.getElementById('lowercase');
+                const number = document.getElementById('number');
+
+                // Length check
+                if (password.length >= 8) {
+                    length.classList.add('valid');
+                    length.querySelector('i').className = 'fas fa-check';
+                } else {
+                    length.classList.remove('valid');
+                    length.querySelector('i').className = 'fas fa-times';
+                }
+
+                // Uppercase check
+                if (/[A-Z]/.test(password)) {
+                    uppercase.classList.add('valid');
+                    uppercase.querySelector('i').className = 'fas fa-check';
+                } else {
+                    uppercase.classList.remove('valid');
+                    uppercase.querySelector('i').className = 'fas fa-times';
+                }
+
+                // Lowercase check
+                if (/[a-z]/.test(password)) {
+                    lowercase.classList.add('valid');
+                    lowercase.querySelector('i').className = 'fas fa-check';
+                } else {
+                    lowercase.classList.remove('valid');
+                    lowercase.querySelector('i').className = 'fas fa-times';
+                }
+
+                // Number check
+                if (/\d/.test(password)) {
+                    number.classList.add('valid');
+                    number.querySelector('i').className = 'fas fa-check';
+                } else {
+                    number.classList.remove('valid');
+                    number.querySelector('i').className = 'fas fa-times';
+                }
             }
+
+            // Form submission handler
+            const resetPasswordForm = document.getElementById('resetPasswordForm');
+            resetPasswordForm.addEventListener('submit', function(e) {
+                if (!validateForm(e)) return;
+
+                const button = this.querySelector('.main-btn');
+                const originalText = button.textContent;
+                
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ĐANG XỬ LÝ...';
+                button.disabled = true;
+                
+                // For development - simulate success after 2 seconds
+                // Remove this simulation in production
+                setTimeout(() => {
+                    // Show success message
+                    document.getElementById('successMessage').style.display = 'flex';
+                    
+                    // Hide form
+                    this.style.display = 'none';
+                    document.querySelector('.bottom-link').style.display = 'none';
+                    
+                    // Redirect after 3 seconds
+                    setTimeout(() => {
+                        window.location.href = '${pageContext.request.contextPath}/account/login.jsp';
+                    }, 3000);
+                }, 2000);
+                
+                // Re-enable button after timeout (in case of form errors)
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }, 5000);
+            });
+
+            // Input focus effects
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                    
+                    // Show password hints when focusing on password field
+                    if (this.name === 'password') {
+                        document.getElementById('passwordHints').style.display = 'block';
+                    }
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        this.parentElement.classList.remove('focused');
+                    }
+                    
+                    // Hide password hints when leaving password field if empty
+                    if (this.name === 'password' && !this.value) {
+                        document.getElementById('passwordHints').style.display = 'none';
+                    }
+                });
+
+                // Real-time password validation
+                if (input.name === 'password') {
+                    input.addEventListener('input', function() {
+                        checkPasswordRequirements(this.value);
+                        
+                        // Show hints if password field has content
+                        if (this.value) {
+                            document.getElementById('passwordHints').style.display = 'block';
+                        }
+                    });
+                }
+            });
         });
     </script>
 </body>

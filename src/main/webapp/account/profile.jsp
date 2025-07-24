@@ -288,6 +288,39 @@
                 display: block;
             }
 
+            /* Password input groups */
+            .password-group {
+                position: relative;
+            }
+
+            .password-group input {
+                padding-right: 3rem;
+            }
+
+            .toggle-password {
+                position: absolute;
+                right: 0.75rem;
+                top: 50%;
+                transform: translateY(-50%);
+                background: none;
+                border: none;
+                color: rgba(100, 116, 139, 0.7);
+                cursor: pointer;
+                padding: 0.5rem;
+                transition: color 0.3s ease;
+                z-index: 3;
+            }
+
+            .toggle-password:hover {
+                color: #3b82f6;
+            }
+
+            .toggle-password:focus {
+                outline: 2px solid #3b82f6;
+                outline-offset: 2px;
+                border-radius: 4px;
+            }
+
             /* Buttons */
             .btn {
                 display: inline-flex;
@@ -573,16 +606,31 @@
                         <form id="passwordForm" method="post" action="<%= request.getContextPath() %>/changePassword">
                             <div class="form-group">
                                 <label>Mật Khẩu Hiện Tại</label>
-                                <input type="password" name="currentPassword" required/>
+                                <div class="password-group">
+                                    <input type="password" name="currentPassword" id="currentPassword" required/>
+                                    <button type="button" class="toggle-password" data-target="currentPassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label>Mật Khẩu Mới</label>
-                                <input type="password" id="newPassword" name="newPassword" required/>
+                                <div class="password-group">
+                                    <input type="password" id="newPassword" name="newPassword" required/>
+                                    <button type="button" class="toggle-password" data-target="newPassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                                 <div id="passwordError" class="error-message"></div>
                             </div>
                             <div class="form-group">
                                 <label>Xác Nhận Mật Khẩu Mới</label>
-                                <input type="password" id="confirmPassword" name="confirmPassword" required/>
+                                <div class="password-group">
+                                    <input type="password" id="confirmPassword" name="confirmPassword" required/>
+                                    <button type="button" class="toggle-password" data-target="confirmPassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-key"></i> Đổi Mật Khẩu
@@ -642,46 +690,80 @@
         
         <script src="https://cdn.jsdelivr.net/npm/jquery @3.6.4/dist/jquery.min.js"></script>
         <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Password toggle functionality
+                const toggleButtons = document.querySelectorAll('.toggle-password');
+                
+                toggleButtons.forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const targetId = this.getAttribute('data-target');
+                        const passwordInput = document.getElementById(targetId);
+                        const icon = this.querySelector('i');
+                        
+                        if (passwordInput) {
+                            if (passwordInput.type === 'password') {
+                                passwordInput.type = 'text';
+                                icon.className = 'fas fa-eye-slash';
+                            } else {
+                                passwordInput.type = 'password';
+                                icon.className = 'fas fa-eye';
+                            }
+                        }
+                    });
+                });
+
+                // Form validation for password change
+                document.getElementById('passwordForm').addEventListener('submit', function (e) {
+                    const newPass = document.getElementById('newPassword').value;
+                    const confirm = document.getElementById('confirmPassword').value;
+                    
+                    if (newPass !== confirm) {
+                        alert("Xác nhận mật khẩu không khớp");
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/.test(newPass)) {
+                        alert("Mật khẩu phải có ít nhất 8 ký tự bao gồm 1 chữ hoa, 1 chữ thường và 1 số.");
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+                
+                // Birthdate validation
+                document.getElementById('birthdate').addEventListener('change', function () {
+                    const date = new Date(this.value);
+                    if (date >= new Date()) {
+                        document.getElementById('birthdateError').textContent = "Ngày sinh không thể ở tương lai.";
+                        this.setCustomValidity("Ngày sinh không hợp lệ.");
+                    } else {
+                        document.getElementById('birthdateError').textContent = "";
+                        this.setCustomValidity("");
+                    }
+                });
+                
+                // Phone validation
+                document.getElementById('phone').addEventListener('input', function () {
+                    const value = this.value.replace(/\D/g, '');
+                    const errorDiv = document.getElementById('phoneError');
+                    if (!value.startsWith('0') || value.length < 10) {
+                        errorDiv.textContent = "Số điện thoại hợp lệ phải bắt đầu bằng 0 và có ít nhất 10 chữ số.";
+                    } else {
+                        errorDiv.textContent = "";
+                    }
+                });
+            });
+
+            // Section navigation
             function showSection(sectionId) {
                 document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
                 document.getElementById(sectionId).classList.add('active');
                 document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
                 document.querySelector(`.nav-link[onclick*="${sectionId}"]`).classList.add('active');
             }
-            
-            document.getElementById('passwordForm').addEventListener('submit', function (e) {
-                const newPass = document.getElementById('newPassword').value;
-                const confirm = document.getElementById('confirmPassword').value;
-                if (newPass !== confirm) {
-                    alert("Xác nhận mật khẩu không khớp");
-                    e.preventDefault();
-                }
-                if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/.test(newPass)) {
-                    alert("Mật khẩu phải có ít nhất 8 ký tự bao gồm 1 chữ hoa, 1 chữ thường và 1 số.");
-                    e.preventDefault();
-                }
-            });
-            
-            document.getElementById('birthdate').addEventListener('change', function () {
-                const date = new Date(this.value);
-                if (date >= new Date()) {
-                    document.getElementById('birthdateError').textContent = "Ngày sinh không thể ở tương lai.";
-                    this.setCustomValidity("Ngày sinh không hợp lệ.");
-                } else {
-                    document.getElementById('birthdateError').textContent = "";
-                    this.setCustomValidity("");
-                }
-            });
-            
-            document.getElementById('phone').addEventListener('input', function () {
-                const value = this.value.replace(/\D/g, '');
-                const errorDiv = document.getElementById('phoneError');
-                if (!value.startsWith('0') || value.length < 10) {
-                    errorDiv.textContent = "Số điện thoại hợp lệ phải bắt đầu bằng 0 và có ít nhất 10 chữ số.";
-                } else {
-                    errorDiv.textContent = "";
-                }
-            });
         </script>
     </body>
 </html>
