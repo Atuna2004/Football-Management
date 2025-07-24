@@ -29,13 +29,14 @@ public class ChatBotServlet extends HttpServlet {
             + "Nếu kết quả là một giá trị cụ thể, hãy trả về chính xác giá trị đó. "
             + "Nếu cần làm rõ thêm, hãy hỏi lại tôi.";
 
-    private static final String API_KEY = "AIzaSyB-Rs0cifH-qN_l4TY5BHqIFKoSWHOvpSM";
+    private static final String API_KEY = "AIzaSyBoPtmjWGYHcT9IWpmKiwkWwP-gOzNuSHM";
 
     private static final String GEMINI_URL
-            = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="
+            = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
             + API_KEY;
 
     @Override
+
     public void init() throws ServletException {
         ServletContext context = getServletContext();
         InputStream is = null;

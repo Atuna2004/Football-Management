@@ -614,19 +614,49 @@
 
     <script>
         // Toggle password visibility
-        function togglePassword(fieldName) {
-            const passwordInput = document.querySelector(`input[name="${fieldName}"]`);
-            const toggleIcon = fieldName === 'password' ? document.getElementById('toggleIcon1') : document.getElementById('toggleIcon2');
+       // Toggle password visibility - CORRECTED VERSION
+function togglePassword(fieldName) {
+    const passwordInput = document.querySelector(`input[name="${fieldName}"]`);
+    const toggleIcon = fieldName === 'password' ? 
+        document.getElementById('toggleIcon1') : 
+        document.getElementById('toggleIcon2');
+    
+    if (passwordInput && toggleIcon) {
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.className = 'fas fa-eye-slash';
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.className = 'fas fa-eye';
+        }
+    }
+}
+
+// Alternative approach - using event delegation (more reliable)
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle password toggle buttons
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Find the input field in the same input-group
+            const inputGroup = this.closest('.input-group');
+            const passwordInput = inputGroup.querySelector('input');
+            const icon = this.querySelector('i');
             
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                toggleIcon.className = 'fas fa-eye-slash';
+                icon.className = 'fas fa-eye-slash';
             } else {
                 passwordInput.type = 'password';
-                toggleIcon.className = 'fas fa-eye';
+                icon.className = 'fas fa-eye';
             }
-        }
-
+        });
+    });
+    
+    
+});
         // Password validation
         function validateForm(event) {
             const email = document.forms[0]["email"].value.trim();
