@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/FieldOwnerSB.css">
 
     <!-- Các CSS khác nếu cần -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <!-- Left Navigation Sidebar -->
@@ -53,7 +53,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="${pageContext.request.contextPath}/owner/reports" class="nav-link"> <%-- CORRECTED: Changed href from '#' to '/owner/reports' --%>
                 <i class="fas fa-chart-bar"></i>
                 <span>Báo cáo</span>
             </a>
