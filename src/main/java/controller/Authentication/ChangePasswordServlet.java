@@ -3,6 +3,7 @@ package controller.Authentication;
 import connect.DBConnection;
 import dao.AccountDAO;
 import model.User;
+import service.PasswordService; 
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,7 +23,7 @@ public class ChangePasswordServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Lấy session, check user đã login chưa
+        // Lấy session, kiểm tra đăng nhập
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("currentUser") == null) {
             response.sendRedirect(request.getContextPath() + "/account/login.jsp");
@@ -36,48 +37,57 @@ public class ChangePasswordServlet extends HttpServlet {
         String newPassword = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
 
+        // Kiểm tra rỗng
         if (currentPassword == null || newPassword == null || confirmPassword == null
                 || currentPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
             request.setAttribute("errorMessage", "Vui lòng điền đầy đủ thông tin.");
-            request.getRequestDispatcher("/account//profile.jsp").forward(request, response);
+            request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
             request.setAttribute("errorMessage", "Mật khẩu mới và xác nhận mật khẩu không khớp.");
-            request.getRequestDispatcher("/account//profile.jsp").forward(request, response);
+            request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
+            return;
+        }
+
+        if (newPassword.length() < 6) {
+            request.setAttribute("errorMessage", "Mật khẩu mới phải có ít nhất 6 ký tự.");
+            request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
             return;
         }
 
         try (Connection conn = DBConnection.getConnection()) {
             AccountDAO accountDAO = new AccountDAO(conn);
 
-            // Kiểm tra mật khẩu hiện tại có đúng không
+            // Lấy lại thông tin người dùng từ CSDL để đảm bảo dữ liệu mới nhất
             User freshUser = accountDAO.getUserById(currentUser.getUserID());
             if (freshUser == null) {
                 request.setAttribute("errorMessage", "Người dùng không tồn tại.");
-                request.getRequestDispatcher("/account//profile.jsp").forward(request, response);
+                request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
                 return;
             }
 
-            // So sánh mật khẩu hiện tại (giả sử lưu mật khẩu mã hóa)
-            // Ở đây tạm so sánh chuỗi trực tiếp (bạn có thể bổ sung hash password)
-            if (!freshUser.getPasswordHash().equals(currentPassword)) {
+            // ✅ Kiểm tra mật khẩu hiện tại bằng BCrypt
+            if (!PasswordService.checkPassword(currentPassword, freshUser.getPasswordHash())) {
                 request.setAttribute("errorMessage", "Mật khẩu hiện tại không đúng.");
-                request.getRequestDispatcher("/account//profile.jsp").forward(request, response);
+                request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
                 return;
             }
 
-            // Cập nhật mật khẩu mới
-            freshUser.setPasswordHash(newPassword);  // Bạn nên hash mật khẩu trước khi lưu
-            boolean updated = accountDAO.updateUser(freshUser);
+            // ✅ Hash mật khẩu mới trước khi lưu
+            String hashedNewPassword = PasswordService.hashPassword(newPassword);
+            freshUser.setPasswordHash(hashedNewPassword);
+
+            // Cập nhật vào CSDL
+            boolean updated = accountDAO.updatePassword(freshUser.getEmail(), newPassword);
 
             if (updated) {
-                // Cập nhật session nếu cần
+                // Cập nhật lại session để đảm bảo mật khẩu mới được đồng bộ
                 session.setAttribute("currentUser", freshUser);
                 request.setAttribute("successMessage", "Đổi mật khẩu thành công.");
             } else {
-                request.setAttribute("errorMessage", "Đổi mật khẩu thất bại.");
+                request.setAttribute("errorMessage", "Đổi mật khẩu thất bại. Vui lòng thử lại.");
             }
 
         } catch (SQLException e) {
@@ -85,6 +95,6 @@ public class ChangePasswordServlet extends HttpServlet {
             request.setAttribute("errorMessage", "Lỗi hệ thống: " + e.getMessage());
         }
 
-        request.getRequestDispatcher("/account//profile.jsp").forward(request, response);
+        request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
     }
 }
