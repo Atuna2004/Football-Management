@@ -16,7 +16,7 @@
 <nav class="navigation-sidebar">
     <ul class="nav-menu">
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/fieldOwner/FODB.jsp" class="nav-link">
+            <a href="${pageContext.request.contextPath}/dashboard" class="nav-link">
                 <i class="fas fa-chart-line"></i>
                 <span>Dashboard</span>
             </a>
