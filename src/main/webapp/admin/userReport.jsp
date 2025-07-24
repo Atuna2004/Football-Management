@@ -5,1004 +5,501 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Quản lý báo cáo người dùng</title>
-        <link rel="stylesheet" href="assets/css/dashboard.css">
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <style>
-            * {
-                font-family: 'Inter', sans-serif;
-                box-sizing: border-box;
-            }
+<head>
+    <title>Quản lý báo cáo người dùng</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark-color: #1d4ed8;
+            --success-color: #10b981;
+            --success-dark-color: #059669;
+            --warning-color: #f59e0b;
+            --warning-dark-color: #d97706;
+            --danger-color: #ef4444;
+            --danger-dark-color: #dc2626;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-light: rgba(59, 130, 246, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-            body {
-                margin: 0;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-            }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 50%, #dbeafe 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
 
-            .main-container {
-                display: flex;
-            }
+        .main-container {
+            display: flex;
+        }
 
-            .report-management {
-                margin-left: 250px;
-                padding: 40px;
-                width: calc(100% - 250px);
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(10px);
-                min-height: 100vh;
-                border-radius: 20px 0 0 0;
-                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
-            }
+        .main-content {
+            margin-left: 280px; /* Adjust this to match your sidebar's width */
+            padding: 40px;
+            width: calc(100% - 280px);
+            min-height: 100vh;
+        }
 
-            .header-section {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 40px;
-                padding-bottom: 20px;
-                border-bottom: 2px solid #f0f0f0;
-            }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
 
-            .header-section h2 {
-                font-size: 32px;
-                font-weight: 700;
-                color: #2d3748;
-                margin: 0;
-                position: relative;
-            }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.07);
+            border: 1px solid var(--border-light);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-            .header-section h2::after {
-                content: '';
-                position: absolute;
-                bottom: -10px;
-                left: 0;
-                width: 50px;
-                height: 4px;
-                background: linear-gradient(90deg, #667eea, #764ba2);
-                border-radius: 2px;
-            }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(59, 130, 246, 0.12);
+        }
 
-            .stats-cards {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                gap: 20px;
-                margin-bottom: 30px;
-            }
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-            .stat-card {
-                background: white;
-                padding: 25px;
-                border-radius: 16px;
-                text-align: center;
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-                border: 1px solid #f0f0f0;
-                position: relative;
-                overflow: hidden;
-            }
+        .stat-info h3 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
 
-            .stat-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 4px;
-                background: linear-gradient(90deg, #667eea, #764ba2);
-            }
+        .stat-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-top: 4px;
+        }
 
-            .stat-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
-            }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            flex-shrink: 0;
+        }
 
-            .stat-card.new::before {
-                background: linear-gradient(90deg, #3182ce, #2b6cb0);
-            }
+        .stat-card.primary .stat-icon { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark-color)); }
+        .stat-card.success .stat-icon { background: linear-gradient(135deg, var(--success-color), var(--success-dark-color)); }
+        .stat-card.warning .stat-icon { background: linear-gradient(135deg, var(--warning-color), var(--warning-dark-color)); }
+        .stat-card.danger  .stat-icon { background: linear-gradient(135deg, var(--danger-color), var(--danger-dark-color)); }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.08);
+            border: 1px solid var(--border-light);
+            margin-bottom: 24px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .card-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-            .stat-card.in-progress::before {
-                background: linear-gradient(90deg, #f6ad55, #ed8936);
-            }
+        .card-header h2 {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 24px;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .card-header h2 i {
+             color: var(--primary-color);
+        }
+        
+        .card-body {
+            padding: 24px 32px;
+        }
+        
+        .card-footer {
+            padding: 24px 32px;
+            background: rgba(59, 130, 246, 0.02);
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-controls {
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* Set grid for search and status */
+            gap: 16px;
+            align-items: center;
+        }
+        
+        .search-box input, .filter-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #dbeafe;
+            border-radius: 12px;
+            font-size: 14px;
+            background-color: #f8fafc;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input { padding-left: 44px; }
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        
+        .search-box input:focus, .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
 
-            .stat-card.resolved::before {
-                background: linear-gradient(90deg, #48bb78, #38a169);
-            }
+        .reports-container {
+            display: grid;
+            gap: 24px;
+            grid-template-columns: 1fr;
+        }
 
-            .stat-card.closed::before {
-                background: linear-gradient(90deg, #a0aec0, #718096);
-            }
-
-            .stat-card .icon {
-                font-size: 36px;
-                margin-bottom: 15px;
-                color: #667eea;
-            }
-
-            .stat-card.new .icon {
-                color: #3182ce;
-            }
-
-            .stat-card.in-progress .icon {
-                color: #ed8936;
-            }
-
-            .stat-card.resolved .icon {
-                color: #38a169;
-            }
-
-            .stat-card.closed .icon {
-                color: #718096;
-            }
-
-            .stat-card .number {
-                font-size: 28px;
-                font-weight: 700;
-                margin-bottom: 5px;
-                color: #2d3748;
-            }
-
-            .stat-card .label {
-                font-size: 14px;
-                color: #718096;
-                font-weight: 500;
-            }
-
-            .filter-section {
-                display: flex;
-                gap: 20px;
-                margin-bottom: 30px;
-                flex-wrap: wrap;
-                align-items: center;
-            }
-
-            .search-box {
-                flex: 1;
-                min-width: 300px;
-                position: relative;
-            }
-
-            .search-box input {
-                width: 100%;
-                padding: 14px 20px 14px 50px;
-                border: 2px solid #e2e8f0;
-                border-radius: 12px;
-                font-size: 16px;
-                transition: border-color 0.3s ease;
-                background: white;
-            }
-
-            .search-box input:focus {
-                outline: none;
-                border-color: #667eea;
-                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            }
-
-            .search-box i {
-                position: absolute;
-                left: 18px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: #a0aec0;
-                font-size: 16px;
-            }
-
-            .filter-select {
-                padding: 14px 20px;
-                border: 2px solid #e2e8f0;
-                border-radius: 12px;
-                font-size: 16px;
-                background: white;
-                cursor: pointer;
-                transition: border-color 0.3s ease;
-                min-width: 160px;
-            }
-
-            .filter-select:focus {
-                outline: none;
-                border-color: #667eea;
-            }
-
+        @media (min-width: 1200px) {
             .reports-container {
-                display: grid;
-                gap: 20px;
-                grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
             }
-
-            .report-card {
-                background: white;
-                border-radius: 16px;
-                padding: 25px;
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-                border: 1px solid #f0f0f0;
-                transition: all 0.3s ease;
-                position: relative;
-                overflow: hidden;
-            }
-
-            .report-card:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
-            }
-
-            .report-status {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                padding: 6px 12px;
-                border-radius: 20px;
-                font-size: 12px;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            .status-new {
-                background: linear-gradient(135deg, #bfdbfe, #93c5fd);
-                color: #1e40af;
-            }
-
-            .status-in-progress {
-                background: linear-gradient(135deg, #fed7aa, #fdba74);
-                color: #9a3412;
-            }
-
-            .status-resolved {
-                background: linear-gradient(135deg, #bbf7d0, #86efac);
-                color: #166534;
-            }
-
-            .status-closed {
-                background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
-                color: #4a5568;
-            }
-
-            .report-header {
-                display: flex;
-                align-items: center;
-                margin-bottom: 20px;
-            }
-
-            .user-avatar {
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                background: linear-gradient(135deg, #667eea, #764ba2);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-weight: 600;
-                font-size: 18px;
-                margin-right: 15px;
-            }
-
-            .user-info h4 {
-                margin: 0;
-                font-size: 18px;
-                font-weight: 600;
-                color: #2d3748;
-            }
-
-            .user-info p {
-                margin: 5px 0 0 0;
-                color: #718096;
-                font-size: 14px;
-            }
-
-            .report-details {
-                margin-bottom: 20px;
-            }
-
-            .detail-row {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 12px;
-                padding: 8px 0;
-                border-bottom: 1px solid #f7fafc;
-            }
-
-            .detail-row:last-child {
-                border-bottom: none;
-            }
-
-            .detail-label {
-                font-weight: 500;
-                color: #4a5568;
-                font-size: 14px;
-            }
-
-            .detail-value {
-                color: #2d3748;
-                font-weight: 600;
-                font-size: 14px;
-            }
-
-            .report-type {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                padding: 4px 10px;
-                border-radius: 12px;
-                font-size: 12px;
-                font-weight: 600;
-            }
-
-            .type-bug {
-                background: #fef2f2;
-                color: #dc2626;
-            }
-
-            .type-feature {
-                background: #f0f9ff;
-                color: #0284c7;
-            }
-
-            .type-complaint {
-                background: #fff7ed;
-                color: #ea580c;
-            }
-
-            .type-other {
-                background: #f7fafc;
-                color: #4a5568;
-            }
-
-            .priority-level {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                padding: 4px 10px;
-                border-radius: 12px;
-                font-size: 12px;
-                font-weight: 600;
-            }
-
-            .priority-high {
-                background: #fef2f2;
-                color: #dc2626;
-            }
-
-            .priority-medium {
-                background: #fff7ed;
-                color: #ea580c;
-            }
-
-            .priority-low {
-                background: #f0fdf4;
-                color: #16a34a;
-            }
-
-            .report-content {
-                background: #f8fafc;
-                padding: 15px;
-                border-radius: 10px;
-                margin-bottom: 20px;
-                border-left: 4px solid #667eea;
-            }
-
-            .report-content h5 {
-                margin: 0 0 8px 0;
-                font-size: 14px;
-                font-weight: 600;
-                color: #4a5568;
-            }
-
-            .report-content p {
-                margin: 0;
-                color: #2d3748;
-                font-size: 14px;
-                line-height: 1.5;
-            }
-
-            .attachments-section {
-                margin-bottom: 20px;
-            }
-
-            .attachments-title {
-                font-weight: 600;
-                color: #2d3748;
-                margin-bottom: 10px;
-                font-size: 14px;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .attachment-list {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-
-            .attachment-item {
-                background: #f7fafc;
-                padding: 6px 12px;
-                border-radius: 8px;
-                font-size: 12px;
-                color: #4a5568;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-
-            .attachment-item:hover {
-                background: #edf2f7;
-            }
-
-            .action-buttons {
-                display: flex;
-                gap: 10px;
-                margin-top: 20px;
-            }
-
-            .btn {
-                flex: 1;
-                padding: 12px 20px;
-                border: none;
-                border-radius: 10px;
-                font-weight: 600;
-                font-size: 14px;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 8px;
-            }
-
-            .btn-view {
-                background: linear-gradient(135deg, #3182ce, #2c5282);
-                color: white;
-            }
-
-            .btn-view:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(49, 130, 206, 0.3);
-            }
-
-            .btn-resolve {
-                background: linear-gradient(135deg, #48bb78, #38a169);
-                color: white;
-            }
-
-            .btn-resolve:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(72, 187, 120, 0.3);
-            }
-
-            .btn-progress {
-                background: linear-gradient(135deg, #f6ad55, #ed8936);
-                color: white;
-            }
-
-            .btn-progress:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(246, 173, 85, 0.3);
-            }
-
-            .btn-close {
-                background: linear-gradient(135deg, #a0aec0, #718096);
-                color: white;
-            }
-
-            .btn-close:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(160, 174, 192, 0.3);
-            }
-
-            .btn-disabled {
-                background: #e2e8f0;
-                color: #a0aec0;
-                cursor: not-allowed;
-            }
-
-            .no-data {
-                text-align: center;
-                padding: 60px 20px;
-                color: #718096;
-                font-size: 18px;
-                grid-column: 1 / -1;
-            }
-
-            .no-data i {
-                font-size: 64px;
-                margin-bottom: 20px;
-                opacity: 0.5;
-            }
-
-            .modal {
-                display: none;
-                position: fixed;
-                z-index: 1000;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                backdrop-filter: blur(5px);
-            }
-
-            .modal-content {
-                background: white;
-                margin: 5% auto;
-                padding: 30px;
-                border-radius: 16px;
-                width: 90%;
-                max-width: 600px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            }
-
-            .modal-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 20px;
-                padding-bottom: 15px;
-                border-bottom: 2px solid #f0f0f0;
-            }
-
-            .modal-header h3 {
-                margin: 0;
-                color: #2d3748;
-                font-size: 20px;
-                font-weight: 600;
-            }
-
-            .close {
-                font-size: 24px;
-                cursor: pointer;
-                color: #a0aec0;
-                transition: color 0.3s ease;
-            }
-
-            .close:hover {
-                color: #e53e3e;
-            }
-
-            .form-group {
-                margin-bottom: 20px;
-            }
-
-            .form-group label {
-                display: block;
-                margin-bottom: 8px;
-                font-weight: 500;
-                color: #4a5568;
-            }
-
-            .form-group textarea, .form-group select {
-                width: 100%;
-                padding: 12px;
-                border: 2px solid #e2e8f0;
-                border-radius: 8px;
-                font-size: 14px;
-                transition: border-color 0.3s ease;
-            }
-
-            .form-group textarea {
-                resize: vertical;
-                min-height: 100px;
-            }
-
-            .form-group textarea:focus, .form-group select:focus {
-                outline: none;
-                border-color: #667eea;
-                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            }
-
-            .modal-actions {
-                display: flex;
-                gap: 10px;
-                justify-content: flex-end;
-            }
-
-            .btn-secondary {
-                background: #e2e8f0;
-                color: #4a5568;
-                padding: 10px 20px;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                font-weight: 500;
-                transition: background-color 0.3s ease;
-            }
-
-            .btn-secondary:hover {
-                background: #cbd5e0;
-            }
-
-            @media (max-width: 768px) {
-                .report-management {
-                    margin-left: 0;
-                    width: 100%;
-                    padding: 20px;
-                    border-radius: 0;
-                }
-
-                .header-section {
-                    flex-direction: column;
-                    align-items: flex-start;
-                    gap: 20px;
-                }
-
-                .stats-cards {
-                    grid-template-columns: 1fr;
-                }
-
-                .filter-section {
-                    flex-direction: column;
-                }
-
-                .search-box {
-                    min-width: auto;
-                }
-
-                .reports-container {
-                    grid-template-columns: 1fr;
-                }
-
-                .modal-content {
-                    width: 95%;
-                    margin: 10% auto;
-                    padding: 20px;
-                }
-            }
-        </style>
-    </head>
-    <body>
-
-        <div class="main-container">
-            <%@ include file="sidebar.jsp" %>
-
-            <div class="report-management">
-                <div class="header-section">
-                    <h2><i class="fas fa-exclamation-triangle"></i> Quản lý báo cáo</h2>
+        }
+        
+        .report-card.card {
+            margin-bottom: 0; 
+        }
+        
+        .report-card:hover {
+             transform: translateY(-5px);
+             box-shadow: 0 25px 60px rgba(59, 130, 246, 0.1);
+        }
+
+        .user-info { display: flex; align-items: center; gap: 16px; }
+
+        .user-avatar {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark-color));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 16px; flex-shrink: 0;
+        }
+
+        .user-info strong { font-weight: 600; font-size: 15px; }
+        .user-info small { color: var(--text-secondary); font-size: 13px; }
+        
+        .report-card h5 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+        
+        .report-description {
+            color: var(--text-secondary); font-size: 14px;
+            margin-bottom: 20px; border-left: 3px solid var(--border-light);
+            padding: 12px 16px; background-color: #f8fafc;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .report-meta {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+            padding-top: 16px; border-top: 1px solid var(--border-light);
+        }
+        
+        .report-meta-item {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: var(--text-secondary);
+        }
+        .report-meta-item i { color: var(--text-secondary); }
+        
+        .badge {
+            padding: 5px 12px; border-radius: 20px; font-size: 12px;
+            font-weight: 500; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .badge-pending { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
+        .badge-in-progress { background: rgba(245, 158, 11, 0.1); color: #d97706; }
+        .badge-resolved { background: rgba(16, 185, 129, 0.1); color: #059669; }
+        .badge-rejected, .badge-closed { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
+        .badge-high, .badge-bug { background-color: rgba(239, 68, 68, 0.1); color: #dc2626; }
+        .badge-medium, .badge-complaint { background-color: rgba(245, 158, 11, 0.1); color: #d97706; }
+        .badge-low, .badge-feature { background-color: rgba(16, 185, 129, 0.1); color: #059669; }
+        .badge-report { background-color: var(--bg-light); color: var(--primary-color); }
+        .badge-other { background-color: rgba(100, 116, 139, 0.1); color: #64748b; }
+
+        .btn {
+            padding: 10px 20px; border: 1px solid transparent; border-radius: 10px;
+            font-size: 14px; font-weight: 500; cursor: pointer;
+            transition: all 0.2s ease; text-decoration: none;
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 8px; flex-grow: 1;
+        }
+
+        .btn:hover { transform: translateY(-2px); }
+        .btn-primary { background: var(--primary-color); color: white; }
+        .btn-primary:hover { background: var(--primary-dark-color); box-shadow: 0 7px 20px -5px rgba(59, 130, 246, 0.4); }
+        .btn-outline { background: #fff; border-color: #dbeafe; color: var(--text-secondary); }
+        .btn-outline:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        
+        .no-data {
+            text-align: center; padding: 60px 40px;
+            color: var(--text-secondary);
+        }
+        .no-data i { font-size: 48px; margin-bottom: 20px; color: rgba(59, 130, 246, 0.2); }
+        .no-data div { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+
+        @media (max-width: 1024px) {
+            .main-content { margin-left: 0; width: 100%; padding: 24px; }
+        }
+        @media (max-width: 768px) {
+            .stats-grid, .filter-controls, .reports-container { grid-template-columns: 1fr; }
+            .card-body, .card-header, .card-footer { padding: 24px; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <%@ include file="sidebar.jsp" %>
+
+    <div class="main-content">
+        <c:set var="pendingCount" value="0" />
+        <c:set var="progressCount" value="0" />
+        <c:set var="resolvedCount" value="0" />
+        <c:set var="rejectedCount" value="0" />
+        <c:forEach var="report" items="${reportList}">
+            <c:if test="${report.status == 'Pending'}"><c:set var="pendingCount" value="${pendingCount + 1}" /></c:if>
+            <c:if test="${report.status == 'In Progress'}"><c:set var="progressCount" value="${progressCount + 1}" /></c:if>
+            <c:if test="${report.status == 'Resolved'}"><c:set var="resolvedCount" value="${resolvedCount + 1}" /></c:if>
+            <c:if test="${report.status == 'Rejected' || report.status == 'Closed'}"><c:set var="rejectedCount" value="${rejectedCount + 1}" /></c:if>
+        </c:forEach>
+
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="stat-header">
+                    <div class="stat-info">
+                        <h3>${pendingCount}</h3>
+                        <p>Báo cáo mới</p>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-inbox"></i></div>
                 </div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-header">
+                    <div class="stat-info">
+                        <h3>${progressCount}</h3>
+                        <p>Đang xử lý</p>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-cogs"></i></div>
+                </div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-header">
+                    <div class="stat-info">
+                        <h3>${resolvedCount}</h3>
+                        <p>Đã giải quyết</p>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                </div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-header">
+                    <div class="stat-info">
+                        <h3>${rejectedCount}</h3>
+                        <p>Từ chối / Đóng</p>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-archive"></i></div>
+                </div>
+            </div>
+        </div>
 
-              <!-- Replace your stats cards section with this: -->
-
-<div class="stats-cards">
-    <div class="stat-card new">
-        <div class="icon"><i class="fas fa-bell"></i></div>
-        <div class="number">
-            <c:set var="pendingCount" value="0" />
-            <c:forEach var="report" items="${reportList}">
-                <c:if test="${report.status == 'Pending'}">
-                    <c:set var="pendingCount" value="${pendingCount + 1}" />
-                </c:if>
-            </c:forEach>
-            ${pendingCount}
-        </div>
-        <div class="label">Báo cáo mới</div>
-    </div>
-    <div class="stat-card in-progress">
-        <div class="icon"><i class="fas fa-cog"></i></div>
-        <div class="number">
-            <c:set var="progressCount" value="0" />
-            <c:forEach var="report" items="${reportList}">
-                <c:if test="${report.status == 'In Progress'}">
-                    <c:set var="progressCount" value="${progressCount + 1}" />
-                </c:if>
-            </c:forEach>
-            ${progressCount}
-        </div>
-        <div class="label">Đang xử lý</div>
-    </div>
-    <div class="stat-card resolved">
-        <div class="icon"><i class="fas fa-check-circle"></i></div>
-        <div class="number">
-            <c:set var="resolvedCount" value="0" />
-            <c:forEach var="report" items="${reportList}">
-                <c:if test="${report.status == 'Resolved'}">
-                    <c:set var="resolvedCount" value="${resolvedCount + 1}" />
-                </c:if>
-            </c:forEach>
-            ${resolvedCount}
-        </div>
-        <div class="label">Đã giải quyết</div>
-    </div>
-    <div class="stat-card closed">
-        <div class="icon"><i class="fas fa-archive"></i></div>
-        <div class="number">
-            <c:set var="rejectedCount" value="0" />
-            <c:forEach var="report" items="${reportList}">
-                <c:if test="${report.status == 'Rejected'}">
-                    <c:set var="rejectedCount" value="${rejectedCount + 1}" />
-                </c:if>
-            </c:forEach>
-            ${rejectedCount}
-        </div>
-        <div class="label">Đã từ chối</div>
-    </div>
-</div>
-
-                <!-- Bộ lọc -->
-                <div class="filter-section">
+        <div class="card">
+             <div class="card-header">
+                <h2><i class="fas fa-flag"></i> Báo cáo từ người dùng</h2>
+            </div>
+            <div class="card-body">
+                <div class="filter-controls">
                     <div class="search-box">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Tìm kiếm theo tên người dùng hoặc tiêu đề..." id="searchInput">
+                        <input type="text" placeholder="Tìm theo tên, email, hoặc tiêu đề..." id="searchInput">
                     </div>
                     <select class="filter-select" id="statusFilter">
                         <option value="">Tất cả trạng thái</option>
-                        <option value="NEW">Báo cáo mới</option>
-                        <option value="IN_PROGRESS">Đang xử lý</option>
-                        <option value="RESOLVED">Đã giải quyết</option>
-                        <option value="CLOSED">Đã đóng</option>
-                    </select>
-                    <select class="filter-select" id="typeFilter">
-                        <option value="">Tất cả loại</option>
-                        <option value="BUG">Lỗi hệ thống</option>
-                        <option value="FEATURE">Yêu cầu tính năng</option>
-                        <option value="COMPLAINT">Khiếu nại</option>
-                        <option value="OTHER">Khác</option>
-                    </select>
-                    <select class="filter-select" id="priorityFilter">
-                        <option value="">Tất cả độ ưu tiên</option>
-                        <option value="HIGH">Cao</option>
-                        <option value="MEDIUM">Trung bình</option>
-                        <option value="LOW">Thấp</option>
+                        <option value="Pending">Mới</option>
+                        <option value="In Progress">Đang xử lý</option>
+                        <option value="Resolved">Đã giải quyết</option>
+                        <option value="Rejected">Đã từ chối</option>
+                        <option value="Closed">Đã đóng</option>
                     </select>
                 </div>
-
-              <!-- Danh sách báo cáo -->
-<c:if test="${empty reportList}">
-    <div class="reports-container">
-        <div class="no-data">
-            <i class="fas fa-clipboard-list"></i>
-            <div>Chưa có báo cáo nào từ người dùng</div>
-            <div style="font-size: 14px; margin-top: 10px; opacity: 0.7;">
-                Các báo cáo từ người dùng sẽ hiển thị tại đây
             </div>
         </div>
-    </div>
-</c:if>
-
-<!-- Replace the report card section in your JSP with this fixed version: -->
-
-<c:if test="${not empty reportList}">
-    <div class="reports-container" id="reportsContainer">
-        <c:forEach var="report" items="${reportList}">
-            <div class="report-card"
-                 data-status="${report.status}"
-                 data-type="${report.type}"
-                 data-priority="${report.priority}"
-                 data-search="${fn:toLowerCase(report.userName)} ${fn:toLowerCase(report.title)}">
-
-                <!-- ✅ FIXED: Status mapping -->
-                <div class="report-status status-${fn:toLowerCase(fn:replace(report.status, ' ', '-'))}">
-                    <c:choose>
-                        <c:when test="${report.status == 'Pending'}">Đang chờ</c:when>
-                        <c:when test="${report.status == 'In Progress'}">Đang xử lý</c:when>
-                        <c:when test="${report.status == 'Resolved'}">Đã giải quyết</c:when>
-                        <c:when test="${report.status == 'Rejected'}">Đã từ chối</c:when>
-                        <c:otherwise>${report.status}</c:otherwise>
-                    </c:choose>
-                </div>
-
-                <!-- Thông tin người dùng -->
-                <div class="report-header">
-                    <div class="user-avatar">
-                        ${fn:substring(report.userName, 0, 1)}
-                    </div>
-                    <div class="user-info">
-                        <h4>${report.userName}</h4>
-                        <p>${report.userEmail}</p>
+        
+        <div class="reports-container" id="reportsContainer">
+            <c:if test="${empty reportList}">
+                <div class="card">
+                    <div class="no-data">
+                        <i class="fas fa-clipboard-list"></i>
+                        <div>Không tìm thấy báo cáo nào</div>
+                        <p>Hiện tại không có báo cáo nào từ người dùng.</p>
                     </div>
                 </div>
+            </c:if>
 
-                <!-- ✅ FIXED: Report details -->
-                <div class="report-details">
-                    <div class="detail-row">
-                        <span class="detail-label">Tiêu đề:</span>
-                        <span class="detail-value">${report.title}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Loại báo cáo:</span>
-                        <span class="detail-value">
-                            <span class="report-type type-${fn:toLowerCase(report.type)}">
-                                <c:choose>
-                                    <c:when test="${report.type == 'REPORT'}">
-                                        <i class="fas fa-flag"></i> Báo cáo sân
-                                    </c:when>
-                                    <c:otherwise>
-                                        <i class="fas fa-file-alt"></i> ${report.type}
-                                    </c:otherwise>
-                                </c:choose>
-                            </span>
-                        </span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Độ ưu tiên:</span>
-                        <span class="detail-value">
-                            <span class="priority-level priority-${fn:toLowerCase(report.priority)}">
-                                <c:choose>
-                                    <c:when test="${report.priority == 'HIGH'}">
-                                        <i class="fas fa-exclamation-triangle"></i> Cao
-                                    </c:when>
-                                    <c:when test="${report.priority == 'MEDIUM'}">
-                                        <i class="fas fa-minus"></i> Trung bình
-                                    </c:when>
-                                    <c:otherwise>
-                                        <i class="fas fa-arrow-down"></i> Thấp
-                                    </c:otherwise>
-                                </c:choose>
-                            </span>
-                        </span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Ngày tạo:</span>
-                        <span class="detail-value">
-                            <fmt:formatDate value="${report.submittedAt}" pattern="dd/MM/yyyy HH:mm" />
-                        </span>
-                    </div>
-                    <c:if test="${not empty report.relatedStadiumID}">
-                        <div class="detail-row">
-                            <span class="detail-label">Sân liên quan:</span>
-                            <span class="detail-value">ID: ${report.relatedStadiumID}</span>
+            <c:forEach var="report" items="${reportList}">
+                <div class="card report-card"
+                     data-status="${report.status}"
+                     data-type="${report.type}"
+                     data-priority="${report.priority}"
+                     data-search="${fn:toLowerCase(report.userName)} ${fn:toLowerCase(report.userEmail)} ${fn:toLowerCase(report.title)}">
+
+                    <div class="card-header">
+                        <div class="user-info">
+                            <div class="user-avatar">${fn:substring(report.userName, 0, 1)}</div>
+                            <div>
+                                <strong>${report.userName}</strong>
+                                <small>${report.userEmail}</small>
+                            </div>
                         </div>
-                    </c:if>
-                </div>
+                        <span class="badge badge-${fn:toLowerCase(fn:replace(report.status, ' ', '-'))}">
+                            ${report.status}
+                        </span>
+                    </div>
 
-                <!-- ✅ FIXED: Report content -->
-                <div class="report-content">
-                    <h5><i class="fas fa-file-alt"></i> Nội dung báo cáo:</h5>
-                    <p>
-                        <c:choose>
-                            <c:when test="${fn:length(report.description) > 150}">
-                                ${fn:substring(report.description, 0, 150)}...
-                            </c:when>
-                            <c:otherwise>
-                                ${report.description}
-                            </c:otherwise>
-                        </c:choose>
-                    </p>
+                    <div class="card-body">
+                        <h5>${report.title}</h5>
+                        <p class="report-description">
+                             <c:choose>
+                                <c:when test="${fn:length(report.description) > 150}">${fn:substring(report.description, 0, 150)}...</c:when>
+                                <c:otherwise>${report.description}</c:otherwise>
+                            </c:choose>
+                        </p>
+                        <div class="report-meta">
+                             <div class="report-meta-item">
+                                <span class="badge badge-${fn:toLowerCase(report.type)}">
+                                    <i class="fas fa-tag"></i> ${report.type}
+                                </span>
+                            </div>
+                             <div class="report-meta-item">
+                                <span class="badge badge-${fn:toLowerCase(report.priority)}">
+                                    <i class="fas fa-exclamation-circle"></i> ${report.priority}
+                                </span>
+                            </div>
+                             <div class="report-meta-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <fmt:formatDate value="${report.submittedAt}" pattern="dd/MM/yyyy HH:mm" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer">
+                         <button class="btn btn-primary" onclick="viewReportDetails(${report.reportID})">
+                            <i class="fas fa-eye"></i> Xem chi tiết
+                        </button>
+                        <c:if test="${report.status == 'Pending' || report.status == 'In Progress'}">
+                             <button class="btn btn-outline" onclick="updateReportStatus(${report.reportID}, 'Resolved')">
+                                <i class="fas fa-check"></i> Giải quyết
+                            </button>
+                             <button class="btn btn-outline" onclick="updateReportStatus(${report.reportID}, 'Rejected')">
+                                <i class="fas fa-times"></i> Từ chối
+                            </button>
+                        </c:if>
+                    </div>
                 </div>
-
-                <!-- ✅ FIXED: Action buttons with correct status values -->
-                <div class="action-buttons">
-                    <button class="btn btn-view" onclick="viewReportDetails(${report.reportID})">
-                        <i class="fas fa-eye"></i>
-                        Xem chi tiết
-                    </button>
-                    <c:choose>
-                        <c:when test="${report.status == 'Pending'}">
-                            <button class="btn btn-progress" onclick="updateReportStatus(${report.reportID}, 'In Progress')">
-                                <i class="fas fa-cog"></i>
-                                Đang xử lý
-                            </button>
-                            <button class="btn btn-resolve" onclick="updateReportStatus(${report.reportID}, 'Resolved')">
-                                <i class="fas fa-check"></i>
-                                Giải quyết
-                            </button>
-                            <button class="btn btn-close" onclick="updateReportStatus(${report.reportID}, 'Rejected')">
-                                <i class="fas fa-times"></i>
-                                Từ chối
-                            </button>
-                        </c:when>
-                        <c:when test="${report.status == 'In Progress'}">
-                            <button class="btn btn-resolve" onclick="updateReportStatus(${report.reportID}, 'Resolved')">
-                                <i class="fas fa-check"></i>
-                                Giải quyết
-                            </button>
-                            <button class="btn btn-close" onclick="updateReportStatus(${report.reportID}, 'Rejected')">
-                                <i class="fas fa-times"></i>
-                                Từ chối
-                            </button>
-                        </c:when>
-                        <c:when test="${report.status == 'Resolved'}">
-                            <button class="btn btn-close" onclick="updateReportStatus(${report.reportID}, 'Closed')">
-                                <i class="fas fa-archive"></i>
-                                Đóng
-                            </button>
-                        </c:when>
-                    </c:choose>
-                </div>
-            </div>
-        </c:forEach>
+            </c:forEach>
+        </div>
     </div>
-</c:if>
-        <!-- JavaScript xử lý Filter, Search, Modal -->
-       <script>
+</div>
+
+<script>
     function viewReportDetails(reportID) {
         window.location.href = "${pageContext.request.contextPath}/admin/reports/view?id=" + reportID;
     }
 
     function updateReportStatus(reportID, newStatus) {
-        if (confirm("Bạn có chắc muốn cập nhật trạng thái báo cáo này?")) {
-            fetch(window.location.pathname, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'reportID=' + reportID + '&newStatus=' + encodeURIComponent(newStatus)
-            }).then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
-                } else {
-                    alert('Cập nhật thành công!');
-                    window.location.reload();
-                }
-            }).catch(error => {
-                alert('Lỗi khi cập nhật trạng thái.');
-                console.error(error);
-            });
+        if (confirm(`Bạn có chắc muốn cập nhật trạng thái thành "${newStatus}" không?`)) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = window.location.pathname;
+
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'reportID';
+            idInput.value = reportID;
+            form.appendChild(idInput);
+
+            const statusInput = document.createElement('input');
+            statusInput.type = 'hidden';
+            statusInput.name = 'newStatus';
+            statusInput.value = newStatus;
+            form.appendChild(statusInput);
+
+            document.body.appendChild(form);
+            form.submit();
         }
     }
 
-    // Lọc báo cáo theo trạng thái
-    document.getElementById("statusFilter").addEventListener("change", filterReports);
-    document.getElementById("typeFilter").addEventListener("change", filterReports);
-    document.getElementById("priorityFilter").addEventListener("change", filterReports);
-    document.getElementById("searchInput").addEventListener("input", filterReports);
+    const statusFilter = document.getElementById("statusFilter");
+    const searchInput = document.getElementById("searchInput");
 
     function filterReports() {
-        const status = document.getElementById("statusFilter").value;
-        const type = document.getElementById("typeFilter").value;
-        const priority = document.getElementById("priorityFilter").value;
-        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        const status = statusFilter.value;
+        const searchTerm = searchInput.value.toLowerCase();
 
         document.querySelectorAll(".report-card").forEach(card => {
             const cardStatus = card.getAttribute("data-status");
-            const cardType = card.getAttribute("data-type");
-            const cardPriority = card.getAttribute("data-priority");
             const cardSearch = card.getAttribute("data-search");
 
-            let show = true;
-
-            if (status && cardStatus !== status) show = false;
-            if (type && cardType !== type) show = false;
-            if (priority && cardPriority !== priority) show = false;
-            if (searchTerm && !cardSearch.includes(searchTerm)) show = false;
+            const show =
+                (status === "" || cardStatus === status) &&
+                (searchTerm === "" || cardSearch.includes(searchTerm));
 
             card.style.display = show ? "block" : "none";
         });
     }
 
-    // Ripple animation (nếu bạn giữ nguyên phần này)
-    document.addEventListener('DOMContentLoaded', function () {
-        const buttons = document.querySelectorAll('.btn');
-        buttons.forEach(btn => {
-            btn.style.position = 'relative';
-            btn.style.overflow = 'hidden';
+    statusFilter.addEventListener("change", filterReports);
 
-            btn.addEventListener('click', function (e) {
-                if (!this.classList.contains('btn-disabled')) {
-                    e.preventDefault();
-                }
-                const ripple = document.createElement('span');
-                const rect = this.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                ripple.style.cssText = `
-                    position: absolute;
-                    width: ${size}px;
-                    height: ${size}px;
-                    background: rgba(255, 255, 255, 0.6);
-                    border-radius: 50%;
-                    left: ${e.clientX - rect.left - size / 2}px;
-                    top: ${e.clientY - rect.top - size / 2}px;
-                    transform: scale(0);
-                    animation: ripple 0.6s ease-out;
-                    pointer-events: none;
-                `;
-                this.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 600);
-            });
-        });
+    let searchTimeout;
+    searchInput.addEventListener("input", () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(filterReports, 300);
     });
+</script>
 
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes ripple {
-            to {
-                transform: scale(2);
-                opacity: 0;
-            }
-        }
-    `;
-    document.head.appendChild(style);
-</script>              
+</body>
+</html>

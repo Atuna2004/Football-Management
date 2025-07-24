@@ -23,8 +23,67 @@ public class UserManagementServlet extends HttpServlet {
             throws ServletException, IOException {
         try (Connection conn = DBConnection.getConnection()) {
             AccountDAO accountDAO = new AccountDAO(conn);
-            List<User> userList = accountDAO.getAllUsers();
+            
+            // Get filter parameter from URL
+            String filter = request.getParameter("filter");
+            List<User> userList;
+            
+            // Apply filtering based on the filter parameter
+            if (filter != null && !filter.isEmpty()) {
+                switch (filter.toLowerCase()) {
+                    case "user":
+                        // Try with different possible role names
+                        try {
+                            userList = accountDAO.getUsersByRole("user");
+                            if (userList.isEmpty()) {
+                                userList = accountDAO.getUsersByRole("User");
+                            }
+                            if (userList.isEmpty()) {
+                                userList = accountDAO.getUsersByRoleID(3); // RoleID 3 for regular users
+                            }
+                        } catch (SQLException e) {
+                            userList = accountDAO.getUsersByRoleID(3);
+                        }
+                        break;
+                    case "owner":
+                        // Try with different possible role names
+                        try {
+                            userList = accountDAO.getUsersByRole("owner");
+                            if (userList.isEmpty()) {
+                                userList = accountDAO.getUsersByRole("Owner");
+                            }
+                            if (userList.isEmpty()) {
+                                userList = accountDAO.getUsersByRoleID(2); // RoleID 2 for field owners
+                            }
+                        } catch (SQLException e) {
+                            userList = accountDAO.getUsersByRoleID(2);
+                        }
+                        break;
+                    case "admin":
+                        // Try with different possible role names
+                        try {
+                            userList = accountDAO.getUsersByRole("admin");
+                            if (userList.isEmpty()) {
+                                userList = accountDAO.getUsersByRole("Admin");
+                            }
+                            if (userList.isEmpty()) {
+                                userList = accountDAO.getUsersByRoleID(1); // RoleID 1 for admin
+                            }
+                        } catch (SQLException e) {
+                            userList = accountDAO.getUsersByRoleID(1);
+                        }
+                        break;
+                    default:
+                        userList = accountDAO.getAllUsers();
+                        break;
+                }
+            } else {
+                // No filter, get all users
+                userList = accountDAO.getAllUsers();
+            }
+            
             request.setAttribute("userList", userList);
+            request.setAttribute("currentFilter", filter);
             request.getRequestDispatcher("/admin/userManagement.jsp").forward(request, response);
         } catch (SQLException e) {
             Logger.getLogger(UserManagementServlet.class.getName()).log(Level.SEVERE, null, e);
