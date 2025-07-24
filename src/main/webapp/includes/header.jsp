@@ -41,8 +41,8 @@
         <div class="container">
             <div class="row header-menu">
                 <div class="col-8 menu-wrapper">
-                    <div class="item"><a href="home.jsp"><i class="fa-solid fa-house"></i></a></div>
-                    <div class="item"><a href="#">Trang chủ</a></div>
+                    <div class="item"><a href="<%= request.getContextPath() %>home.jsp"><i class="fa-solid fa-house"></i></a></div>
+                    <div class="item"><a href="<%= request.getContextPath() %>home.jsp">Trang chủ</a></div>
                     <div class="item"><a href="<%= request.getContextPath() %>/stadiums">Danh sách sân bóng</a></div>
                     <div class="item"><a href="#">Đồ ăn</a></div>
                     <div class="item"><a href="#">Giới thiệu</a></div>
@@ -61,33 +61,15 @@
                             } else {
                     %>
                                 <div class="item">
-                                    <a href="<%= request.getContextPath() %>/become-owner-request.jsp" onclick="requestOwner()">Dành cho chủ sân</a>
+                                    <a href="#" onclick="requestOwner(event)">Dành cho chủ sân</a>
                                 </div>
-
-                                <script>
-                                    function requestOwner() {
-                                        const confirmRequest = confirm("Bạn hiện tại không phải chủ sân. Bạn có muốn đăng ký làm chủ sân không?");
-                                        if (confirmRequest) {
-                                            window.location.href = "<%= request.getContextPath() %>/become-owner-request.jsp";
-                                        }
-                                    }
-                                </script>
                     <%
                             }
                         } else {
                     %>
                             <div class="item">
-                                <a href="#" onclick="requestOwnerGuest()">Dành cho chủ sân</a>
+                                <a href="#" onclick="requestOwnerGuest(event)">Dành cho chủ sân</a>
                             </div>
-
-                            <script>
-                                function requestOwnerGuest() {
-                                    const confirmRequest = confirm("Bạn cần đăng nhập trước khi gửi yêu cầu làm chủ sân.");
-                                    if (confirmRequest) {
-                                        window.location.href = "<%= request.getContextPath() %>/account/login.jsp";
-                                    }
-                                }
-                            </script>
                     <%
                         }
                     %>
@@ -135,5 +117,27 @@
         </div>
     </div>
 </header>
+
+<script>
+    function requestOwner(event) {
+        event.preventDefault(); // Prevent the default link behavior
+        const confirmRequest = confirm("Bạn hiện tại không phải chủ sân. Bạn có muốn đăng ký làm chủ sân không?");
+        if (confirmRequest) {
+            window.location.href = "<%= request.getContextPath() %>/become-owner-request.jsp";
+        }
+        // If user clicks Cancel, nothing happens and they stay on the current page
+    }
+
+    function requestOwnerGuest(event) {
+        event.preventDefault(); // Prevent the default link behavior
+        const confirmRequest = confirm("Bạn cần đăng nhập trước khi gửi yêu cầu làm chủ sân.");
+        if (confirmRequest) {
+            window.location.href = "<%= request.getContextPath() %>/account/login.jsp";
+        }
+        // If user clicks Cancel, nothing happens and they stay on the current page
+    }
+</script>
+
 </body>
+</html> 
 </html>
