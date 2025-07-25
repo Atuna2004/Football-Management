@@ -46,7 +46,7 @@ public class EditFoodServlet extends HttpServlet {
             FoodItem item = new FoodItemDAO().getFoodItemById(id);
             if (item == null) {
                 logger.warning("Không tìm thấy món ăn với ID: " + id);
-                resp.sendRedirect(req.getContextPath() + "/owner/food-items.jsp");
+                resp.sendRedirect(req.getContextPath() + "/owner/food-items");
                 return;
             }
 

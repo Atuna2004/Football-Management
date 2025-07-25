@@ -71,15 +71,9 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/tournaments" class="nav-link">
+            <a href="${pageContext.request.contextPath}/tournament" class="nav-link">
                 <i class="fas fa-trophy"></i>
                 <span>Giải đấu</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="fa-solid fa-utensils"></i>
-                <span>Đồ ăn</span>
             </a>
         </li>
     </ul>
