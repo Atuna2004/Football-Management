@@ -53,7 +53,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/owner/reports" class="nav-link"> <%-- CORRECTED: Changed href from '#' to '/owner/reports' --%>
+            <a href="${pageContext.request.contextPath}/owner/reports" class="nav-link">
                 <i class="fas fa-chart-bar"></i>
                 <span>Báo cáo</span>
             </a>

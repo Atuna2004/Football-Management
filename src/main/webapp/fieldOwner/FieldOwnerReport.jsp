@@ -13,12 +13,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Field Owner Reports</title>
     <!-- Font Awesome for icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -26,247 +25,235 @@
         }
 
         body {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            background: #f8f9fa;
-            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 50%, #dbeafe 100%);
+            min-height: 100vh;
+            color: #1e293b;
             line-height: 1.6;
         }
 
-        /* Header Styles */
+        /* Top Header */
         .top-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            padding: 20px 0;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 1000;
             height: 80px;
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.08);
         }
 
         .top-header .container-fluid {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 30px;
+            padding: 0 40px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
         .logo h3 {
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             margin: 0;
-            font-weight: 600;
-            font-size: 1.5rem;
         }
 
-        .logo a {
-            text-decoration: none !important;
-            color: inherit;
+        .logo h3 a {
+            text-decoration: none;
+            color: #3b82f6;
+            transition: all 0.3s ease;
         }
 
-        .logo a:hover {
-            text-decoration: none !important;
-            color: inherit;
+        .logo h3 a:hover {
+            transform: scale(1.1);
+            text-decoration: none;
         }
 
         .user-greeting {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
-            font-size: 16px;
+            padding: 12px 20px;
+            border-radius: 12px;
             font-weight: 500;
-        }
-
-        .user-greeting i {
-            margin-right: 8px;
-            color: rgba(255,255,255,0.8);
-        }
-
-        /* Sidebar Styles */
-        .navigation-sidebar {
-            position: fixed;
-            top: 80px; /* Adjusted to be below the fixed header */
-            bottom: 0;
-            left: 0;
-            width: 280px; /* Explicitly set width as per your CSS */
-            background: #ffffff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
-            overflow-y: auto;
-            z-index: 999;
-        }
-
-        .navigation-sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .navigation-sidebar li {
-            margin-bottom: 10px;
-        }
-
-        .navigation-sidebar a {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 15px;
-            border-radius: 6px;
-            text-decoration: none;
-            color: #333;
-            transition: background 0.3s ease;
+            gap: 8px;
+            font-size: 14px;
         }
 
-        .navigation-sidebar a.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .navigation-sidebar a:hover {
-            background: #f5f5f5;
-            color: #333;
-        }
-
-        .navigation-sidebar a.active:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .navigation-sidebar i {
-            font-size: 18px;
-        }
-
-        /* Main Content Styles */
+        /* Main Content */
         .main-content {
-            margin-left: 280px; /* CRUCIAL: Offset by sidebar width */
-            padding: 30px;
-            background: #f8f9fa;
-            min-height: calc(100vh - 80px); /* Account for fixed header */
-            margin-top: 80px; /* Account for fixed header */
+            margin-left: 300px;
+            padding: 40px;
+            min-height: calc(100vh - 80px);
+            margin-top: 80px;
         }
 
         /* Page Title */
         .page-title {
-            color: #333;
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 30px;
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 32px;
+            margin-bottom: 32px;
+            letter-spacing: -0.5px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+        }
+
+        .page-title i {
+            color: #3b82f6;
         }
 
         /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-bottom: 48px;
         }
 
         .stat-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 32px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transform: translateY(-8px);
+            box-shadow: 0 32px 80px rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.2);
         }
 
         .stat-card .icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin: 0 auto 24px;
         }
 
-        .stat-card.new-reports .icon { color: #667eea; }
-        .stat-card.in-progress .icon { color: #ffc107; }
-        .stat-card.resolved .icon { color: #28a745; }
-        .stat-card.rejected .icon { color: #dc3545; }
+        .stat-card.new-reports .icon {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .stat-card.resolved .icon {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .stat-card.total .icon {
+            background: linear-gradient(135deg, #64748b, #475569);
+        }
 
         .stat-card h4 {
-            font-size: 2.5rem;
+            font-size: 48px;
             font-weight: 700;
-            color: #333;
-            margin-bottom: 5px;
+            color: #1e293b;
+            margin-bottom: 8px;
+            line-height: 1;
         }
 
         .stat-card p {
-            color: #666;
-            font-size: 1rem;
+            font-size: 14px;
+            color: #64748b;
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
         }
 
-        /* Filter Section */
+        /* Filter Form */
         .report-form {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            padding: 32px 40px;
+            margin-bottom: 40px;
         }
 
         .filter-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr auto;
-            gap: 15px;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 20px;
             align-items: end;
         }
 
         .report-form input,
         .report-form select {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(59, 130, 246, 0.1);
+            border-radius: 12px;
             padding: 12px 16px;
-            font-size: 14px;
-            border-radius: 8px;
-            border: 2px solid #e9ecef;
-            background: white;
-            transition: border-color 0.3s ease;
+            font-weight: 500;
+            color: #1e293b;
+            transition: all 0.3s ease;
             width: 100%;
+            font-family: 'Inter', sans-serif;
         }
 
         .report-form input:focus,
         .report-form select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
             outline: none;
-            border-color: #667eea;
         }
 
         .report-form button {
-            padding: 12px 20px;
-            font-size: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: 500;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
         }
 
         .report-form button:hover {
-            background: linear-gradient(135deg, #5a67d8 0%, #667eea 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 12px 32px rgba(59, 130, 246, 0.25);
         }
 
-        /* Reports List */
+        /* Reports Container */
         .reports-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.1);
             overflow: hidden;
         }
 
         .report-item {
-            padding: 25px;
-            border-bottom: 1px solid #f0f0f0;
-            transition: background 0.3s ease;
+            padding: 32px 40px;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            transition: all 0.3s ease;
         }
 
         .report-item:last-child {
@@ -274,103 +261,90 @@
         }
 
         .report-item:hover {
-            background: #f8f9fa;
+            background: rgba(59, 130, 246, 0.03);
         }
 
         .report-header {
             display: flex;
-            justify-content: space-between; /* Changed from 'between' to 'space-between' for clarity */
+            justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 15px;
+            margin-bottom: 24px;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 16px;
             flex: 1;
         }
 
         .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
-            font-size: 1.2rem;
+            font-weight: 700;
+            font-size: 20px;
         }
 
         .user-details h5 {
             font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
+            color: #1e293b;
+            margin-bottom: 4px;
+            font-size: 16px;
         }
 
         .user-details .email {
-            color: #666;
-            font-size: 0.9rem;
+            color: #64748b;
+            font-size: 14px;
         }
 
         /* Status Badge */
         .status-badge {
             padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 0.8rem;
+            border-radius: 12px;
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .status-Pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-InProgress {
-            background: #d1ecf1;
-            color: #0c5460;
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
         }
 
         .status-Resolved {
-            background: #d4edda;
-            color: #155724;
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
         }
 
-        .status-Rejected, .status-Closed {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        /* Report Details */
-        .report-content {
-            margin-bottom: 20px;
-        }
-
+        /* Report Content */
         .report-title {
-            font-size: 1.2rem;
+            font-size: 20px;
             font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
+            color: #1e293b;
+            margin-bottom: 12px;
         }
 
         .report-description {
-            color: #666;
-            margin-bottom: 15px;
+            color: #64748b;
+            margin-bottom: 24px;
             line-height: 1.6;
         }
 
         .report-meta {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            background: rgba(59, 130, 246, 0.03);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 24px;
         }
 
         .meta-item {
@@ -379,113 +353,145 @@
         }
 
         .meta-label {
-            font-size: 0.8rem;
-            color: #666;
-            font-weight: 500;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .meta-value {
-            color: #333;
+            color: #1e293b;
             font-weight: 500;
+        }
+
+        /* Admin Response */
+        .admin-response {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.1);
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 20px;
         }
 
         /* Action Buttons */
         .report-actions {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
         .btn {
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
             text-decoration: none;
             border: none;
             cursor: pointer;
             transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-warning {
-            background: #ffc107;
-            color: #212529;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
         }
 
         .btn-success {
-            background: #28a745;
+            background: linear-gradient(135deg, #10b981, #059669);
             color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
         }
 
         .btn-danger {
-            background: #dc3545;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
         }
 
-        .btn:hover {
+        .btn-danger:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.25);
         }
 
         /* Empty State */
         .empty-data {
             text-align: center;
-            padding: 60px 40px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            padding: 80px 40px;
         }
 
         .empty-data i {
-            font-size: 4rem;
-            color: #ddd;
-            margin-bottom: 20px;
+            font-size: 64px;
+            color: #cbd5e1;
+            margin-bottom: 24px;
         }
 
         .empty-data h3 {
-            color: #666;
-            margin-bottom: 10px;
+            color: #64748b;
+            margin-bottom: 12px;
+            font-size: 20px;
+            font-weight: 600;
         }
 
         .empty-data p {
-            color: #999;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Alert Styles */
+        .alert {
+            border: none;
+            border-radius: 16px;
+            padding: 20px 24px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Form Styling */
+        .d-inline-block {
+            display: inline-block;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .navigation-sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-
             .main-content {
                 margin-left: 0;
-                padding: 20px;
+                padding: 24px;
             }
 
             .filter-grid {
                 grid-template-columns: 1fr;
-                gap: 15px;
+                gap: 16px;
             }
 
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
+                gap: 24px;
             }
 
             .report-header {
                 flex-direction: column;
-                gap: 15px;
+                gap: 16px;
+                align-items: flex-start;
             }
 
             .report-meta {
@@ -493,22 +499,53 @@
             }
 
             .report-actions {
-                justify-content: center;
+                justify-content: flex-start;
+            }
+
+            .page-title {
+                font-size: 28px;
+            }
+
+            .top-header .container-fluid {
+                padding: 0 24px;
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start !important;
             }
         }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-delay-1 { animation-delay: 0.1s; animation-fill-mode: both; }
+        .animate-delay-2 { animation-delay: 0.2s; animation-fill-mode: both; }
+        .animate-delay-3 { animation-delay: 0.3s; animation-fill-mode: both; }
     </style>
 </head>
 <body>
     <!-- Top Header -->
     <div class="top-header">
-        <div class="container-fluid d-flex justify-content-between align-items-center">
+        <div class="container-fluid">
             <!-- Logo và tên trang quản lý -->
             <div class="logo">
                 <h3>
                     <a href="<%= request.getContextPath() %>/home.jsp">
-                        <i class="fas fa-futbol me-2"></i>
-                        Field Manager
+                        <i class="fas fa-futbol"></i>
                     </a>
+                    Field Manager
                 </h3>
             </div>
             <%
@@ -533,27 +570,30 @@
     </div>
 
     <!-- Sidebar -->
-    <div class="navigation-sidebar">
-        <%@ include file="FieldOwnerSB.jsp" %>
-    </div>
+    <%@ include file="FieldOwnerSB.jsp" %>
 
     <!-- Main Content -->
     <main class="main-content">
-        <h1 class="page-title">
+        <h1 class="page-title fade-in">
             <i class="fas fa-exclamation-triangle"></i>
             Quản lý báo cáo
         </h1>
 
         <%-- Display status update messages --%>
         <c:if test="${not empty param.statusUpdate}">
-            <div class="alert alert-${param.statusUpdate == 'success' ? 'success' : 'danger'} alert-dismissible fade show" role="alert">
+            <div class="alert alert-${param.statusUpdate == 'success' ? 'success' : 'danger'} fade-in">
                 <c:if test="${param.statusUpdate == 'success'}">
-                    <strong>Success!</strong> Report ID <c:out value="${param.reportID}"/> updated to <c:out value="${param.newStatus}"/> status.
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Thành công!</strong> Báo cáo ID <c:out value="${param.reportID}"/> đã được cập nhật thành trạng thái <c:out value="${param.newStatus}"/>.
+                    </div>
                 </c:if>
                 <c:if test="${param.statusUpdate == 'error'}">
-                    <strong>Error!</strong> Failed to update report ID <c:out value="${param.reportID}"/> status. <c:out value="${param.errorMessage}"/>
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div>
+                        <strong>Lỗi!</strong> Không thể cập nhật báo cáo ID <c:out value="${param.reportID}"/>. <c:out value="${param.errorMessage}"/>
+                    </div>
                 </c:if>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </c:if>
 
@@ -564,37 +604,31 @@
                 allReports = new java.util.ArrayList<>();
             }
             long newReportsCount = allReports.stream().filter(r -> "Pending".equalsIgnoreCase(r.getStatus())).count();
-            long inProgressReportsCount = allReports.stream().filter(r -> "InProgress".equalsIgnoreCase(r.getStatus())).count();
             long resolvedReportsCount = allReports.stream().filter(r -> "Resolved".equalsIgnoreCase(r.getStatus())).count();
-            long rejectedReportsCount = allReports.stream().filter(r -> "Rejected".equalsIgnoreCase(r.getStatus()) || "Closed".equalsIgnoreCase(r.getStatus())).count();
+            long totalReportsCount = allReports.size();
         %>
 
         <!-- Stats Cards -->
         <div class="stats-grid">
-            <div class="stat-card new-reports">
+            <div class="stat-card new-reports fade-in animate-delay-1">
                 <div class="icon"><i class="fas fa-bell"></i></div>
                 <h4><%= newReportsCount %></h4>
                 <p>Báo cáo mới</p>
             </div>
-            <div class="stat-card in-progress">
-                <div class="icon"><i class="fas fa-hourglass-half"></i></div>
-                <h4><%= inProgressReportsCount %></h4>
-                <p>Đang xử lý</p>
-            </div>
-            <div class="stat-card resolved">
+            <div class="stat-card resolved fade-in animate-delay-2">
                 <div class="icon"><i class="fas fa-check-circle"></i></div>
                 <h4><%= resolvedReportsCount %></h4>
                 <p>Đã giải quyết</p>
             </div>
-            <div class="stat-card rejected">
-                <div class="icon"><i class="fas fa-times-circle"></i></div>
-                <h4><%= rejectedReportsCount %></h4>
-                <p>Đã từ chối</p>
+            <div class="stat-card total fade-in animate-delay-3">
+                <div class="icon"><i class="fas fa-chart-bar"></i></div>
+                <h4><%= totalReportsCount %></h4>
+                <p>Tổng báo cáo</p>
             </div>
         </div>
 
         <!-- Filter Form -->
-        <div class="report-form">
+        <div class="report-form fade-in">
             <form action="${pageContext.request.contextPath}/owner/reports" method="get">
                 <div class="filter-grid">
                     <input type="text" name="search" placeholder="Tìm kiếm theo người dùng hoặc tiêu đề..." value="${param.search != null ? param.search : ''}">
@@ -602,24 +636,7 @@
                     <select name="status">
                         <option value="">Tất cả trạng thái</option>
                         <option value="Pending" ${"Pending" eq param.status ? 'selected' : ''}>Pending</option>
-                        <option value="InProgress" ${"InProgress" eq param.status ? 'selected' : ''}>In Progress</option>
                         <option value="Resolved" ${"Resolved" eq param.status ? 'selected' : ''}>Resolved</option>
-                        <option value="Rejected" ${"Rejected" eq param.status ? 'selected' : ''}>Rejected</option>
-                        <option value="Closed" ${"Closed" eq param.status ? 'selected' : ''}>Closed</option>
-                    </select>
-                    
-                    <select name="type">
-                        <option value="">Tất cả loại</option>
-                        <option value="REPORT" ${"REPORT" eq param.type ? 'selected' : ''}>Báo cáo sân</option>
-                        <option value="BOOKING_ISSUE" ${"BOOKING_ISSUE" eq param.type ? 'selected' : ''}>Vấn đề đặt sân</option>
-                        <option value="FOOD_ISSUE" ${"FOOD_ISSUE" eq param.type ? 'selected' : ''}>Vấn đề đồ ăn</option>
-                    </select>
-                    
-                    <select name="priority">
-                        <option value="">Tất cả độ ưu tiên</option>
-                        <option value="HIGH" ${"HIGH" eq param.priority ? 'selected' : ''}>Cao</option>
-                        <option value="MEDIUM" ${"MEDIUM" eq param.priority ? 'selected' : ''}>Trung bình</option>
-                        <option value="LOW" ${"LOW" eq param.priority ? 'selected' : ''}>Thấp</option>
                     </select>
                     
                     <button type="submit">
@@ -630,7 +647,7 @@
         </div>
 
         <!-- Reports List -->
-        <div class="reports-container">
+        <div class="reports-container fade-in">
             <c:if test="${empty reports}">
                 <div class="empty-data">
                     <i class="fas fa-inbox"></i>
@@ -671,14 +688,6 @@
                             
                             <div class="report-meta">
                                 <div class="meta-item">
-                                    <span class="meta-label">Loại báo cáo</span>
-                                    <span class="meta-value"><c:out value="${report.type != null ? report.type : 'N/A'}"/></span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-label">Độ ưu tiên</span>
-                                    <span class="meta-value"><c:out value="${report.priority != null ? report.priority : 'N/A'}"/></span>
-                                </div>
-                                <div class="meta-item">
                                     <span class="meta-label">Ngày tạo</span>
                                     <span class="meta-value"><fmt:formatDate value="${report.submittedAt}" pattern="dd/MM/yyyy HH:mm"/></span>
                                 </div>
@@ -689,7 +698,7 @@
                             </div>
                             
                             <c:if test="${not empty report.adminResponse}">
-                                <div class="admin-response" style="background: #e8f4f8; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                                <div class="admin-response">
                                     <div class="meta-item">
                                         <span class="meta-label">Phản hồi Admin</span>
                                         <span class="meta-value"><c:out value="${report.adminResponse}"/></span>
@@ -703,33 +712,23 @@
                         </div>
                         
                         <div class="report-actions">
-                            <a href="${pageContext.request.contextPath}/owner/report-details?reportID=${report.reportID}" class="btn btn-primary">
-                                <i class="fas fa-info-circle"></i> Xem chi tiết
-                            </a>
-                            <c:if test="${'Pending' eq report.status || 'InProgress' eq report.status}">
+                            <c:if test="${'Pending' eq report.status}">
                                 <%-- Use separate forms for POST requests --%>
                                 <form action="${pageContext.request.contextPath}/owner/reports" method="post" class="d-inline-block">
                                     <input type="hidden" name="reportID" value="${report.reportID}">
-                                    <input type="hidden" name="status" value="InProgress">
-                                    <button type="submit" class="btn btn-warning">
-                                        <i class="fas fa-play-circle"></i> Đang xử lý
-                                    </button>
-                                </form>
-                                <form action="${pageContext.request.contextPath}/owner/reports" method="post" class="d-inline-block">
-                                    <input type="hidden" name="reportID" value="${report.reportID}">
-                                    <input type="hidden" name="status" value="Resolved">
+                                    <input type="hidden" name="newStatus" value="Resolved">
                                     <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-check-circle"></i> Đã giải quyết
-                                    </button>
-                                </form>
-                                <form action="${pageContext.request.contextPath}/owner/reports" method="post" class="d-inline-block">
-                                    <input type="hidden" name="reportID" value="${report.reportID}">
-                                    <input type="hidden" name="status" value="Rejected">
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="fas fa-times-circle"></i> Từ chối
+                                        <i class="fas fa-check"></i> Giải quyết
                                     </button>
                                 </form>
                             </c:if>
+                            <form action="${pageContext.request.contextPath}/owner/reports" method="post" class="d-inline-block">
+                                <input type="hidden" name="reportID" value="${report.reportID}">
+                                <input type="hidden" name="action" value="delete">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa báo cáo này không? Hành động này không thể hoàn tác.')">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </c:forEach>
@@ -750,6 +749,13 @@
                         link.classList.add("active");
                     }
                 }
+            });
+
+            // Add fade-in animation to report items
+            const reportItems = document.querySelectorAll('.report-item');
+            reportItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.1}s`;
+                item.classList.add('fade-in');
             });
         });
     </script>

@@ -9,8 +9,6 @@ import java.util.logging.Logger;
 
 public class DBConnection {
 
-    // Xóa bỏ các hằng số chứa thông tin nhạy cảm
-
     public static Connection getConnection() {
         try {
             // Đọc thông tin từ file config

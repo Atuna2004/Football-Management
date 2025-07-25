@@ -100,6 +100,28 @@ public class ReportDAO {
         }
     }
 
+    public boolean deleteReport(int reportID) throws SQLException {
+        String sql = "DELETE FROM Report WHERE ReportID = ?";
+        LOGGER.log(Level.INFO, "Executing deleteReport for ReportID: {0}", reportID);
+        
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, reportID);
+            int rowsAffected = ps.executeUpdate();
+            
+            if (rowsAffected > 0) {
+                LOGGER.log(Level.INFO, "Report deleted successfully. ReportID: {0}, Rows affected: {1}", 
+                          new Object[]{reportID, rowsAffected});
+                return true;
+            } else {
+                LOGGER.log(Level.WARNING, "No report found with ReportID: {0}. No rows affected.", reportID);
+                return false;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error in deleteReport for ID " + reportID + ": " + e.getMessage(), e);
+            throw e;
+        }
+    }
+
     public void respondToReport(int reportID, String response, String newStatus) throws SQLException {
         String sql = "UPDATE Report SET AdminResponse = ?, Status = ?, RespondedAt = GETDATE() WHERE ReportID = ?";
         LOGGER.log(Level.INFO, "Executing respondToReport for ReportID: {0}, Status: {1}", new Object[]{reportID, newStatus});
