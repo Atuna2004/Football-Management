@@ -260,7 +260,7 @@
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 searchForm.submit(); // Gửi form sau 100ms khi ngừng gõ
-            }, 100);
+            }, 400);
         });
 
         // 🔹 Click vào dòng sân → chuyển đến danh sách sân con
