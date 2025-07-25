@@ -43,10 +43,9 @@
             <div class="row header-menu">
                 <div class="col-8 menu-wrapper">
                     <div class="item"><a href="<%= request.getContextPath() %>home.jsp"><i class="fa-solid fa-house"></i></a></div>
-                    <div class="item"><a href="<%= request.getContextPath() %>home.jsp">Trang chủ</a></div>
+                    <div class="item"><a href="<%= request.getContextPath() %>/home.jsp">Trang chủ</a></div>
                     <div class="item"><a href="<%= request.getContextPath() %>/stadiums">Danh sách sân bóng</a></div>
                     <div class="item"><a href="<%= request.getContextPath() %>/user/tournaments">Giải đấu</a></div>
-                    <div class="item"><a href="#">Giới thiệu</a></div>
 
                     <%-- Kiểm tra nếu người dùng đăng nhập --%>
                     <%
@@ -75,8 +74,7 @@
                         }
                     %>
 
-                    <div class="item"><a href="#">Liên hệ</a></div>
-                    <div class="item"><a href="#">Chính sách</a></div>
+
                 </div>
 
                 <div class="col-4 box-account d-flex justify-content-end align-items-center">
