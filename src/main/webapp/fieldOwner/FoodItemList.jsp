@@ -120,7 +120,7 @@
                                             <tr>
                                                 <td colspan="7" class="text-center py-5">
                                                     <div class="text-muted">
-                                                        <i class="fas fa-building fa-3x mb-3"></i>
+                                                        <i class="fas fa-utensils fa-3x mb-3"></i>
                                                         <p class="mb-0">Chưa có món ăn nào</p>
                                                         <small>Hãy thêm món ăn đầu tiên của bạn!</small>
                                                     </div>
@@ -181,37 +181,7 @@
                                 </table>
                             </div> 
                         </div>
-
                     </div>
-                    <!-- Pagination -->
-                    <c:if test="${totalPages > 0}">
-                        <nav class="mt-4">
-                            <ul class="pagination justify-content-center">
-                                <c:if test="${currentPage > 1}">
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page=${currentPage - 1}&search=${param.search}">
-                                            <i class="fas fa-chevron-left"></i> Trước
-                                        </a>
-                                    </li>
-                                </c:if>
-
-                                <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                        <a class="page-link" href="?page=${i}&search=${param.search}">${i}</a>
-                                    </li>
-                                </c:forEach>
-
-                                <c:if test="${currentPage < totalPages}">
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page=${currentPage + 1}&search=${param.search}">
-                                            Sau <i class="fas fa-chevron-right"></i>
-                                        </a>
-                                    </li>
-                                </c:if>
-                            </ul>
-                        </nav>
-                    </c:if>
-
                 </div>
 
 
@@ -235,7 +205,7 @@
                                 <div class="mb-3">
                                     <label class="form-label">Sân</label>
                                     <select name="stadiumId" class="form-select" required>
-                                        <c:forEach var="s" items="${stadiumList}">
+                                        <c:forEach var="s" items="${stadiums}">
                                             <option value="${s.stadiumID}">${s.name}</option>
                                         </c:forEach>
                                     </select>

@@ -37,6 +37,7 @@
         </div>
     </div>
 
+
     <div class="header-row row-bottom">
         <div class="container">
             <div class="row header-menu">
@@ -44,7 +45,7 @@
                     <div class="item"><a href="<%= request.getContextPath() %>home.jsp"><i class="fa-solid fa-house"></i></a></div>
                     <div class="item"><a href="<%= request.getContextPath() %>home.jsp">Trang chủ</a></div>
                     <div class="item"><a href="<%= request.getContextPath() %>/stadiums">Danh sách sân bóng</a></div>
-                    <div class="item"><a href="#">Đồ ăn</a></div>
+                    <div class="item"><a href="<%= request.getContextPath() %>/user/tournaments">Giải đấu</a></div>
                     <div class="item"><a href="#">Giới thiệu</a></div>
 
                     <%-- Kiểm tra nếu người dùng đăng nhập --%>

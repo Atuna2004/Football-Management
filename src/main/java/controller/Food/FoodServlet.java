@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.FoodItem;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/food")
