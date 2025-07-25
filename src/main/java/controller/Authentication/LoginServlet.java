@@ -4,6 +4,7 @@ import connect.DBConnection;
 import dao.AccountDAO;
 import model.User;
 
+import jakarta.servlet.ServletContext; // Thêm import
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.HashSet; // Thêm import
 import java.util.Random;
 
 import model.GoogleAccount;
@@ -47,6 +49,19 @@ public class LoginServlet extends HttpServlet {
                 if (PasswordService.checkPassword(password, user.getPasswordHash())) {
                     HttpSession session = request.getSession();
                     session.setAttribute("currentUser", user);
+
+                    // === PHẦN CODE MỚI ĐỂ ĐẾM NGƯỜI DÙNG ONLINE ===
+                    ServletContext context = getServletContext();
+                    synchronized (context) {
+                        HashSet<Integer> onlineUsers = (HashSet<Integer>) context.getAttribute("onlineUsers");
+                        if (onlineUsers == null) {
+                            onlineUsers = new HashSet<>();
+                        }
+                        onlineUsers.add(user.getUserID());
+                        context.setAttribute("onlineUsers", onlineUsers);
+                    }
+                    // ===============================================
+
                     response.sendRedirect(request.getContextPath() + "/home.jsp");
                 } else {
                     HttpSession session = request.getSession();
@@ -105,6 +120,19 @@ public class LoginServlet extends HttpServlet {
 
             HttpSession session = request.getSession();
             session.setAttribute("currentUser", user);
+
+            // === PHẦN CODE MỚI ĐỂ ĐẾM NGƯỜI DÙNG ONLINE (GOOGLE) ===
+            ServletContext context = getServletContext();
+            synchronized (context) {
+                HashSet<Integer> onlineUsers = (HashSet<Integer>) context.getAttribute("onlineUsers");
+                if (onlineUsers == null) {
+                    onlineUsers = new HashSet<>();
+                }
+                onlineUsers.add(user.getUserID());
+                context.setAttribute("onlineUsers", onlineUsers);
+            }
+            // ===============================================
+
             response.sendRedirect(request.getContextPath() + "/home.jsp");
 
         } catch (Exception e) {

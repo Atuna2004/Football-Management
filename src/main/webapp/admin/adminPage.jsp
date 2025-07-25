@@ -866,28 +866,6 @@
                     }
                 });
             });
-
-            // Real-time updates simulation for online users
-            const onlineUserElement = document.querySelector('.stat-card.info .stat-info h3');
-            if (onlineUserElement) {
-                setInterval(() => {
-                    // Simulate small changes in online users (±1-2 users)
-                    const currentValue = parseInt(onlineUserElement.textContent);
-                    const change = Math.floor(Math.random() * 5) - 2; // -2 to +2
-                    const newValue = Math.max(0, currentValue + change);
-                    
-                    // Only update if there's actually a change
-                    if (newValue !== currentValue) {
-                        onlineUserElement.style.transform = 'scale(1.1)';
-                        onlineUserElement.style.color = '#06b6d4';
-                        setTimeout(() => {
-                            onlineUserElement.textContent = newValue;
-                            onlineUserElement.style.transform = 'scale(1)';
-                            onlineUserElement.style.color = '#1e293b';
-                        }, 200);
-                    }
-                }, 10000); // Update every 10 seconds
-            }
         });
     </script>
 </body>
