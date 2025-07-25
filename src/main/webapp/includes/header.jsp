@@ -74,6 +74,8 @@
                         }
                     %>
 
+                    <div class="item"><a href="#">Liên hệ</a></div>
+                    <div class="item"><a href="#">Chính sách</a></div>
 
                 </div>
 
