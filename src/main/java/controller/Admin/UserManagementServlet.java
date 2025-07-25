@@ -24,66 +24,153 @@ public class UserManagementServlet extends HttpServlet {
         try (Connection conn = DBConnection.getConnection()) {
             AccountDAO accountDAO = new AccountDAO(conn);
             
+            // Pagination parameters
+            int page = 1;
+            int recordsPerPage = 10; // Default records per page
+            
+            // Parse page parameter
+            String pageStr = request.getParameter("page");
+            if (pageStr != null && !pageStr.isEmpty()) {
+                try {
+                    page = Integer.parseInt(pageStr);
+                    if (page < 1) page = 1;
+                } catch (NumberFormatException e) {
+                    page = 1;
+                }
+            }
+            
+            // Parse records per page parameter
+            String recordsPerPageStr = request.getParameter("size");
+            if (recordsPerPageStr != null && !recordsPerPageStr.isEmpty()) {
+                try {
+                    recordsPerPage = Integer.parseInt(recordsPerPageStr);
+                    if (recordsPerPage < 1) recordsPerPage = 10;
+                    if (recordsPerPage > 100) recordsPerPage = 100; // Max limit
+                } catch (NumberFormatException e) {
+                    recordsPerPage = 10;
+                }
+            }
+            
             // Get filter parameter from URL
             String filter = request.getParameter("filter");
             List<User> userList;
+            int totalRecords;
             
-            // Apply filtering based on the filter parameter
+            // Apply filtering based on the filter parameter with pagination
             if (filter != null && !filter.isEmpty()) {
                 switch (filter.toLowerCase()) {
                     case "user":
-                        // Try with different possible role names
                         try {
-                            userList = accountDAO.getUsersByRole("user");
+                            userList = accountDAO.getUsersByRoleWithPagination("user", page, recordsPerPage);
+                            totalRecords = accountDAO.getTotalUserCountByRole("user");
                             if (userList.isEmpty()) {
-                                userList = accountDAO.getUsersByRole("User");
+                                userList = accountDAO.getUsersByRoleWithPagination("User", page, recordsPerPage);
+                                totalRecords = accountDAO.getTotalUserCountByRole("User");
                             }
                             if (userList.isEmpty()) {
-                                userList = accountDAO.getUsersByRoleID(3); // RoleID 3 for regular users
+                                userList = accountDAO.getUsersByRoleIDWithPagination(3, page, recordsPerPage);
+                                totalRecords = accountDAO.getTotalUserCountByRoleID(3);
                             }
                         } catch (SQLException e) {
-                            userList = accountDAO.getUsersByRoleID(3);
+                            userList = accountDAO.getUsersByRoleIDWithPagination(3, page, recordsPerPage);
+                            totalRecords = accountDAO.getTotalUserCountByRoleID(3);
                         }
                         break;
                     case "owner":
-                        // Try with different possible role names
                         try {
-                            userList = accountDAO.getUsersByRole("owner");
+                            userList = accountDAO.getUsersByRoleWithPagination("owner", page, recordsPerPage);
+                            totalRecords = accountDAO.getTotalUserCountByRole("owner");
                             if (userList.isEmpty()) {
-                                userList = accountDAO.getUsersByRole("Owner");
+                                userList = accountDAO.getUsersByRoleWithPagination("Owner", page, recordsPerPage);
+                                totalRecords = accountDAO.getTotalUserCountByRole("Owner");
                             }
                             if (userList.isEmpty()) {
-                                userList = accountDAO.getUsersByRoleID(2); // RoleID 2 for field owners
+                                userList = accountDAO.getUsersByRoleIDWithPagination(2, page, recordsPerPage);
+                                totalRecords = accountDAO.getTotalUserCountByRoleID(2);
                             }
                         } catch (SQLException e) {
-                            userList = accountDAO.getUsersByRoleID(2);
+                            userList = accountDAO.getUsersByRoleIDWithPagination(2, page, recordsPerPage);
+                            totalRecords = accountDAO.getTotalUserCountByRoleID(2);
                         }
                         break;
                     case "admin":
-                        // Try with different possible role names
                         try {
-                            userList = accountDAO.getUsersByRole("admin");
+                            userList = accountDAO.getUsersByRoleWithPagination("admin", page, recordsPerPage);
+                            totalRecords = accountDAO.getTotalUserCountByRole("admin");
                             if (userList.isEmpty()) {
-                                userList = accountDAO.getUsersByRole("Admin");
+                                userList = accountDAO.getUsersByRoleWithPagination("Admin", page, recordsPerPage);
+                                totalRecords = accountDAO.getTotalUserCountByRole("Admin");
                             }
                             if (userList.isEmpty()) {
-                                userList = accountDAO.getUsersByRoleID(1); // RoleID 1 for admin
+                                userList = accountDAO.getUsersByRoleIDWithPagination(1, page, recordsPerPage);
+                                totalRecords = accountDAO.getTotalUserCountByRoleID(1);
                             }
                         } catch (SQLException e) {
-                            userList = accountDAO.getUsersByRoleID(1);
+                            userList = accountDAO.getUsersByRoleIDWithPagination(1, page, recordsPerPage);
+                            totalRecords = accountDAO.getTotalUserCountByRoleID(1);
                         }
                         break;
                     default:
-                        userList = accountDAO.getAllUsers();
+                        userList = accountDAO.getUsersByPageWithRoles(page, recordsPerPage);
+                        totalRecords = accountDAO.getTotalUserCount();
                         break;
                 }
             } else {
-                // No filter, get all users
-                userList = accountDAO.getAllUsers();
+                // No filter, get all users with pagination
+                userList = accountDAO.getUsersByPageWithRoles(page, recordsPerPage);
+                totalRecords = accountDAO.getTotalUserCount();
             }
             
+            // Calculate pagination info
+            int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+            if (totalPages == 0) totalPages = 1; // At least 1 page
+            
+            // Ensure current page is within valid range
+            if (page > totalPages) {
+                page = totalPages;
+                // Redirect to the last valid page
+                StringBuilder redirectUrl = new StringBuilder("user-list?page=" + page);
+                if (filter != null && !filter.isEmpty()) {
+                    redirectUrl.append("&filter=").append(filter);
+                }
+                if (recordsPerPageStr != null && !recordsPerPageStr.isEmpty()) {
+                    redirectUrl.append("&size=").append(recordsPerPage);
+                }
+                response.sendRedirect(redirectUrl.toString());
+                return;
+            }
+            
+            // Calculate pagination display range (show 5 pages at a time)
+            int startPage = Math.max(1, page - 2);
+            int endPage = Math.min(totalPages, page + 2);
+            
+            // If we're at the beginning, show more pages towards the end
+            if (endPage - startPage < 4 && totalPages > 4) {
+                if (startPage == 1) {
+                    endPage = Math.min(totalPages, startPage + 4);
+                } else if (endPage == totalPages) {
+                    startPage = Math.max(1, endPage - 4);
+                }
+            }
+            
+            // Set attributes for JSP
             request.setAttribute("userList", userList);
             request.setAttribute("currentFilter", filter);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalRecords", totalRecords);
+            request.setAttribute("recordsPerPage", recordsPerPage);
+            request.setAttribute("startPage", startPage);
+            request.setAttribute("endPage", endPage);
+            request.setAttribute("hasPrevious", page > 1);
+            request.setAttribute("hasNext", page < totalPages);
+            
+            // For displaying record range
+            int startRecord = (page - 1) * recordsPerPage + 1;
+            int endRecord = Math.min(page * recordsPerPage, totalRecords);
+            request.setAttribute("startRecord", startRecord);
+            request.setAttribute("endRecord", endRecord);
+            
             request.getRequestDispatcher("/admin/userManagement.jsp").forward(request, response);
         } catch (SQLException e) {
             Logger.getLogger(UserManagementServlet.class.getName()).log(Level.SEVERE, null, e);
@@ -119,7 +206,9 @@ public class UserManagementServlet extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("user-list");
+            // Preserve pagination parameters when redirecting after error
+            String redirectUrl = buildRedirectUrl(request, "user-list");
+            response.sendRedirect(redirectUrl);
         }
     }
 
@@ -140,7 +229,8 @@ public class UserManagementServlet extends HttpServlet {
             try {
                 dob = Date.valueOf(dobStr);
             } catch (IllegalArgumentException ex) {
-                response.sendRedirect("user-list");
+                String redirectUrl = buildRedirectUrl(request, "user-list");
+                response.sendRedirect(redirectUrl);
                 return;
             }
         }
@@ -155,7 +245,10 @@ public class UserManagementServlet extends HttpServlet {
         user.setDateOfBirth(dob);
 
         accountDAO.addUser(user);
-        response.sendRedirect("user-list");
+        
+        // Preserve pagination parameters when redirecting
+        String redirectUrl = buildRedirectUrl(request, "user-list");
+        response.sendRedirect(redirectUrl);
     }
 
     private void updateUser(HttpServletRequest request, HttpServletResponse response, AccountDAO accountDAO)
@@ -179,7 +272,8 @@ public class UserManagementServlet extends HttpServlet {
                 try {
                     dob = Date.valueOf(dobStr);
                 } catch (IllegalArgumentException e) {
-                    response.sendRedirect("user-list");
+                    String redirectUrl = buildRedirectUrl(request, "user-list");
+                    response.sendRedirect(redirectUrl);
                     return;
                 }
             }
@@ -195,7 +289,7 @@ public class UserManagementServlet extends HttpServlet {
             user.setGoogleID((googleID != null && !googleID.isEmpty()) ? googleID : null);
             user.setAvatarUrl((avatarUrl != null && !avatarUrl.isEmpty()) ? avatarUrl : null);
 
-            // Nếu người dùng nhập mật khẩu mới, hash lại
+            // If user enters new password, hash it
             if (password != null && !password.trim().isEmpty()) {
                 user.setPasswordHash(hashPassword(password));
             } else {
@@ -203,15 +297,20 @@ public class UserManagementServlet extends HttpServlet {
                 if (existing != null) {
                     user.setPasswordHash(existing.getPasswordHash());
                 } else {
-                    response.sendRedirect("user-list");
+                    String redirectUrl = buildRedirectUrl(request, "user-list");
+                    response.sendRedirect(redirectUrl);
                     return;
                 }
             }
 
             accountDAO.updateUser(user);
-            response.sendRedirect("user-list");
+            
+            // Preserve pagination parameters when redirecting
+            String redirectUrl = buildRedirectUrl(request, "user-list");
+            response.sendRedirect(redirectUrl);
         } catch (NumberFormatException ex) {
-            response.sendRedirect("user-list");
+            String redirectUrl = buildRedirectUrl(request, "user-list");
+            response.sendRedirect(redirectUrl);
         }
     }
 
@@ -219,7 +318,8 @@ public class UserManagementServlet extends HttpServlet {
             throws IOException {
         String idStr = request.getParameter("id");
         if (idStr == null || !idStr.matches("\\d+")) {
-            response.sendRedirect("user-list");
+            String redirectUrl = buildRedirectUrl(request, "user-list");
+            response.sendRedirect(redirectUrl);
             return;
         }
 
@@ -229,7 +329,38 @@ public class UserManagementServlet extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        response.sendRedirect("user-list");
+        
+        // Preserve pagination parameters when redirecting
+        String redirectUrl = buildRedirectUrl(request, "user-list");
+        response.sendRedirect(redirectUrl);
+    }
+
+    /**
+     * Helper method to build redirect URL while preserving pagination parameters
+     */
+    private String buildRedirectUrl(HttpServletRequest request, String baseUrl) {
+        StringBuilder url = new StringBuilder(baseUrl);
+        String page = request.getParameter("page");
+        String size = request.getParameter("size");
+        String filter = request.getParameter("filter");
+        
+        boolean hasParams = false;
+        
+        if (page != null && !page.isEmpty()) {
+            url.append("?page=").append(page);
+            hasParams = true;
+        }
+        
+        if (size != null && !size.isEmpty()) {
+            url.append(hasParams ? "&" : "?").append("size=").append(size);
+            hasParams = true;
+        }
+        
+        if (filter != null && !filter.isEmpty()) {
+            url.append(hasParams ? "&" : "?").append("filter=").append(filter);
+        }
+        
+        return url.toString();
     }
 
     private String hashPassword(String password) {

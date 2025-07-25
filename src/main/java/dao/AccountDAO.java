@@ -419,4 +419,205 @@ public List<User> getUsersByRoleID(int roleID) throws SQLException {
     list.addAll(userMap.values());
     return list;
 }
+// Add these methods to your AccountDAO class
+
+public int getTotalUserCount() throws SQLException {
+    String sql = "SELECT COUNT(*) FROM [User]";
+    try (Connection conn = DBConnection.getConnection(); 
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    }
+    return 0;
+}
+
+public int getTotalUserCountByRole(String roleName) throws SQLException {
+    String sql = "SELECT COUNT(DISTINCT u.UserID) FROM [User] u " +
+                 "LEFT JOIN UserRole ur ON u.UserID = ur.UserID " +
+                 "LEFT JOIN Role r ON ur.RoleID = r.RoleID " +
+                 "WHERE r.RoleName = ?";
+    try (Connection conn = DBConnection.getConnection(); 
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, roleName);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+    }
+    return 0;
+}
+
+public int getTotalUserCountByRoleID(int roleID) throws SQLException {
+    String sql = "SELECT COUNT(DISTINCT u.UserID) FROM [User] u " +
+                 "LEFT JOIN UserRole ur ON u.UserID = ur.UserID " +
+                 "WHERE ur.RoleID = ?";
+    try (Connection conn = DBConnection.getConnection(); 
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, roleID);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+    }
+    return 0;
+}
+
+// Updated getUsersByPage with role support
+public List<User> getUsersByPageWithRoles(int page, int itemsPerPage) throws SQLException {
+    List<User> list = new ArrayList<>();
+    String sql = "SELECT u.UserID, u.FullName, u.Email, u.Phone, u.IsActive, u.Address, u.DateOfBirth, u.CreatedAt, u.AvatarUrl, u.GoogleID, r.RoleID, r.RoleName " +
+                 "FROM (SELECT *, ROW_NUMBER() OVER (ORDER BY UserID) AS RowNum FROM [User]) AS u " +
+                 "LEFT JOIN UserRole ur ON u.UserID = ur.UserID " +
+                 "LEFT JOIN Role r ON ur.RoleID = r.RoleID " +
+                 "WHERE u.RowNum BETWEEN ? AND ? " +
+                 "ORDER BY u.UserID";
+    
+    try (Connection conn = DBConnection.getConnection(); 
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        int start = (page - 1) * itemsPerPage + 1;
+        int end = page * itemsPerPage;
+        
+        stmt.setInt(1, start);
+        stmt.setInt(2, end);
+        
+        Map<Integer, User> userMap = new HashMap<>();
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                int id = rs.getInt("UserID");
+                User user = userMap.get(id);
+                if (user == null) {
+                    user = new User();
+                    user.setUserID(id);
+                    user.setFullName(rs.getString("FullName"));
+                    user.setEmail(rs.getString("Email"));
+                    user.setPhone(rs.getString("Phone"));
+                    user.setActive(rs.getBoolean("IsActive"));
+                    user.setAddress(rs.getString("Address"));
+                    user.setDateOfBirth(rs.getDate("DateOfBirth"));
+                    user.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                    user.setAvatarUrl(rs.getString("AvatarUrl"));
+                    user.setGoogleID(rs.getString("GoogleID"));
+                    user.setRoles(new ArrayList<>());
+                    userMap.put(id, user);
+                }
+                if (rs.getString("RoleName") != null) {
+                    user.getRoles().add(new Role(rs.getInt("RoleID"), rs.getString("RoleName")));
+                }
+            }
+        }
+        list.addAll(userMap.values());
+    }
+    return list;
+}
+
+// Get users by role with pagination
+public List<User> getUsersByRoleWithPagination(String roleName, int page, int itemsPerPage) throws SQLException {
+    List<User> list = new ArrayList<>();
+    String sql = "SELECT u.UserID, u.FullName, u.Email, u.Phone, u.IsActive, u.Address, u.DateOfBirth, u.CreatedAt, u.AvatarUrl, u.GoogleID, r.RoleID, r.RoleName " +
+                 "FROM (SELECT u.*, ROW_NUMBER() OVER (ORDER BY u.UserID) AS RowNum " +
+                 "      FROM [User] u " +
+                 "      LEFT JOIN UserRole ur ON u.UserID = ur.UserID " +
+                 "      LEFT JOIN Role r ON ur.RoleID = r.RoleID " +
+                 "      WHERE r.RoleName = ?) AS u " +
+                 "LEFT JOIN UserRole ur ON u.UserID = ur.UserID " +
+                 "LEFT JOIN Role r ON ur.RoleID = r.RoleID " +
+                 "WHERE u.RowNum BETWEEN ? AND ? " +
+                 "ORDER BY u.UserID";
+    
+    try (Connection conn = DBConnection.getConnection(); 
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        int start = (page - 1) * itemsPerPage + 1;
+        int end = page * itemsPerPage;
+        
+        stmt.setString(1, roleName);
+        stmt.setInt(2, start);
+        stmt.setInt(3, end);
+        
+        Map<Integer, User> userMap = new HashMap<>();
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                int id = rs.getInt("UserID");
+                User user = userMap.get(id);
+                if (user == null) {
+                    user = new User();
+                    user.setUserID(id);
+                    user.setFullName(rs.getString("FullName"));
+                    user.setEmail(rs.getString("Email"));
+                    user.setPhone(rs.getString("Phone"));
+                    user.setActive(rs.getBoolean("IsActive"));
+                    user.setAddress(rs.getString("Address"));
+                    user.setDateOfBirth(rs.getDate("DateOfBirth"));
+                    user.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                    user.setAvatarUrl(rs.getString("AvatarUrl"));
+                    user.setGoogleID(rs.getString("GoogleID"));
+                    user.setRoles(new ArrayList<>());
+                    userMap.put(id, user);
+                }
+                if (rs.getString("RoleName") != null) {
+                    user.getRoles().add(new Role(rs.getInt("RoleID"), rs.getString("RoleName")));
+                }
+            }
+        }
+        list.addAll(userMap.values());
+    }
+    return list;
+}
+
+public List<User> getUsersByRoleIDWithPagination(int roleID, int page, int itemsPerPage) throws SQLException {
+    List<User> list = new ArrayList<>();
+    String sql = "SELECT u.UserID, u.FullName, u.Email, u.Phone, u.IsActive, u.Address, u.DateOfBirth, u.CreatedAt, u.AvatarUrl, u.GoogleID, r.RoleID, r.RoleName " +
+                 "FROM (SELECT u.*, ROW_NUMBER() OVER (ORDER BY u.UserID) AS RowNum " +
+                 "      FROM [User] u " +
+                 "      LEFT JOIN UserRole ur ON u.UserID = ur.UserID " +
+                 "      WHERE ur.RoleID = ?) AS u " +
+                 "LEFT JOIN UserRole ur ON u.UserID = ur.UserID " +
+                 "LEFT JOIN Role r ON ur.RoleID = r.RoleID " +
+                 "WHERE u.RowNum BETWEEN ? AND ? " +
+                 "ORDER BY u.UserID";
+    
+    try (Connection conn = DBConnection.getConnection(); 
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        int start = (page - 1) * itemsPerPage + 1;
+        int end = page * itemsPerPage;
+        
+        stmt.setInt(1, roleID);
+        stmt.setInt(2, start);
+        stmt.setInt(3, end);
+        
+        Map<Integer, User> userMap = new HashMap<>();
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                int id = rs.getInt("UserID");
+                User user = userMap.get(id);
+                if (user == null) {
+                    user = new User();
+                    user.setUserID(id);
+                    user.setFullName(rs.getString("FullName"));
+                    user.setEmail(rs.getString("Email"));
+                    user.setPhone(rs.getString("Phone"));
+                    user.setActive(rs.getBoolean("IsActive"));
+                    user.setAddress(rs.getString("Address"));
+                    user.setDateOfBirth(rs.getDate("DateOfBirth"));
+                    user.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                    user.setAvatarUrl(rs.getString("AvatarUrl"));
+                    user.setGoogleID(rs.getString("GoogleID"));
+                    user.setRoles(new ArrayList<>());
+                    userMap.put(id, user);
+                }
+                if (rs.getString("RoleName") != null) {
+                    user.getRoles().add(new Role(rs.getInt("RoleID"), rs.getString("RoleName")));
+                }
+            }
+        }
+        list.addAll(userMap.values());
+    }
+    return list;
+}
 }
