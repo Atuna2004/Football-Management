@@ -27,11 +27,12 @@
                     <i class="fas fa-users"></i> 
                     Quản Lý Người Dùng
                     <!-- Display current filter -->
-                    <c:if test="${not empty param.filter}">
+                    <c:if test="${not empty currentFilter}">
                         <span class="filter-indicator">
                             <c:choose>
-                                <c:when test="${param.filter eq 'user'}">- Người Dùng</c:when>
-                                <c:when test="${param.filter eq 'owner'}">- Chủ Sân</c:when>
+                                <c:when test="${currentFilter eq 'user'}">- Người Dùng</c:when>
+                                <c:when test="${currentFilter eq 'owner'}">- Chủ Sân</c:when>
+                                <c:when test="${currentFilter eq 'admin'}">- Quản Trị Viên</c:when>
                                 <c:otherwise>- Tất Cả</c:otherwise>
                             </c:choose>
                         </span>
@@ -49,16 +50,20 @@
                 <!-- Filter Buttons -->
                 <div class="filter-buttons">
                     <a href="${pageContext.request.contextPath}/admin/user-list" 
-                       class="filter-btn ${empty param.filter or param.filter eq 'all' ? 'active' : ''}">
+                       class="filter-btn ${empty currentFilter ? 'active' : ''}">
                         <i class="fas fa-users"></i> Tất Cả
                     </a>
                     <a href="${pageContext.request.contextPath}/admin/user-list?filter=user" 
-                       class="filter-btn ${param.filter eq 'user' ? 'active' : ''}">
+                       class="filter-btn ${currentFilter eq 'user' ? 'active' : ''}">
                         <i class="fas fa-user"></i> Người Dùng
                     </a>
                     <a href="${pageContext.request.contextPath}/admin/user-list?filter=owner" 
-                       class="filter-btn ${param.filter eq 'owner' ? 'active' : ''}">
+                       class="filter-btn ${currentFilter eq 'owner' ? 'active' : ''}">
                         <i class="fas fa-user-tie"></i> Chủ Sân
+                    </a>
+                    <a href="${pageContext.request.contextPath}/admin/user-list?filter=admin" 
+                       class="filter-btn ${currentFilter eq 'admin' ? 'active' : ''}">
+                        <i class="fas fa-user-shield"></i> Admin
                     </a>
                 </div>
                 
@@ -70,71 +75,45 @@
 
             <!-- Users Table Card -->
             <div class="card fade-in">
-                <!-- Filter userList based on URL parameter -->
                 <c:choose>
-                    <c:when test="${param.filter eq 'user'}">
-                        <c:set var="filteredUsers" value="${[]}"/>
-                        <c:forEach var="user" items="${userList}">
-                            <c:if test="${user.role eq 'user'}">
-                                <c:set var="filteredUsers" value="${filteredUsers}"/>
-                                <%-- Add user to filtered list --%>
-                            </c:if>
-                        </c:forEach>
-                    </c:when>
-                    <c:when test="${param.filter eq 'owner'}">
-                        <c:set var="filteredUsers" value="${[]}"/>
-                        <c:forEach var="user" items="${userList}">
-                            <c:if test="${user.role eq 'owner'}">
-                                <c:set var="filteredUsers" value="${filteredUsers}"/>
-                                <%-- Add user to filtered list --%>
-                            </c:if>
-                        </c:forEach>
-                    </c:when>
-                    <c:otherwise>
-                        <c:set var="filteredUsers" value="${userList}"/>
-                    </c:otherwise>
-                </c:choose>
-
-                <!-- Check if we have users to display based on current filter -->
-                <c:set var="displayUsers" value="${[]}"/>
-                <c:forEach var="user" items="${userList}">
-                    <c:choose>
-                        <c:when test="${param.filter eq 'user' and user.role eq 'user'}">
-                            <c:set var="displayUsers" value="${displayUsers}${user};"/>
-                        </c:when>
-                        <c:when test="${param.filter eq 'owner' and user.role eq 'owner'}">
-                            <c:set var="displayUsers" value="${displayUsers}${user};"/>
-                        </c:when>
-                        <c:when test="${empty param.filter or param.filter eq 'all'}">
-                            <c:set var="displayUsers" value="${displayUsers}${user};"/>
-                        </c:when>
-                    </c:choose>
-                </c:forEach>
-
-                <!-- Backend filtering is now handled by servlet, so we show all users returned -->
-                <c:set var="userCount" value="${fn:length(userList)}"/>
-
-                <c:choose>
-                    <c:when test="${userCount eq 0}">
+                    <c:when test="${totalRecords eq 0}">
                         <div class="empty-state">
                             <i class="fas fa-users"></i>
                             <h3>
                                 <c:choose>
-                                    <c:when test="${param.filter eq 'user'}">Chưa có người dùng nào</c:when>
-                                    <c:when test="${param.filter eq 'owner'}">Chưa có chủ sân nào</c:when>
+                                    <c:when test="${currentFilter eq 'user'}">Chưa có người dùng nào</c:when>
+                                    <c:when test="${currentFilter eq 'owner'}">Chưa có chủ sân nào</c:when>
+                                    <c:when test="${currentFilter eq 'admin'}">Chưa có quản trị viên nào</c:when>
                                     <c:otherwise>Chưa có người dùng nào</c:otherwise>
                                 </c:choose>
                             </h3>
                             <p>
                                 <c:choose>
-                                    <c:when test="${param.filter eq 'user'}">Không có người dùng thông thường nào trong hệ thống.</c:when>
-                                    <c:when test="${param.filter eq 'owner'}">Không có chủ sân nào trong hệ thống.</c:when>
+                                    <c:when test="${currentFilter eq 'user'}">Không có người dùng thông thường nào trong hệ thống.</c:when>
+                                    <c:when test="${currentFilter eq 'owner'}">Không có chủ sân nào trong hệ thống.</c:when>
+                                    <c:when test="${currentFilter eq 'admin'}">Không có quản trị viên nào trong hệ thống.</c:when>
                                     <c:otherwise>Hệ thống chưa có người dùng nào được đăng ký. Hãy thêm người dùng mới để bắt đầu.</c:otherwise>
                                 </c:choose>
                             </p>
                         </div>
                     </c:when>
                     <c:otherwise>
+                        <!-- Pagination Info -->
+                        <div class="pagination-info">
+                            <span class="text-muted">
+                                Hiển thị ${startRecord} đến ${endRecord} của ${totalRecords} bản ghi
+                                <c:if test="${not empty currentFilter}">
+                                    <span class="filter-tag">
+                                        <c:choose>
+                                            <c:when test="${currentFilter eq 'user'}">- Người Dùng</c:when>
+                                            <c:when test="${currentFilter eq 'owner'}">- Chủ Sân</c:when>
+                                            <c:when test="${currentFilter eq 'admin'}">- Admin</c:when>
+                                        </c:choose>
+                                    </span>
+                                </c:if>
+                            </span>
+                        </div>
+
                         <div class="table-container">
                             <table id="userTable">
                                 <thead>
@@ -150,78 +129,179 @@
                                 </thead>
                                 <tbody>
                                     <c:forEach var="user" items="${userList}" varStatus="loop">
-                                        <!-- Apply filter logic - now handled by backend filtering -->
-                                        <c:set var="showUser" value="true"/>
-
-                                        <c:if test="${showUser}">
-                                            <tr class="user-row fade-in"
-                                                data-name="${fn:toLowerCase(user.fullName)}"
-                                                data-email="${fn:toLowerCase(user.email)}"
-                                                data-role="${user.role}"
-                                                style="animation-delay: ${loop.index * 0.1}s">
-                                                <td><strong>#${user.userID}</strong></td>
-                                                <td>
-                                                    <div class="user-info">
-                                                        <div class="user-avatar">
-                                                            ${fn:substring(user.fullName, 0, 1)}
-                                                        </div>
-                                                        <div class="user-name">${user.fullName}</div>
+                                        <tr class="user-row fade-in"
+                                            data-name="${fn:toLowerCase(user.fullName)}"
+                                            data-email="${fn:toLowerCase(user.email)}"
+                                            style="animation-delay: ${loop.index * 0.1}s">
+                                            <td><strong>#${user.userID}</strong></td>
+                                            <td>
+                                                <div class="user-info">
+                                                    <div class="user-avatar">
+                                                        <c:choose>
+                                                            <c:when test="${not empty user.avatarUrl}">
+                                                                <img src="${user.avatarUrl}" alt="${user.fullName}" />
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                ${fn:substring(user.fullName, 0, 1)}
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </div>
-                                                </td>
-                                                <td>${user.email}</td>
-                                                <td>${user.phone}</td>
-                                                <td>
-                                                    <c:choose>
-                                                        <c:when test="${not empty user.roles}">
-                                                            <c:forEach var="role" items="${user.roles}" varStatus="roleStatus">
-                                                                <span class="role-badge
-                                                                      ${role.roleName eq 'admin' ? 'role-admin' :
-                                                                        role.roleName eq 'owner' ? 'role-owner' :
-                                                                        'role-user'}">
-                                                                          ${role.roleName eq 'owner' ? 'Chủ Sân' : 
-                                                                            role.roleName eq 'admin' ? 'Admin' : 'Người Dùng'}
-                                                                      </span>
-                                                                <c:if test="${not roleStatus.last}"> </c:if>
-                                                            </c:forEach>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="role-badge role-user">Người Dùng</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                                <td>
-                                                    <span class="status-badge ${user.active ? 'status-active' : 'status-inactive'} d-flex align-items-center">
-                                                        <i class="fas ${user.active ? 'fa-check-circle' : 'fa-times-circle'} me-2"></i>
-                                                        ${user.active ? 'Hoạt động' : 'Tạm khóa'}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <div class="action-buttons">
-                                                        <button type="button" class="action-btn btn-edit"
-                                                                data-userid="${user.userID}"
-                                                                data-fullname="${fn:escapeXml(user.fullName)}"
-                                                                data-email="${fn:escapeXml(user.email)}"
-                                                                data-phone="${not empty user.phone ? fn:escapeXml(user.phone) : ''}"
-                                                                data-address="${not empty user.address ? fn:escapeXml(user.address) : ''}"
-                                                                data-dob="${not empty user.dateOfBirth ? user.dateOfBirth : ''}"
-                                                                data-active="${user.active}"
-                                                                onclick="handleEditClick(this)">
-                                                            <i class="fas fa-edit"></i> Sửa
+                                                    <div class="user-name">${user.fullName}</div>
+                                                </div>
+                                            </td>
+                                            <td>${user.email}</td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${not empty user.phone}">
+                                                        ${user.phone}
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="text-muted">Chưa có</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${not empty user.roles}">
+                                                        <c:forEach var="role" items="${user.roles}" varStatus="roleStatus">
+                                                            <span class="role-badge
+                                                                  ${fn:toLowerCase(role.roleName) eq 'admin' ? 'role-admin' :
+                                                                    fn:toLowerCase(role.roleName) eq 'owner' ? 'role-owner' :
+                                                                    'role-user'}">
+                                                                      <c:choose>
+                                                                          <c:when test="${fn:toLowerCase(role.roleName) eq 'owner'}">Chủ Sân</c:when>
+                                                                          <c:when test="${fn:toLowerCase(role.roleName) eq 'admin'}">Admin</c:when>
+                                                                          <c:otherwise>Người Dùng</c:otherwise>
+                                                                      </c:choose>
+                                                                  </span>
+                                                            <c:if test="${not roleStatus.last}"> </c:if>
+                                                        </c:forEach>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="role-badge role-user">Người Dùng</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge ${user.active ? 'status-active' : 'status-inactive'} d-flex align-items-center">
+                                                    <i class="fas ${user.active ? 'fa-check-circle' : 'fa-times-circle'} me-2"></i>
+                                                    ${user.active ? 'Hoạt động' : 'Tạm khóa'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button type="button" class="action-btn btn-edit"
+                                                            data-userid="${user.userID}"
+                                                            data-fullname="${fn:escapeXml(user.fullName)}"
+                                                            data-email="${fn:escapeXml(user.email)}"
+                                                            data-phone="${not empty user.phone ? fn:escapeXml(user.phone) : ''}"
+                                                            data-address="${not empty user.address ? fn:escapeXml(user.address) : ''}"
+                                                            data-dob="${not empty user.dateOfBirth ? user.dateOfBirth : ''}"
+                                                            data-active="${user.active}"
+                                                            onclick="handleEditClick(this)">
+                                                        <i class="fas fa-edit"></i> Sửa
+                                                    </button>
+                                                    <form method="post" action="user-list" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa người dùng này?')">
+                                                        <input type="hidden" name="action" value="delete">
+                                                        <input type="hidden" name="id" value="${user.userID}">
+                                                        <!-- Preserve pagination parameters -->
+                                                        <input type="hidden" name="page" value="${currentPage}">
+                                                        <input type="hidden" name="size" value="${recordsPerPage}">
+                                                        <c:if test="${not empty currentFilter}">
+                                                            <input type="hidden" name="filter" value="${currentFilter}">
+                                                        </c:if>
+                                                        <button type="submit" class="action-btn btn-delete">
+                                                            <i class="fas fa-trash"></i> Xóa
                                                         </button>
-                                                        <form method="post" action="user-list" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa người dùng này?')">
-                                                            <input type="hidden" name="action" value="delete">
-                                                            <input type="hidden" name="id" value="${user.userID}">
-                                                            <button type="submit" class="action-btn btn-delete">
-                                                                <i class="fas fa-trash"></i> Xóa
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </c:if>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     </c:forEach>
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- Pagination Controls -->
+                        <div class="pagination-container">
+                            <!-- Records per page selector -->
+                            <div class="records-per-page">
+                                <label for="recordsPerPage">Hiển thị:</label>
+                                <select id="recordsPerPage" class="form-control" onchange="changePageSize(this.value)">
+                                    <option value="5" ${recordsPerPage == 5 ? 'selected' : ''}>5</option>
+                                    <option value="10" ${recordsPerPage == 10 ? 'selected' : ''}>10</option>
+                                    <option value="25" ${recordsPerPage == 25 ? 'selected' : ''}>25</option>
+                                    <option value="50" ${recordsPerPage == 50 ? 'selected' : ''}>50</option>
+                                    <option value="100" ${recordsPerPage == 100 ? 'selected' : ''}>100</option>
+                                </select>
+                                <span>bản ghi/trang</span>
+                            </div>
+
+                            <!-- Pagination Navigation -->
+                            <nav aria-label="User list pagination" class="pagination-nav">
+                                <ul class="pagination">
+                                    <!-- First Page -->
+                                    <c:if test="${currentPage > 1}">
+                                        <li class="page-item">
+                                            <a class="page-link" href="user-list?page=1${not empty currentFilter ? '&filter='.concat(currentFilter) : ''}${recordsPerPage != 10 ? '&size='.concat(recordsPerPage) : ''}" title="Trang đầu">
+                                                <i class="fas fa-angle-double-left"></i>
+                                            </a>
+                                        </li>
+                                    </c:if>
+                                    
+                                    <!-- Previous Page -->
+                                    <c:if test="${hasPrevious}">
+                                        <li class="page-item">
+                                            <a class="page-link" href="user-list?page=${currentPage - 1}${not empty currentFilter ? '&filter='.concat(currentFilter) : ''}${recordsPerPage != 10 ? '&size='.concat(recordsPerPage) : ''}" title="Trang trước">
+                                                <i class="fas fa-angle-left"></i>
+                                            </a>
+                                        </li>
+                                    </c:if>
+                                    
+                                    <!-- Page Numbers -->
+                                    <c:forEach begin="${startPage}" end="${endPage}" var="pageNum">
+                                        <li class="page-item ${pageNum == currentPage ? 'active' : ''}">
+                                            <c:choose>
+                                                <c:when test="${pageNum == currentPage}">
+                                                    <span class="page-link current">${pageNum}</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <a class="page-link" href="user-list?page=${pageNum}${not empty currentFilter ? '&filter='.concat(currentFilter) : ''}${recordsPerPage != 10 ? '&size='.concat(recordsPerPage) : ''}" title="Trang ${pageNum}">
+                                                        ${pageNum}
+                                                    </a>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </li>
+                                    </c:forEach>
+                                    
+                                    <!-- Next Page -->
+                                    <c:if test="${hasNext}">
+                                        <li class="page-item">
+                                            <a class="page-link" href="user-list?page=${currentPage + 1}${not empty currentFilter ? '&filter='.concat(currentFilter) : ''}${recordsPerPage != 10 ? '&size='.concat(recordsPerPage) : ''}" title="Trang sau">
+                                                <i class="fas fa-angle-right"></i>
+                                            </a>
+                                        </li>
+                                    </c:if>
+                                    
+                                    <!-- Last Page -->
+                                    <c:if test="${currentPage < totalPages}">
+                                        <li class="page-item">
+                                            <a class="page-link" href="user-list?page=${totalPages}${not empty currentFilter ? '&filter='.concat(currentFilter) : ''}${recordsPerPage != 10 ? '&size='.concat(recordsPerPage) : ''}" title="Trang cuối">
+                                                <i class="fas fa-angle-double-right"></i>
+                                            </a>
+                                        </li>
+                                    </c:if>
+                                </ul>
+                            </nav>
+
+                            <!-- Quick Page Jump -->
+                            <c:if test="${totalPages > 10}">
+                                <div class="quick-jump">
+                                    <span>Đến trang:</span>
+                                    <input type="number" id="jumpToPage" min="1" max="${totalPages}" value="${currentPage}" class="page-jump-input">
+                                    <button onclick="jumpToPage()" class="btn-jump">Đi</button>
+                                </div>
+                            </c:if>
                         </div>
                     </c:otherwise>
                 </c:choose>
@@ -243,6 +323,12 @@
                     <form id="userForm" method="post" action="user-list">
                         <input type="hidden" name="action" id="modalAction" value="add">
                         <input type="hidden" name="userID" id="modalUserID">
+                        <!-- Preserve pagination parameters in form -->
+                        <input type="hidden" name="page" value="${currentPage}">
+                        <input type="hidden" name="size" value="${recordsPerPage}">
+                        <c:if test="${not empty currentFilter}">
+                            <input type="hidden" name="filter" value="${currentFilter}">
+                        </c:if>
                         
                         <div class="form-group">
                             <label for="fullName">
@@ -265,7 +351,7 @@
                                 <i class="fas fa-lock"></i> 
                                 Mật khẩu
                             </label>
-                            <input type="password" id="password" name="passwordHash" required>
+                            <input type="password" id="password" name="password" required>
                         </div>
                         
                         <div class="form-group">
@@ -311,8 +397,9 @@
         </div>
     </div>
 
-    <!-- Add CSS for filter buttons -->
+    <!-- Enhanced CSS for Pagination -->
     <style>
+        /* Filter Buttons */
         .filter-buttons {
             display: flex;
             gap: 10px;
@@ -361,6 +448,142 @@
             margin-bottom: 30px;
         }
 
+        /* Pagination Info */
+        .pagination-info {
+            padding: 15px 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .filter-tag {
+            color: #3b82f6;
+            font-weight: 500;
+        }
+
+        /* Pagination Container */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        /* Records per page */
+        .records-per-page {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .records-per-page select {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Pagination Navigation */
+        .pagination-nav {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 4px;
+        }
+
+        .page-item {
+            display: flex;
+        }
+
+        .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            padding: 8px 12px;
+            color: #64748b;
+            text-decoration: none;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .page-link:hover {
+            color: #3b82f6;
+            border-color: #3b82f6;
+            background: #f1f5f9;
+        }
+
+        .page-item.active .page-link,
+        .page-link.current {
+            color: white;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-color: #3b82f6;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Quick Jump */
+        .quick-jump {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .page-jump-input {
+            width: 60px;
+            padding: 6px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .btn-jump {
+            padding: 6px 12px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s ease;
+        }
+
+        .btn-jump:hover {
+            background: #2563eb;
+        }
+
+        /* Avatar image styling */
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
             .search-container {
                 flex-direction: column;
@@ -370,11 +593,49 @@
             .filter-buttons {
                 margin: 10px 0;
                 justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .pagination-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .pagination-nav {
+                order: 2;
+            }
+
+            .records-per-page {
+                order: 1;
+                justify-content: center;
+            }
+
+            .quick-jump {
+                order: 3;
+                justify-content: center;
+            }
+
+            .pagination {
+                gap: 2px;
+            }
+
+            .page-link {
+                min-width: 36px;
+                height: 36px;
+                padding: 6px 10px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
             }
         }
     </style>
 
-    <!-- JavaScript -->
+    <!-- Enhanced JavaScript -->
     <script>
         // Form validation
         document.getElementById("userForm").addEventListener("submit", function (e) {
@@ -424,10 +685,41 @@
             }
         });
 
+        // Page size change function
+        function changePageSize(size) {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('size', size);
+            currentUrl.searchParams.set('page', '1'); // Reset to first page when changing size
+            window.location.href = currentUrl.toString();
+        }
+
+        // Jump to page function
+        function jumpToPage() {
+            const pageInput = document.getElementById('jumpToPage');
+            const pageNum = parseInt(pageInput.value);
+            const maxPages = ${totalPages};
+            
+            if (pageNum >= 1 && pageNum <= maxPages) {
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('page', pageNum);
+                window.location.href = currentUrl.toString();
+            } else {
+                alert('Vui lòng nhập số trang hợp lệ (1-' + maxPages + ')');
+                pageInput.value = ${currentPage};
+            }
+        }
+
+        // Handle Enter key in jump input
+        document.getElementById('jumpToPage')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                jumpToPage();
+            }
+        });
+
         // Initialize page interactions
         document.addEventListener('DOMContentLoaded', function () {
             // Update sidebar active state based on current filter
-            const currentFilter = new URLSearchParams(window.location.search).get('filter');
+            const currentFilter = '${currentFilter}' || '';
             if (currentFilter) {
                 // Dispatch event to update sidebar
                 const filterEvent = new CustomEvent('userFilterChanged', {
@@ -437,7 +729,7 @@
             }
 
             // Button ripple effects
-            const buttons = document.querySelectorAll('.action-btn, .add-btn, .btn-save, .btn-cancel, .filter-btn');
+            const buttons = document.querySelectorAll('.action-btn, .add-btn, .btn-save, .btn-cancel, .btn-jump');
             buttons.forEach(btn => {
                 btn.style.position = 'relative';
                 btn.style.overflow = 'hidden';
@@ -468,6 +760,16 @@
             const rows = document.querySelectorAll('.user-row');
             rows.forEach((row, index) => {
                 row.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // Add loading state to pagination links
+            const paginationLinks = document.querySelectorAll('.page-link');
+            paginationLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (!this.classList.contains('current')) {
+                        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    }
+                });
             });
         });
 
@@ -527,10 +829,11 @@
             }
         };
 
-        // Enhanced search functionality with role filtering
+        // Enhanced search functionality (only filters current page results)
         document.getElementById("searchInput")?.addEventListener("input", function () {
             const searchTerm = this.value.toLowerCase();
             const rows = document.querySelectorAll(".user-row");
+            let visibleCount = 0;
             
             rows.forEach(row => {
                 const name = row.getAttribute("data-name");
@@ -539,11 +842,33 @@
                 if (name.includes(searchTerm) || email.includes(searchTerm)) {
                     row.style.display = "";
                     row.classList.add('fade-in');
+                    visibleCount++;
                 } else {
                     row.style.display = "none";
                     row.classList.remove('fade-in');
                 }
             });
+
+            // Show message if no results found on current page
+            const tableBody = document.querySelector('#userTable tbody');
+            let noResultsRow = document.getElementById('noSearchResults');
+            
+            if (visibleCount === 0 && searchTerm !== '') {
+                if (!noResultsRow) {
+                    noResultsRow = document.createElement('tr');
+                    noResultsRow.id = 'noSearchResults';
+                    noResultsRow.innerHTML = `
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #64748b;">
+                            <i class="fas fa-search" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                            Không tìm thấy kết quả phù hợp trên trang này.<br>
+                            <small>Thử tìm kiếm trên các trang khác hoặc thay đổi từ khóa.</small>
+                        </td>
+                    `;
+                    tableBody.appendChild(noResultsRow);
+                }
+            } else if (noResultsRow) {
+                noResultsRow.remove();
+            }
         });
 
         // Keyboard shortcuts
@@ -557,6 +882,13 @@
             if (e.key === 'Escape') {
                 closeModal();
             }
+            // Arrow keys for pagination navigation
+            if (e.ctrlKey && e.key === 'ArrowLeft' && ${hasPrevious}) {
+                window.location.href = 'user-list?page=${currentPage - 1}${not empty currentFilter ? "&filter=".concat(currentFilter) : ""}${recordsPerPage != 10 ? "&size=".concat(recordsPerPage) : ""}';
+            }
+            if (e.ctrlKey && e.key === 'ArrowRight' && ${hasNext}) {
+                window.location.href = 'user-list?page=${currentPage + 1}${not empty currentFilter ? "&filter=".concat(currentFilter) : ""}${recordsPerPage != 10 ? "&size=".concat(recordsPerPage) : ""}';
+            }
         });
 
         // Add dynamic CSS for ripple animation
@@ -568,10 +900,37 @@
                     opacity: 0;
                 }
             }
+            
+            .readonly-field {
+                background-color: #f8fafc !important;
+                cursor: not-allowed;
+            }
+            
+            .fade-in {
+                animation: fadeIn 0.5s ease-in-out;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
         `;
         document.head.appendChild(style);
 
-        console.log('User Management page initialized successfully!');
+        // Show pagination shortcuts help
+        const showPaginationHelp = () => {
+            console.log('%c⌨️ Pagination Shortcuts:', 'font-weight: bold; color: #3b82f6;');
+            console.log('Ctrl + ← : Previous page');
+            console.log('Ctrl + → : Next page');
+            console.log('Ctrl + N : Add new user');
+            console.log('ESC     : Close modal');
+        };
+
+        // Initialize help on page load
+        setTimeout(showPaginationHelp, 1000);
+
+        console.log('User Management with Pagination initialized successfully!');
+        console.log('Current page: ${currentPage}/${totalPages} | Records: ${totalRecords} | Per page: ${recordsPerPage}');
     </script>
 </body>
-</html>
+</html>a
