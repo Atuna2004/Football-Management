@@ -118,7 +118,7 @@
                         <div class="request-card" data-status="${req.status}" data-name="${fn:toLowerCase(req.fullName)}">
                             <div class="request-status status-${fn:toLowerCase(req.status)}">
                                 <c:choose>
-                                    <c:when test="${req.status == 'PENDING'}">Chờ duyệt</c:when>
+                                    <c:when test="${req.status == 'Pending'}">Chờ duyệt</c:when>
                                     <c:when test="${req.status == 'APPROVED'}">Đã duyệt</c:when>
                                     <c:otherwise>Từ chối</c:otherwise>
                                 </c:choose>
