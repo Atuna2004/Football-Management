@@ -60,7 +60,7 @@ public class FieldOwnerReportServlet extends HttpServlet {
             conn = DBConnection.getConnection();
             ReportDAO reportDAO = new ReportDAO(conn);
 
-            // You can implement filtering here based on request parameters (search, status, type, priority)
+            // You can implement filtering here based on request parameters (search, status)
             // For now, it fetches all reports for the owner.
             ownerReports = reportDAO.getReportsByOwnerId(ownerId);
             LOGGER.log(Level.INFO, "Successfully fetched {0} reports for owner ID: {1}", new Object[]{ownerReports.size(), ownerId});
@@ -86,8 +86,7 @@ public class FieldOwnerReportServlet extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP POST method for updating report status.
-     * This method now incorporates the logic previously intended for UpdateReportStatusServlet.
+     * Handles the HTTP POST method for updating report status and deleting reports.
      *
      * @param request servlet request
      * @param response servlet response
@@ -102,7 +101,7 @@ public class FieldOwnerReportServlet extends HttpServlet {
 
         // 1. Authentication and Authorization Check (Crucial for security)
         if (session == null || (session.getAttribute("loggedInUser") == null && session.getAttribute("currentUser") == null)) {
-            LOGGER.warning("Unauthorized POST attempt to update report status. Redirecting to login.");
+            LOGGER.warning("Unauthorized POST attempt to update report. Redirecting to login.");
             response.sendRedirect(request.getContextPath() + "/account/login.jsp");
             return;
         }
@@ -117,18 +116,19 @@ public class FieldOwnerReportServlet extends HttpServlet {
         }
 
         if (currentUser == null || !currentUser.isFieldOwner()) {
-            LOGGER.warning("User " + (currentUser != null ? currentUser.getEmail() : "N/A") + " attempted to update report status without owner role via POST. Access denied.");
+            LOGGER.warning("User " + (currentUser != null ? currentUser.getEmail() : "N/A") + " attempted to update report without owner role via POST. Access denied.");
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to perform this action.");
             return;
         }
 
         // 2. Get parameters from the request
         String reportIDStr = request.getParameter("reportID");
-        String newStatus = request.getParameter("status"); // Parameter name from JSP form
+        String action = request.getParameter("action");
+        String newStatus = request.getParameter("newStatus");
 
-        if (reportIDStr == null || reportIDStr.isEmpty() || newStatus == null || newStatus.isEmpty()) {
-            LOGGER.warning("Missing reportID or status parameter for update via POST. reportID: " + reportIDStr + ", status: " + newStatus);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing required parameters for report status update.");
+        if (reportIDStr == null || reportIDStr.trim().isEmpty()) {
+            LOGGER.warning("Missing reportID parameter for POST request");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing required reportID parameter.");
             return;
         }
 
@@ -147,16 +147,42 @@ public class FieldOwnerReportServlet extends HttpServlet {
             conn = DBConnection.getConnection();
             ReportDAO reportDAO = new ReportDAO(conn);
 
-            // 4. Update report status in the database
-            reportDAO.updateReportStatus(reportID, newStatus);
-            LOGGER.info("Report ID " + reportID + " status updated to: " + newStatus + " by owner: " + currentUser.getEmail() + " via POST.");
+            // 4. Check if this is a delete action
+            if ("delete".equals(action)) {
+                LOGGER.info("Processing delete request for Report ID: " + reportID + " by owner: " + currentUser.getEmail());
+                boolean deleted = reportDAO.deleteReport(reportID);
+                
+                if (deleted) {
+                    LOGGER.info("Report ID " + reportID + " deleted successfully by owner: " + currentUser.getEmail());
+                    // Set success message in session
+                    session.setAttribute("successMessage", "Báo cáo đã được xóa thành công!");
+                } else {
+                    LOGGER.warning("Report deletion failed - report not found. Report ID: " + reportID);
+                    // Set error message in session
+                    session.setAttribute("errorMessage", "Không tìm thấy báo cáo để xóa!");
+                }
+                
+            } else if (newStatus != null && !newStatus.trim().isEmpty()) {
+                // This is a status update action
+                LOGGER.info("Processing status update for Report ID: " + reportID + " to status: " + newStatus + " by owner: " + currentUser.getEmail());
+                reportDAO.updateReportStatus(reportID, newStatus);
+                LOGGER.info("Report ID " + reportID + " status updated to: " + newStatus + " by owner: " + currentUser.getEmail());
+                
+                // Set success message in session
+                session.setAttribute("successMessage", "Trạng thái báo cáo đã được cập nhật thành công!");
+                
+            } else {
+                LOGGER.warning("No valid action or newStatus provided for POST request. Action: " + action + ", NewStatus: " + newStatus);
+                session.setAttribute("errorMessage", "Hành động không hợp lệ!");
+            }
 
-            // 5. Redirect back to the reports page with a success message
-            response.sendRedirect(request.getContextPath() + "/owner/reports?statusUpdate=success&reportID=" + reportID + "&newStatus=" + newStatus);
+            // 5. Redirect back to the reports page
+            response.sendRedirect(request.getContextPath() + "/owner/reports");
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Database error updating report status for ID: " + reportID + " via POST.", e);
-            response.sendRedirect(request.getContextPath() + "/owner/reports?statusUpdate=error&reportID=" + reportID + "&errorMessage=" + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Database error processing request for Report ID: " + reportID, e);
+            session.setAttribute("errorMessage", "Có lỗi xảy ra khi xử lý yêu cầu: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/owner/reports");
         } finally {
             if (conn != null) {
                 try {
@@ -170,6 +196,6 @@ public class FieldOwnerReportServlet extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "Servlet for Field Owner Report Management";
+        return "Servlet for Field Owner Report Management with Delete Functionality";
     }
 }
