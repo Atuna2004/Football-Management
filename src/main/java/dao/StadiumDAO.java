@@ -11,6 +11,22 @@ public class StadiumDAO {
 
     public List<Stadium> getAllStadiums() {
         List<Stadium> stadiumList = new ArrayList<>();
+        String sql = "SELECT * FROM Stadium WHERE Status = 'active'";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                stadiumList.add(mapResultSetToStadium(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stadiumList;
+    }
+    
+    public List<Stadium> getAllStadiumsForFieldOwner() {
+        List<Stadium> stadiumList = new ArrayList<>();
         String sql = "SELECT * FROM Stadium";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -262,5 +278,73 @@ public class StadiumDAO {
                 rs.getInt("OwnerID")
         );
     }
-}
+    
+    public List<Stadium> getStadiumsByOwner(int ownerId) {
+        List<Stadium> list = new ArrayList<>();
+        String sql = "SELECT StadiumID, Name FROM Stadium WHERE OwnerID = ?";
 
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, ownerId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Stadium stadium = new Stadium();
+                stadium.setStadiumID(rs.getInt("StadiumID"));
+                stadium.setName(rs.getString("Name"));
+                list.add(stadium);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi lấy sân theo OwnerID = " + ownerId);
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    
+    // Tìm kiếm sân theo ownerID và từ khóa (tên hoặc vị trí)
+    public List<Stadium> searchStadiumsByOwner(int ownerId, String keyword, int page, int recordsPerPage) {
+        List<Stadium> stadiumList = new ArrayList<>();
+        String sql = "SELECT * FROM Stadium " +
+                     "WHERE OwnerID = ? AND (name LIKE ? OR location LIKE ?) " +
+                     "ORDER BY stadiumID " +
+                     "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, ownerId);
+            ps.setString(2, "%" + keyword + "%");
+            ps.setString(3, "%" + keyword + "%");
+            ps.setInt(4, (page - 1) * recordsPerPage);
+            ps.setInt(5, recordsPerPage);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                stadiumList.add(mapResultSetToStadium(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stadiumList;
+    }
+
+    // Đếm tổng số sân theo owner và từ khóa tìm kiếm
+    public int getTotalSearchCountByOwner(int ownerId, String keyword) {
+        String sql = "SELECT COUNT(*) AS total FROM Stadium " +
+                     "WHERE OwnerID = ? AND (name LIKE ? OR location LIKE ?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, ownerId);
+            ps.setString(2, "%" + keyword + "%");
+            ps.setString(3, "%" + keyword + "%");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+}

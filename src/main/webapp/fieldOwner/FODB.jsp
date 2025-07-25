@@ -15,10 +15,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Quản lý sân bóng</title>
+    <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href=" https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css " rel="stylesheet">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/FieldOwnerDB.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js "></script>
 </head>
 <body>
     <!-- Top Header -->
@@ -32,7 +35,6 @@
                     Field Manager Page
                 </h3>
             </div>
-
             <%
                 User currentUser = (User) session.getAttribute("currentUser");
                 if (currentUser != null) {
@@ -55,7 +57,7 @@
     </div>
 
     <div class="dashboard-container">
-        <!-- Left Navigation Sidebar -->
+        <!-- Sidebar -->
         <%@ include file="FieldOwnerSB.jsp" %>
 
         <!-- Main Content -->
@@ -64,7 +66,6 @@
             <section class="stats-overview">
                 <h4 class="mb-4">Thống kê tổng quan</h4>
                 <%
-                    // Khởi tạo các biến mặc định
                     int todayBookings = 0;
                     double monthlyRevenue = 0.0;
                     int totalFields = 0;
@@ -74,32 +75,28 @@
                     Map<Integer, Double> monthlyRevenueMap = null;
                     boolean hasError = false;
                     String errorMessage = "";
-                    
-                    // Lấy dữ liệu thống kê từ database
+                    DashboardDAO dashboardDAO = null;
+                    Map<Integer, Integer> monthlyBookingMap = null;
+                    Map<Integer, Integer> dailyBookingMap = null;
+                    Map<Integer, Double> dailyRevenueMap = null; 
                     if (currentUser != null) {
                         try {
-                            DashboardDAO dashboardDAO = new DashboardDAO();
-                            
-                            // Lấy thống kê tổng quan
+                            dashboardDAO = new DashboardDAO();
                             DashboardStats stats = dashboardDAO.getDashboardStats(currentUser.getUserID());
-                            
                             if (stats != null) {
                                 todayBookings = stats.getTodayBookings();
                                 totalFields = stats.getTotalFields();
                                 totalCustomers = stats.getTotalCustomers();
                             }
-                            
-                            // Lấy doanh thu tháng hiện tại từ hàm getMonthlyRevenueByOwner
+
                             monthlyRevenueMap = dashboardDAO.getMonthlyRevenueByOwner(currentUser.getUserID());
-                            int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1; // +1 vì Calendar.MONTH bắt đầu từ 0
+                            int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
                             if (monthlyRevenueMap != null && monthlyRevenueMap.containsKey(currentMonth)) {
                                 monthlyRevenue = monthlyRevenueMap.get(currentMonth);
                             }
-                            
-                            // Lấy danh sách đặt sân gần đây (10 booking gần nhất)
+
                             recentBookings = dashboardDAO.getRecentBookings(currentUser.getUserID(), 10);
-                            
-                            // Format doanh thu
+
                             NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
                             if (monthlyRevenue >= 1000000) {
                                 monthlyRevenueFormatted = String.format("%.1fM", monthlyRevenue / 1000000);
@@ -108,11 +105,15 @@
                             } else {
                                 monthlyRevenueFormatted = currencyFormat.format(monthlyRevenue);
                             }
-                            
+
+                            if (dashboardDAO != null) {
+                                monthlyBookingMap = dashboardDAO.getMonthlyBookingsByOwner(currentUser.getUserID());
+                                dailyBookingMap = dashboardDAO.getDailyBookingsByOwner(currentUser.getUserID());
+                                dailyRevenueMap = dashboardDAO.getDailyRevenueByOwner(currentUser.getUserID());
+                            }
                         } catch (Exception e) {
                             hasError = true;
                             errorMessage = "Lỗi khi tải dữ liệu: " + e.getMessage();
-                            System.err.println("Dashboard error: " + e.getMessage());
                             e.printStackTrace();
                         }
                     }
@@ -120,119 +121,66 @@
 
                 <div class="stats-grid">
                     <div class="stat-card bookings">
-                        <div class="icon">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
+                        <div class="icon"><i class="fas fa-calendar-check"></i></div>
                         <div class="stat-content">
                             <h4><%= todayBookings %></h4>
                             <p>Lượt đặt hôm nay</p>
                         </div>
                     </div>
-
                     <div class="stat-card revenue">
-                        <div class="icon">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
+                        <div class="icon"><i class="fas fa-dollar-sign"></i></div>
                         <div class="stat-content">
                             <h4><%= monthlyRevenueFormatted %></h4>
                             <p>Doanh thu tháng này</p>
                         </div>
                     </div>
-
                     <div class="stat-card fields">
-                        <div class="icon">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
+                        <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
                         <div class="stat-content">
                             <h4><%= totalFields %></h4>
                             <p>Tổng số sân</p>
                         </div>
                     </div>
-
                     <div class="stat-card customers">
-                        <div class="icon">
-                            <i class="fas fa-users"></i>
-                        </div>
+                        <div class="icon"><i class="fas fa-users"></i></div>
                         <div class="stat-content">
                             <h4><%= totalCustomers %></h4>
                             <p>Khách hàng</p>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
-                
-                <%-- Hiển thị thông báo lỗi nếu có --%>
+
                 <% if (hasError) { %>
                     <div class="alert alert-warning mt-3">
                         <i class="fas fa-exclamation-triangle me-2"></i>
                         <strong>Cảnh báo:</strong> <%= errorMessage %>
                     </div>
                 <% } %>
-
-                <%-- Hiển thị thông báo nếu không có dữ liệu --%>
-                <% if (!hasError && todayBookings == 0 && monthlyRevenue == 0.0 && totalFields == 0 && totalCustomers == 0) { %>
+                <% if (!hasError && todayBookings == 0 && monthlyRevenue == 0 && totalFields == 0 && totalCustomers == 0) { %>
                     <div class="alert alert-info mt-3">
                         <i class="fas fa-info-circle me-2"></i>
-                        <strong>Thông báo:</strong> Chưa có dữ liệu thống kê. Hãy bắt đầu bằng cách thêm sân và nhận booking đầu tiên!
+                        <strong>Thông báo:</strong> Chưa có dữ liệu thống kê. Hãy bắt đầu bằng cách thêm sân!
                     </div>
                 <% } %>
             </section>
 
-            <!-- Quick Actions -->
+            <!-- Chart Section -->
             <div class="card">
                 <div class="card-header">
-                    <h5>Thao tác nhanh</h5>
+                    <h5>Biểu đồ thống kê</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <a href="createStadium.jsp" class="action-card">
-                                <div class="action-icon">
-                                    <i class="fas fa-plus"></i>
-                                </div>
-                                <span>Thêm sân mới</span>
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            <a href="#" class="action-card">
-                                <div class="action-icon">
-                                    <i class="fas fa-calendar-plus"></i>
-                                </div>
-                                <span>Tạo lịch đặt</span>
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            <a href="#" class="action-card">
-                                <div class="action-icon">
-                                    <i class="fas fa-file-alt"></i>
-                                </div>
-                                <span>Xuất báo cáo</span>
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            <a href="#" class="action-card">
-                                <div class="action-icon">
-                                    <i class="fas fa-bell"></i>
-                                </div>
-                                <span>Gửi thông báo</span>
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            <a href="#" class="action-card">
-                                <div class="action-icon">
-                                    <i class="fas fa-chart-line"></i>
-                                </div>
-                                <span>Xem thống kê</span>
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            <a href="#" class="action-card">
-                                <div class="action-icon">
-                                    <i class="fas fa-users-cog"></i>
-                                </div>
-                                <span>Quản lý nhân viên</span>
-                            </a>
-                        </div>
+                    <div class="d-flex mb-3 flex-wrap gap-2">
+                        <select id="chartType" class="form-select w-auto">
+                            <option value="revenue">Doanh thu</option>
+                            <option value="bookings" selected>Lượt đặt sân</option>
+                        </select>
+                        <select id="timeRange" class="form-select w-auto">
+                            <option value="daily">Theo ngày (tháng này)</option>
+                            <option value="monthly">Theo tháng (năm nay)</option>
+                        </select>
                     </div>
+                    <canvas id="dashboardChart" height="80"></canvas>
                 </div>
             </div>
 
@@ -242,7 +190,7 @@
                     <h5>Đặt sân gần đây</h5>
                     <small class="text-muted">
                         <% if (recentBookings != null && !recentBookings.isEmpty()) { %>
-                            <%= recentBookings.size() %> booking gần nhất
+                            5 booking gần nhất
                         <% } else { %>
                             Chưa có dữ liệu
                         <% } %>
@@ -266,12 +214,13 @@
                                 </thead>
                                 <tbody>
                                     <%
+                                        int count = 0;
                                         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                                         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
                                         SimpleDateFormat datetimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                                         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-                                        
                                         for (RecentBooking booking : recentBookings) {
+                                            if (count >= 5) break;
                                     %>
                                         <tr>
                                             <td><strong>#<%= booking.getBookingID() %></strong></td>
@@ -291,49 +240,27 @@
                                                 </div>
                                             </td>
                                             <td><%= dateFormat.format(booking.getBookingDate()) %></td>
-                                            <td>
-                                                <%= timeFormat.format(booking.getStartTime()) %> - 
-                                                <%= timeFormat.format(booking.getEndTime()) %>
-                                            </td>
-                                            <td>
-                                                <strong class="text-success">
-                                                    <%= currencyFormat.format(booking.getTotalAmount()) %>
-                                                </strong>
-                                            </td>
+                                            <td><%= timeFormat.format(booking.getStartTime()) %> - <%= timeFormat.format(booking.getEndTime()) %></td>
+                                            <td><strong class="text-success"><%= currencyFormat.format(booking.getTotalAmount()) %></strong></td>
                                             <td>
                                                 <%
-                                                    String statusClass = "";
+                                                    String statusClass = "badge bg-secondary";
                                                     String statusText = booking.getStatus();
                                                     switch (booking.getStatus().toLowerCase()) {
-                                                        case "completed":
-                                                            statusClass = "badge bg-success";
-                                                            statusText = "Hoàn thành";
-                                                            break;
-                                                        case "pending":
-                                                            statusClass = "badge bg-warning";
-                                                            statusText = "Chờ xử lý";
-                                                            break;
-                                                        case "cancelled":
-                                                            statusClass = "badge bg-danger";
-                                                            statusText = "Đã hủy";
-                                                            break;
-                                                        case "confirmed":
-                                                            statusClass = "badge bg-primary";
-                                                            statusText = "Đã xác nhận";
-                                                            break;
-                                                        default:
-                                                            statusClass = "badge bg-secondary";
+                                                        case "completed": statusClass = "badge bg-success"; statusText = "Hoàn thành"; break;
+                                                        case "pending": statusClass = "badge bg-warning"; statusText = "Chờ xử lý"; break;
+                                                        case "cancelled": statusClass = "badge bg-danger"; statusText = "Đã hủy"; break;
+                                                        case "confirmed": statusClass = "badge bg-primary"; statusText = "Đã xác nhận"; break;
                                                     }
                                                 %>
                                                 <span class="<%= statusClass %>"><%= statusText %></span>
                                             </td>
-                                            <td>
-                                                <small class="text-muted">
-                                                    <%= datetimeFormat.format(booking.getCreatedAt()) %>
-                                                </small>
-                                            </td>
+                                            <td><small class="text-muted"><%= datetimeFormat.format(booking.getCreatedAt()) %></small></td>
                                         </tr>
-                                    <% } %>
+                                    <% 
+                                        count++;
+                                        }
+                                    %>
                                 </tbody>
                             </table>
                         </div>
@@ -355,6 +282,155 @@
         </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Helper: Convert Java Map to JSON -->
+    <%!
+        public String mapToJson(Map<Integer, Double> map) {
+            StringBuilder sb = new StringBuilder("{");
+            if (map != null) {
+                boolean first = true;
+                for (Map.Entry<Integer, Double> entry : map.entrySet()) {
+                    if (!first) sb.append(",");
+                    sb.append(entry.getKey()).append(":").append(entry.getValue());
+                    first = false;
+                }
+            }
+            sb.append("}");
+            return sb.toString();
+        }
+        public String intMapToJson(Map<Integer, Integer> map) {
+            StringBuilder sb = new StringBuilder("{");
+            if (map != null) {
+                boolean first = true;
+                for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+                    if (!first) sb.append(",");
+                    sb.append(entry.getKey()).append(":").append(entry.getValue());
+                    first = false;
+                }
+            }
+            sb.append("}");
+            return sb.toString();
+        }
+    %>
+
+    <!-- Chart Script -->
+    <script>
+        const monthlyRevenueData = <%= monthlyRevenueMap != null ? mapToJson(monthlyRevenueMap) : "{}" %>;
+        const monthlyBookingData = <%= monthlyBookingMap != null ? intMapToJson(monthlyBookingMap) : "{}" %>;
+        const dailyRevenueData = <%= dailyRevenueMap != null ? mapToJson(dailyRevenueMap) : "{}" %>;
+        const dailyBookingData = <%= dailyBookingMap != null ? intMapToJson(dailyBookingMap) : "{}" %>;
+        console.log("Dữ liệu biểu đồ:", { dailyBookingData, monthlyBookingData, dailyRevenueData });
+
+        let chartInstance = null;
+
+        function renderChart(type, range) {
+            let labels = [];
+            let data = [];
+            let label = '';
+            let borderColor = '#667eea';
+            let backgroundColor = 'rgba(102, 126, 234, 0.2)';
+
+            if (range === 'daily') {
+                const today = new Date();
+                const currentMonth = today.getMonth(); // 0-11
+                const currentYear = today.getFullYear();
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // 28, 29, 30, 31
+                const allDays = Array.from({ length: daysInMonth }, (_, i) => i + 1); // [1, 2, ..., 31]
+
+                // Chọn dữ liệu theo loại biểu đồ
+                const sourceData = type === 'revenue' ? dailyRevenueData : dailyBookingData;
+                const dataType = type === 'revenue' ? 'Doanh thu' : 'Lượt đặt sân';
+
+                // Luôn hiển thị tất cả các ngày trong tháng
+                labels = allDays;
+                data = allDays.map(day => sourceData[day] || 0); // 0 nếu không có dữ liệu
+
+                label = dataType;
+                borderColor = type === 'revenue' ? '#28a745' : '#4facfe';
+                backgroundColor = type === 'revenue' 
+                    ? 'rgba(40, 167, 69, 0.2)' 
+                    : 'rgba(79, 172, 254, 0.2)';
+            }else if (range === 'monthly') {
+                labels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                          'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+                data = labels.map((_, i) => type === 'revenue' 
+                    ? parseFloat(monthlyRevenueData[i + 1] || 0)
+                    : parseInt(monthlyBookingData[i + 1] || 0));
+                label = type === 'revenue' ? 'Doanh thu (đ)' : 'Lượt đặt sân';
+            }
+
+            if (chartInstance) chartInstance.destroy();
+
+            const ctx = document.getElementById('dashboardChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        borderColor: borderColor,
+                        backgroundColor: backgroundColor,
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    return type === 'revenue'
+                                        ? new Intl.NumberFormat('vi-VN').format(value) + ' đ'
+                                        : value + ' lượt';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                source: 'data',
+                                autoSkip: false,
+                                maxRotation: 0
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    if (type === 'revenue') {
+                                        if (value >= 1e6) return (value / 1e6).toFixed(1) + 'M';
+                                        if (value >= 1e3) return (value / 1e3).toFixed(0) + 'K';
+                                        return value;
+                                    }
+                                    return value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Khởi tạo khi tải trang
+        document.addEventListener("DOMContentLoaded", function () {
+            renderChart('bookings', 'daily'); // Mặc định: Lượt đặt sân theo ngày
+        });
+
+        // Sự kiện thay đổi
+        document.getElementById('chartType').addEventListener('change', function () {
+            renderChart(this.value, document.getElementById('timeRange').value);
+        });
+        document.getElementById('timeRange').addEventListener('change', function () {
+            renderChart(document.getElementById('chartType').value, this.value);
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap @5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -114,8 +114,10 @@
         <h5><i class="fas fa-hamburger"></i> Giá đồ ăn: 
             <fmt:formatNumber value="${foodPrice}" type="number" groupingUsed="true" /> đ
         </h5>
-        <h5><i class="fas fa-wallet"></i> Tổng cộng: 
-            <fmt:formatNumber value="${totalAmount}" type="number" groupingUsed="true" /> đ
+        <h5><i class="fas fa-wallet"></i> Tổng sau giảm giá: 
+            <strong style="color: #28a745;">
+                <fmt:formatNumber value="${totalAmount}" type="number" groupingUsed="true" /> đ
+            </strong>
         </h5>
     </div>
 

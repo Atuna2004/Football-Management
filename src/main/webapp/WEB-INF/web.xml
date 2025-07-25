@@ -4,6 +4,22 @@
         <servlet-name>LoginFacebookServlet</servlet-name>
         <url-pattern>/LoginFacebookServlet</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>SubmitReportServlet</servlet-name>
+        <servlet-class>controller.Stadium.SubmitReportServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminDashboardServlet</servlet-name>
+        <url-pattern>/adminDashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AvatarUploadServlet</servlet-name>
+        <url-pattern>/uploadAvatar</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SubmitReportServlet</servlet-name>
+        <url-pattern>/submit-report</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
@@ -12,12 +28,16 @@
         <servlet-class>controller.NewServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UserListServlet</servlet-name>
-        <servlet-class>controller.Admin.UserManagementtServlet</servlet-class>
+        <servlet-name>AvatarUploadServlet</servlet-name>
+        <servlet-class>controller.Authentication.AvatarUploadServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>PendingFieldOwnerServlet</servlet-name>
-        <servlet-class>controller.Admin.PendingFieldOwnerServlet</servlet-class>
+        <servlet-name>AdminDashboardServlet</servlet-name>
+        <servlet-class>controller.Admin.AdminDashboardServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UserListServlet</servlet-name>
+        <servlet-class>controller.Admin.UserManagementtServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>UserReportServlet</servlet-name>

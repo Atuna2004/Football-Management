@@ -46,7 +46,7 @@ public class SignupServlet extends HttpServlet {
 
             User newUser = new User();
             newUser.setEmail(email);
-            newUser.setPasswordHash(PasswordService.hashPassword(password)); // hashed here
+            newUser.setPasswordHash(password); // hashed here
             newUser.setFullName(fullName);
             newUser.setPhone(phone);
             newUser.setActive(false);

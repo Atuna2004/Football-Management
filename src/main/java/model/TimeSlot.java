@@ -18,6 +18,7 @@ public class TimeSlot {
     // 🔥 THÊM:
     private String bookingStatus;           // "Pending", "Confirmed", v.v.
     private LocalDateTime bookingCreatedAt; // Dùng để kiểm tra giữ chỗ có quá hạn không
+    private boolean active;
 
     public TimeSlot() {}
 
@@ -123,6 +124,14 @@ public class TimeSlot {
 
     public void setBookingCreatedAt(LocalDateTime bookingCreatedAt) {
         this.bookingCreatedAt = bookingCreatedAt;
+    }
+    
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     // =================== Logic kiểm tra đã đặt thực sự =====================
