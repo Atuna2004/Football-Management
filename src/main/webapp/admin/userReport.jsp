@@ -105,7 +105,6 @@
 
         .stat-card.primary .stat-icon { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark-color)); }
         .stat-card.success .stat-icon { background: linear-gradient(135deg, var(--success-color), var(--success-dark-color)); }
-        .stat-card.warning .stat-icon { background: linear-gradient(135deg, var(--warning-color), var(--warning-dark-color)); }
         .stat-card.danger  .stat-icon { background: linear-gradient(135deg, var(--danger-color), var(--danger-dark-color)); }
         
         .card {
@@ -251,9 +250,7 @@
             font-weight: 500; display: inline-flex; align-items: center; gap: 6px;
         }
         .badge-pending { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
-        .badge-in-progress { background: rgba(245, 158, 11, 0.1); color: #d97706; }
         .badge-resolved { background: rgba(16, 185, 129, 0.1); color: #059669; }
-        .badge-rejected, .badge-closed { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
         .badge-high, .badge-bug { background-color: rgba(239, 68, 68, 0.1); color: #dc2626; }
         .badge-medium, .badge-complaint { background-color: rgba(245, 158, 11, 0.1); color: #d97706; }
         .badge-low, .badge-feature { background-color: rgba(16, 185, 129, 0.1); color: #059669; }
@@ -269,10 +266,10 @@
         }
 
         .btn:hover { transform: translateY(-2px); }
-        .btn-primary { background: var(--primary-color); color: white; }
-        .btn-primary:hover { background: var(--primary-dark-color); box-shadow: 0 7px 20px -5px rgba(59, 130, 246, 0.4); }
-        .btn-outline { background: #fff; border-color: #dbeafe; color: var(--text-secondary); }
-        .btn-outline:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        .btn-success { background: #22c55e; color: white; }
+        .btn-success:hover { background: #16a34a; box-shadow: 0 7px 20px -5px rgba(34, 197, 94, 0.35); }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; box-shadow: 0 7px 20px -5px rgba(239, 68, 68, 0.35); }
         
         .no-data {
             text-align: center; padding: 60px 40px;
@@ -298,14 +295,12 @@
 
     <div class="main-content">
         <c:set var="pendingCount" value="0" />
-        <c:set var="progressCount" value="0" />
         <c:set var="resolvedCount" value="0" />
-        <c:set var="rejectedCount" value="0" />
+        <c:set var="totalCount" value="0" />
         <c:forEach var="report" items="${reportList}">
+            <c:set var="totalCount" value="${totalCount + 1}" />
             <c:if test="${report.status == 'Pending'}"><c:set var="pendingCount" value="${pendingCount + 1}" /></c:if>
-            <c:if test="${report.status == 'In Progress'}"><c:set var="progressCount" value="${progressCount + 1}" /></c:if>
             <c:if test="${report.status == 'Resolved'}"><c:set var="resolvedCount" value="${resolvedCount + 1}" /></c:if>
-            <c:if test="${report.status == 'Rejected' || report.status == 'Closed'}"><c:set var="rejectedCount" value="${rejectedCount + 1}" /></c:if>
         </c:forEach>
 
         <div class="stats-grid">
@@ -316,15 +311,6 @@
                         <p>Báo cáo mới</p>
                     </div>
                     <div class="stat-icon"><i class="fas fa-inbox"></i></div>
-                </div>
-            </div>
-            <div class="stat-card warning">
-                <div class="stat-header">
-                    <div class="stat-info">
-                        <h3>${progressCount}</h3>
-                        <p>Đang xử lý</p>
-                    </div>
-                    <div class="stat-icon"><i class="fas fa-cogs"></i></div>
                 </div>
             </div>
             <div class="stat-card success">
@@ -339,10 +325,10 @@
             <div class="stat-card danger">
                 <div class="stat-header">
                     <div class="stat-info">
-                        <h3>${rejectedCount}</h3>
-                        <p>Từ chối / Đóng</p>
+                        <h3>${totalCount}</h3>
+                        <p>Tổng báo cáo</p>
                     </div>
-                    <div class="stat-icon"><i class="fas fa-archive"></i></div>
+                    <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
                 </div>
             </div>
         </div>
@@ -360,10 +346,7 @@
                     <select class="filter-select" id="statusFilter">
                         <option value="">Tất cả trạng thái</option>
                         <option value="Pending">Mới</option>
-                        <option value="In Progress">Đang xử lý</option>
                         <option value="Resolved">Đã giải quyết</option>
-                        <option value="Rejected">Đã từ chối</option>
-                        <option value="Closed">Đã đóng</option>
                     </select>
                 </div>
             </div>
@@ -415,11 +398,6 @@
                                 </span>
                             </div>
                              <div class="report-meta-item">
-                                <span class="badge badge-${fn:toLowerCase(report.priority)}">
-                                    <i class="fas fa-exclamation-circle"></i> ${report.priority}
-                                </span>
-                            </div>
-                             <div class="report-meta-item">
                                 <i class="fas fa-calendar-alt"></i>
                                 <fmt:formatDate value="${report.submittedAt}" pattern="dd/MM/yyyy HH:mm" />
                             </div>
@@ -427,17 +405,14 @@
                     </div>
                     
                     <div class="card-footer">
-                         <button class="btn btn-primary" onclick="viewReportDetails(${report.reportID})">
-                            <i class="fas fa-eye"></i> Xem chi tiết
-                        </button>
-                        <c:if test="${report.status == 'Pending' || report.status == 'In Progress'}">
-                             <button class="btn btn-outline" onclick="updateReportStatus(${report.reportID}, 'Resolved')">
+                        <c:if test="${report.status == 'Pending'}">
+                             <button class="btn btn-success" onclick="updateReportStatus(${report.reportID}, 'Resolved')">
                                 <i class="fas fa-check"></i> Giải quyết
                             </button>
-                             <button class="btn btn-outline" onclick="updateReportStatus(${report.reportID}, 'Rejected')">
-                                <i class="fas fa-times"></i> Từ chối
-                            </button>
                         </c:if>
+                        <button class="btn btn-danger" onclick="deleteReport(${report.reportID})">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
                     </div>
                 </div>
             </c:forEach>
@@ -446,28 +421,64 @@
 </div>
 
 <script>
-    function viewReportDetails(reportID) {
-        window.location.href = "${pageContext.request.contextPath}/admin/reports/view?id=" + reportID;
-    }
-
     function updateReportStatus(reportID, newStatus) {
-        if (confirm(`Bạn có chắc muốn cập nhật trạng thái thành "${newStatus}" không?`)) {
+        // Status translations
+        const statusMessages = {
+            'Resolved': 'giải quyết báo cáo này'
+        };
+        
+        const actionMessage = statusMessages[newStatus] || `cập nhật trạng thái thành "${newStatus}"`;
+        
+        if (confirm(`Bạn có chắc chắn muốn ${actionMessage} không?`)) {
+            // Create and submit form
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = window.location.pathname;
+            form.style.display = 'none';
 
+            // Add report ID
             const idInput = document.createElement('input');
             idInput.type = 'hidden';
             idInput.name = 'reportID';
             idInput.value = reportID;
             form.appendChild(idInput);
 
+            // Add new status
             const statusInput = document.createElement('input');
             statusInput.type = 'hidden';
             statusInput.name = 'newStatus';
             statusInput.value = newStatus;
             form.appendChild(statusInput);
 
+            // Add to DOM and submit
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    function deleteReport(reportID) {
+        if (confirm('Bạn có chắc chắn muốn xóa báo cáo này không? Hành động này không thể hoàn tác.')) {
+            // Create and submit form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = window.location.pathname;
+            form.style.display = 'none';
+
+            // Add report ID
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'reportID';
+            idInput.value = reportID;
+            form.appendChild(idInput);
+
+            // Add delete action
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'delete';
+            form.appendChild(actionInput);
+
+            // Add to DOM and submit
             document.body.appendChild(form);
             form.submit();
         }

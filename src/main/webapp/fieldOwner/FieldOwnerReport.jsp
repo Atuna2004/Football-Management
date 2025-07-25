@@ -186,9 +186,8 @@
         }
 
         .stat-card.new-reports .icon { color: #667eea; }
-        .stat-card.in-progress .icon { color: #ffc107; }
         .stat-card.resolved .icon { color: #28a745; }
-        .stat-card.rejected .icon { color: #dc3545; }
+        .stat-card.total .icon { color: #6c757d; }
 
         .stat-card h4 {
             font-size: 2.5rem;
@@ -214,7 +213,7 @@
 
         .filter-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            grid-template-columns: 2fr 1fr auto;
             gap: 15px;
             align-items: end;
         }
@@ -330,19 +329,9 @@
             color: #856404;
         }
 
-        .status-InProgress {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
         .status-Resolved {
             background: #d4edda;
             color: #155724;
-        }
-
-        .status-Rejected, .status-Closed {
-            background: #f8d7da;
-            color: #721c24;
         }
 
         /* Report Details */
@@ -413,29 +402,26 @@
             gap: 5px;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-warning {
-            background: #ffc107;
-            color: #212529;
-        }
-
         .btn-success {
-            background: #28a745;
+            background: #22c55e;
             color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.35);
         }
 
         .btn-danger {
-            background: #dc3545;
+            background: #ef4444;
             color: white;
         }
 
-        .btn:hover {
+        .btn-danger:hover {
+            background: #dc2626;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.35);
         }
 
         /* Empty State */
@@ -564,9 +550,8 @@
                 allReports = new java.util.ArrayList<>();
             }
             long newReportsCount = allReports.stream().filter(r -> "Pending".equalsIgnoreCase(r.getStatus())).count();
-            long inProgressReportsCount = allReports.stream().filter(r -> "InProgress".equalsIgnoreCase(r.getStatus())).count();
             long resolvedReportsCount = allReports.stream().filter(r -> "Resolved".equalsIgnoreCase(r.getStatus())).count();
-            long rejectedReportsCount = allReports.stream().filter(r -> "Rejected".equalsIgnoreCase(r.getStatus()) || "Closed".equalsIgnoreCase(r.getStatus())).count();
+            long totalReportsCount = allReports.size();
         %>
 
         <!-- Stats Cards -->
@@ -576,20 +561,15 @@
                 <h4><%= newReportsCount %></h4>
                 <p>Báo cáo mới</p>
             </div>
-            <div class="stat-card in-progress">
-                <div class="icon"><i class="fas fa-hourglass-half"></i></div>
-                <h4><%= inProgressReportsCount %></h4>
-                <p>Đang xử lý</p>
-            </div>
             <div class="stat-card resolved">
                 <div class="icon"><i class="fas fa-check-circle"></i></div>
                 <h4><%= resolvedReportsCount %></h4>
                 <p>Đã giải quyết</p>
             </div>
-            <div class="stat-card rejected">
-                <div class="icon"><i class="fas fa-times-circle"></i></div>
-                <h4><%= rejectedReportsCount %></h4>
-                <p>Đã từ chối</p>
+            <div class="stat-card total">
+                <div class="icon"><i class="fas fa-chart-bar"></i></div>
+                <h4><%= totalReportsCount %></h4>
+                <p>Tổng báo cáo</p>
             </div>
         </div>
 
@@ -602,24 +582,7 @@
                     <select name="status">
                         <option value="">Tất cả trạng thái</option>
                         <option value="Pending" ${"Pending" eq param.status ? 'selected' : ''}>Pending</option>
-                        <option value="InProgress" ${"InProgress" eq param.status ? 'selected' : ''}>In Progress</option>
                         <option value="Resolved" ${"Resolved" eq param.status ? 'selected' : ''}>Resolved</option>
-                        <option value="Rejected" ${"Rejected" eq param.status ? 'selected' : ''}>Rejected</option>
-                        <option value="Closed" ${"Closed" eq param.status ? 'selected' : ''}>Closed</option>
-                    </select>
-                    
-                    <select name="type">
-                        <option value="">Tất cả loại</option>
-                        <option value="REPORT" ${"REPORT" eq param.type ? 'selected' : ''}>Báo cáo sân</option>
-                        <option value="BOOKING_ISSUE" ${"BOOKING_ISSUE" eq param.type ? 'selected' : ''}>Vấn đề đặt sân</option>
-                        <option value="FOOD_ISSUE" ${"FOOD_ISSUE" eq param.type ? 'selected' : ''}>Vấn đề đồ ăn</option>
-                    </select>
-                    
-                    <select name="priority">
-                        <option value="">Tất cả độ ưu tiên</option>
-                        <option value="HIGH" ${"HIGH" eq param.priority ? 'selected' : ''}>Cao</option>
-                        <option value="MEDIUM" ${"MEDIUM" eq param.priority ? 'selected' : ''}>Trung bình</option>
-                        <option value="LOW" ${"LOW" eq param.priority ? 'selected' : ''}>Thấp</option>
                     </select>
                     
                     <button type="submit">
@@ -671,14 +634,6 @@
                             
                             <div class="report-meta">
                                 <div class="meta-item">
-                                    <span class="meta-label">Loại báo cáo</span>
-                                    <span class="meta-value"><c:out value="${report.type != null ? report.type : 'N/A'}"/></span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-label">Độ ưu tiên</span>
-                                    <span class="meta-value"><c:out value="${report.priority != null ? report.priority : 'N/A'}"/></span>
-                                </div>
-                                <div class="meta-item">
                                     <span class="meta-label">Ngày tạo</span>
                                     <span class="meta-value"><fmt:formatDate value="${report.submittedAt}" pattern="dd/MM/yyyy HH:mm"/></span>
                                 </div>
@@ -703,33 +658,23 @@
                         </div>
                         
                         <div class="report-actions">
-                            <a href="${pageContext.request.contextPath}/owner/report-details?reportID=${report.reportID}" class="btn btn-primary">
-                                <i class="fas fa-info-circle"></i> Xem chi tiết
-                            </a>
-                            <c:if test="${'Pending' eq report.status || 'InProgress' eq report.status}">
+                            <c:if test="${'Pending' eq report.status}">
                                 <%-- Use separate forms for POST requests --%>
                                 <form action="${pageContext.request.contextPath}/owner/reports" method="post" class="d-inline-block">
                                     <input type="hidden" name="reportID" value="${report.reportID}">
-                                    <input type="hidden" name="status" value="InProgress">
-                                    <button type="submit" class="btn btn-warning">
-                                        <i class="fas fa-play-circle"></i> Đang xử lý
-                                    </button>
-                                </form>
-                                <form action="${pageContext.request.contextPath}/owner/reports" method="post" class="d-inline-block">
-                                    <input type="hidden" name="reportID" value="${report.reportID}">
-                                    <input type="hidden" name="status" value="Resolved">
+                                    <input type="hidden" name="newStatus" value="Resolved">
                                     <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-check-circle"></i> Đã giải quyết
-                                    </button>
-                                </form>
-                                <form action="${pageContext.request.contextPath}/owner/reports" method="post" class="d-inline-block">
-                                    <input type="hidden" name="reportID" value="${report.reportID}">
-                                    <input type="hidden" name="status" value="Rejected">
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="fas fa-times-circle"></i> Từ chối
+                                        <i class="fas fa-check"></i> Giải quyết
                                     </button>
                                 </form>
                             </c:if>
+                            <form action="${pageContext.request.contextPath}/owner/reports" method="post" class="d-inline-block">
+                                <input type="hidden" name="reportID" value="${report.reportID}">
+                                <input type="hidden" name="action" value="delete">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa báo cáo này không? Hành động này không thể hoàn tác.')">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </c:forEach>
