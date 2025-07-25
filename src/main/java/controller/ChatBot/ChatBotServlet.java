@@ -29,7 +29,7 @@ public class ChatBotServlet extends HttpServlet {
             + "Nếu kết quả là một giá trị cụ thể, hãy trả về chính xác giá trị đó. "
             + "Nếu cần làm rõ thêm, hãy hỏi lại tôi.";
 
-    private static final String API_KEY = "AIzaSyBoPtmjWGYHcT9IWpmKiwkWwP-gOzNuSHM";
+    private static final String API_KEY = "xxx";
 
     private static final String GEMINI_URL
             = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
