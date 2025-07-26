@@ -1,5 +1,6 @@
 package service;
 
+import config.ConfigAPIKey;
 import jakarta.activation.DataHandler;
 import jakarta.activation.FileDataSource;
 import jakarta.mail.*;
@@ -7,141 +8,89 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
-import jakarta.mail.internet.MimeUtility;
 import java.io.File;
-
 import java.util.Properties;
 
 public class EmailService {
 
-    public static final String EMAIL_SENDER = "xxx";
-    public static final String EMAIL_PASSWORD = "xxx";
-    private static final String SMTP_HOST = "smtp.gmail.com";
-    private static final int SMTP_PORT = 587;
+
+
 
     private void validateCredentials() {
-        if (EMAIL_SENDER == null || EMAIL_PASSWORD == null) {
-            System.out.println("⚠️ Vui lòng cấu hình biến môi trường SENDER_EMAIL và SENDER_PASSWORD.");
-            throw new IllegalStateException("Chưa cấu hình thông tin email.");
+        String sender = ConfigAPIKey.getProperty("email.sender.address");
+        String password = ConfigAPIKey.getProperty("email.sender.password");
+        if (sender == null || sender.isEmpty() || password == null || password.isEmpty()) {
+            System.out.println("⚠️ Lỗi: Vui lòng cấu hình 'email.sender.address' và 'email.sender.password' trong file config.properties.");
+            throw new IllegalStateException("Chưa cấu hình đầy đủ thông tin email trong file config.properties.");
         }
-        System.out.println("✅ SENDER_EMAIL: " + EMAIL_SENDER);
-        System.out.println("✅ SENDER_PASSWORD: ********");
+        System.out.println("✅ SENDER_EMAIL được cấu hình: " + sender);
     }
+
 
     private Session createSession() {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", SMTP_HOST);
-        props.put("mail.smtp.port", SMTP_PORT);
-        props.put("mail.debug", "true");
+        props.put("mail.smtp.host", ConfigAPIKey.getProperty("email.smtp.host"));
+        props.put("mail.smtp.port", ConfigAPIKey.getProperty("email.smtp.port"));
+        props.put("mail.debug", "false"); // Nên đặt là false trong production
 
         return Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(EMAIL_SENDER, EMAIL_PASSWORD);
+                return new PasswordAuthentication(
+                        ConfigAPIKey.getProperty("email.sender.address"),
+                        ConfigAPIKey.getProperty("email.sender.password")
+                );
             }
         });
     }
 
-    public void sendOTPEmail(String recipientEmail, String resetCode, String subject) {
+
+    private void sendHtmlEmail(String recipientEmail, String subject, String htmlContent) {
         validateCredentials();
         Session session = createSession();
-
         try {
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(EMAIL_SENDER));
+            message.setFrom(new InternetAddress(ConfigAPIKey.getProperty("email.sender.address")));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
             message.setSubject(subject);
-            message.setContent(
-                "<h1>Yêu cầu xác thực OTP</h1>"
-                + "<p>Mã xác thực của bạn là: <strong>" + resetCode + "</strong></p>"
-                + "<p>Mã này có hiệu lực trong vòng 5 phút.</p>",
-                "text/html; charset=UTF-8"
-            );
-
+            message.setContent(htmlContent, "text/html; charset=UTF-8");
             Transport.send(message);
-            System.out.println("✅ Đã gửi email OTP đến: " + recipientEmail);
-
+            System.out.println("✅ Đã gửi email '" + subject + "' đến: " + recipientEmail);
         } catch (MessagingException e) {
-            System.err.println("❌ Gửi email OTP thất bại: " + e.getMessage());
+            System.err.println("❌ Gửi email thất bại: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public void sendOTPEmail(String recipientEmail, String resetCode, String subject) {
+        String htmlContent = "<h1>Yêu cầu xác thực OTP</h1>"
+                + "<p>Mã xác thực của bạn là: <strong>" + resetCode + "</strong></p>"
+                + "<p>Mã này có hiệu lực trong vòng 5 phút.</p>";
+        sendHtmlEmail(recipientEmail, subject, htmlContent);
     }
 
     public void sendManualSignupEmail(String recipientEmail, String username) {
-        validateCredentials();
-        Session session = createSession();
-
-        try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(EMAIL_SENDER));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            message.setSubject("Chào mừng bạn đến với Ứng dụng của chúng tôi!");
-            message.setContent(
-                "<h1>Đăng ký thành công</h1>"
+        String htmlContent = "<h1>Đăng ký thành công</h1>"
                 + "<p>Xin chào " + username + ",</p>"
-                + "<p>Thông tin tài khoản của bạn đã được tạo thành công.</p>",
-                "text/html; charset=UTF-8"
-            );
-
-            Transport.send(message);
-            System.out.println("✅ Đã gửi email đăng ký thủ công đến: " + recipientEmail);
-
-        } catch (MessagingException e) {
-            System.err.println("❌ Gửi email thất bại: " + e.getMessage());
-            e.printStackTrace();
-        }
+                + "<p>Thông tin tài khoản của bạn đã được tạo thành công.</p>";
+        sendHtmlEmail(recipientEmail, "Chào mừng bạn đến với Ứng dụng của chúng tôi!", htmlContent);
     }
 
     public void sendGoogleSignupEmail(String recipientEmail, String username) {
-        validateCredentials();
-        Session session = createSession();
-
-        try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(EMAIL_SENDER));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            message.setSubject("Chào mừng bạn - Đăng ký bằng Google");
-            message.setContent(
-                "<h1>Đăng ký bằng Google thành công</h1>"
+        String htmlContent = "<h1>Đăng ký bằng Google thành công</h1>"
                 + "<p>Xin chào " + username + ",</p>"
-                + "<p>Bạn đã đăng ký tài khoản thành công bằng Google.</p>",
-                "text/html; charset=UTF-8"
-            );
-
-            Transport.send(message);
-            System.out.println("✅ Đã gửi email đăng ký bằng Google đến: " + recipientEmail);
-
-        } catch (MessagingException e) {
-            System.err.println("❌ Gửi email thất bại: " + e.getMessage());
-            e.printStackTrace();
-        }
+                + "<p>Bạn đã đăng ký tài khoản thành công bằng Google.</p>";
+        sendHtmlEmail(recipientEmail, "Chào mừng bạn - Đăng ký bằng Google", htmlContent);
     }
 
     public void sendConfirmationEmail(String recipientEmail, String orderDetails) {
-        validateCredentials();
-        Session session = createSession();
-
-        try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(EMAIL_SENDER));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            message.setSubject("Xác nhận đơn hàng");
-            message.setContent(
-                "<h1>Cảm ơn bạn đã đặt hàng!</h1>"
-                + "<p>Chi tiết đơn hàng:</p><pre>" + orderDetails + "</pre>",
-                "text/html; charset=UTF-8"
-            );
-
-            Transport.send(message);
-            System.out.println("✅ Đã gửi email xác nhận đơn hàng đến: " + recipientEmail);
-
-        } catch (MessagingException e) {
-            System.err.println("❌ Gửi email xác nhận thất bại: " + e.getMessage());
-            e.printStackTrace();
-        }
+        String htmlContent = "<h1>Cảm ơn bạn đã đặt hàng!</h1>"
+                + "<p>Chi tiết đơn hàng:</p><pre>" + orderDetails + "</pre>";
+        sendHtmlEmail(recipientEmail, "Xác nhận đơn hàng", htmlContent);
     }
+
 
     public static void sendEmail(String recipientEmail, String subject, String messageText) throws MessagingException {
         System.out.println("📨 [DEBUG] - Gửi tới: " + recipientEmail);
@@ -149,28 +98,29 @@ public class EmailService {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", SMTP_HOST);
-        props.put("mail.smtp.port", SMTP_PORT);
+        props.put("mail.smtp.host", ConfigAPIKey.getProperty("email.smtp.host"));
+        props.put("mail.smtp.port", ConfigAPIKey.getProperty("email.smtp.port"));
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
         props.put("mail.debug", "true");
 
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(EMAIL_SENDER, EMAIL_PASSWORD);
+                return new PasswordAuthentication(
+                        ConfigAPIKey.getProperty("email.sender.address"),
+                        ConfigAPIKey.getProperty("email.sender.password")
+                );
             }
         });
 
         try {
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(EMAIL_SENDER));
+            message.setFrom(new InternetAddress(ConfigAPIKey.getProperty("email.sender.address")));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
             message.setSubject(subject);
             message.setText(messageText);
-
             Transport.send(message);
             System.out.println("✅ Email đã gửi thành công!");
-
         } catch (MessagingException e) {
             System.err.println("❌ Gửi email thất bại: " + e.getMessage());
             throw e;
@@ -180,14 +130,12 @@ public class EmailService {
     public void sendCheckinQRCodeEmail(String recipientEmail, String fullName, int bookingId, File qrFile, String checkinUrl) {
         validateCredentials();
         Session session = createSession();
-
         try {
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(EMAIL_SENDER));
+            message.setFrom(new InternetAddress(ConfigAPIKey.getProperty("email.sender.address")));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
             message.setSubject("🎟️ Mã QR Check-in - Đơn #" + bookingId);
 
-            // Nội dung HTML có nhúng ảnh QR
             String html = "<h2>Xin chào " + fullName + ",</h2>"
                     + "<p>Vui lòng trình mã QR dưới đây khi đến sân để check-in.</p>"
                     + "<p><strong>Đơn #" + bookingId + "</strong></p>"
@@ -208,7 +156,6 @@ public class EmailService {
 
             message.setContent(multipart);
             Transport.send(message);
-
             System.out.println("✅ Đã gửi email QR code kèm ảnh đến " + recipientEmail);
         } catch (Exception e) {
             e.printStackTrace();

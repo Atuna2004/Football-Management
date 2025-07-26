@@ -1,25 +1,23 @@
 package connect;
 
+import config.ConfigAPIKey;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 public class DBConnection {
-
-    private static final String DRIVER_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=FootballFieldManagement;encrypt=true;trustServerCertificate=true";
-    private static final String USER_NAME = "sa";
-    private static final String PASSWORD = "123";
-
-    private static Connection conn = null;
 
     public static Connection getConnection() {
         try {
-            Class.forName(DRIVER_NAME);
-            Connection conn = DriverManager.getConnection(DB_URL, USER_NAME, PASSWORD);
+            // Đọc thông tin từ file config
+            Class.forName(ConfigAPIKey.getProperty("db.driver"));
+            Connection conn = DriverManager.getConnection(
+                    ConfigAPIKey.getProperty("db.url"),
+                    ConfigAPIKey.getProperty("db.user"),
+                    ConfigAPIKey.getProperty("db.password")
+            );
             System.out.println("✅ Connected to database.");
             return conn;
         } catch (ClassNotFoundException | SQLException ex) {
@@ -38,7 +36,6 @@ public class DBConnection {
             }
         }
     }
-
 
     public static void main(String[] args) {
         Connection testConn = getConnection();

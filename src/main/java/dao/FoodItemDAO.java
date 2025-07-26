@@ -248,32 +248,38 @@ public class FoodItemDAO {
         }
         return list;
     }
-    public List<FoodItem> searchByName(String keyword) {
+    public List<FoodItem> searchByName(String keyword, int ownerId) {
         List<FoodItem> list = new ArrayList<>();
 
         boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT FoodItemID, StadiumID, Name, Description, Price, ")
-           .append("StockQuantity, IsActive, ImageUrl ")
-           .append("FROM FoodItem ");
+        sql.append("SELECT fi.FoodItemID, fi.StadiumID, fi.Name, fi.Description, fi.Price, ")
+                .append("fi.StockQuantity, fi.IsActive, fi.ImageUrl, ")
+                .append("s.Name AS StadiumName ")
+                .append("FROM FoodItem fi ")
+                .append("JOIN Stadium s ON fi.StadiumID = s.StadiumID ") 
+                .append("WHERE s.OwnerID = ? ");
 
         if (hasKeyword) {
-            sql.append("WHERE Name COLLATE Latin1_General_CI_AI LIKE ? ");
+            sql.append("AND fi.Name COLLATE Latin1_General_CI_AI LIKE ? ");
         }
-        sql.append("ORDER BY Name");
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        sql.append("ORDER BY fi.Name");
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            ps.setInt(1, ownerId);
 
             if (hasKeyword) {
-                ps.setString(1, "%" + keyword.trim() + "%");
+                ps.setString(2, "%" + keyword.trim() + "%");
             }
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    // mapFoodItem không cần StadiumName ➜ includeStadium = false
-                    list.add(mapFoodItem(rs, false));
+                    
+                    // mapFoodItem có StadiumName 
+                    list.add(mapFoodItem(rs, true));// đổi từ false ➜ true
                 }
             }
         } catch (SQLException e) {
@@ -281,6 +287,4 @@ public class FoodItemDAO {
         }
         return list;
     }
-    
-    
 }

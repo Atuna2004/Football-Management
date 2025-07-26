@@ -125,6 +125,29 @@
         <i class="fas fa-home me-2"></i>Quay về trang chủ
     </a>
 </div>
+        
+ <div class="row g-4">
+        <c:forEach var="t" items="${list}">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="images-food/default-food.jpg4" class="card-img-top" alt="${item.name}" />
+                    <div class="card-body">
+                        <h5 class="card-title">${item.name}</h5>
+                        <p class="card-text">
+                            Giá: <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true" /> đ
+                        </p>
+                        <form action="add-to-cart" method="post">
+                            <input type="hidden" name="foodItemId" value="${item.foodItemID}" />
+                            <input type="hidden" name="stadiumId" value="${stadiumId}" />
+                            <input type="hidden" name="bookingId" value="${bookingId}" />
+                            <input type="number" name="quantity" value="1" min="1" class="form-control mb-2" />
+                            <button type="submit" class="btn btn-success">🛒 Thêm vào giỏ</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </c:forEach>
+    </div>
 
 </body>
 </html>

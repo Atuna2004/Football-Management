@@ -3,12 +3,11 @@ package model;
 import java.util.Date;
 
 public class Report {
-    // Database fields
     private int reportID;
     private int userID;
     private Integer relatedBookingID;
     private Integer relatedFoodOrderID;
-    private Integer relatedStadiumID;  // ✅ Added missing field
+    private Integer relatedStadiumID;
     private String title;
     private String description;
     private Date submittedAt;
@@ -16,15 +15,14 @@ public class Report {
     private String adminResponse;
     private Date respondedAt;
     
-    // Display fields
+   
     private String userName;
     private String userEmail;
     private String type;
     private String priority;
-    
-    // Constructors
+    private String stadiumName; 
+ 
     public Report() {
-        // Default constructor
     }
     
     public Report(int userID, Integer relatedStadiumID, String title, String description) {
@@ -69,7 +67,6 @@ public class Report {
         this.relatedFoodOrderID = relatedFoodOrderID;
     }
     
-    // ✅ Added missing getter/setter for RelatedStadiumID
     public Integer getRelatedStadiumID() {
         return relatedStadiumID;
     }
@@ -157,6 +154,15 @@ public class Report {
     public void setPriority(String priority) {
         this.priority = priority;
     }
+
+    // ✅ Added the missing getter and setter for stadiumName
+    public String getStadiumName() {
+        return stadiumName;
+    }
+
+    public void setStadiumName(String stadiumName) {
+        this.stadiumName = stadiumName;
+    }
     
     // ✅ Added utility methods
     @Override
@@ -168,6 +174,7 @@ public class Report {
                 ", title='" + title + '\'' +
                 ", status='" + status + '\'' +
                 ", submittedAt=" + submittedAt +
+                ", stadiumName='" + stadiumName + '\'' + // Include in toString for debugging
                 '}';
     }
 }
