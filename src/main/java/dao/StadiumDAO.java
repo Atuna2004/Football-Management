@@ -266,8 +266,8 @@ public class StadiumDAO {
     }
 
     // ✅ Hàm chung để tạo đối tượng Stadium từ ResultSet
-    private Stadium mapResultSetToStadium(ResultSet rs) throws SQLException {
-        return new Stadium(
+   private Stadium mapResultSetToStadium(ResultSet rs) throws SQLException {
+        Stadium stadium = new Stadium(
                 rs.getInt("stadiumID"),
                 rs.getString("name"),
                 rs.getString("location"),
@@ -277,7 +277,18 @@ public class StadiumDAO {
                 rs.getString("phoneNumber"),
                 rs.getInt("OwnerID")
         );
+
+        // Thêm phần này để lấy GPS nếu có
+        try {
+            stadium.setLatitude(rs.getDouble("latitude"));
+            stadium.setLongitude(rs.getDouble("longitude"));
+        } catch (SQLException e) {
+            // Nếu cột chưa có trong DB (cũ), bỏ qua
+        }
+
+        return stadium;
     }
+
     
     public List<Stadium> getStadiumsByOwner(int ownerId) {
         List<Stadium> list = new ArrayList<>();

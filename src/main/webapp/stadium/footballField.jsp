@@ -10,7 +10,7 @@
     <title>Danh sách sân bóng</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/footballField.css"/>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
 <%@ include file="/includes/header.jsp" %>
@@ -40,6 +40,12 @@
                                     </li>
                                 </c:forEach>
                             </ul>
+                        </div>
+
+                        <!-- Gợi ý sân gần bạn -->
+                        <div class="mt-4">
+                            <h5 style="color: #18458b; font-size: 18px;"><i class="fa-solid fa-location-dot"></i> Sân gần bạn</h5>
+                            <div id="suggested-stadiums">⏳ Đang xác định vị trí...</div>
                         </div>
                     </div>
                 </div>
@@ -107,18 +113,14 @@
                         <ul class="pagination justify-content-center mt-4">
                             <c:forEach begin="1" end="${totalPages}" var="i">
                                 <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                    <a class="page-link"
-                                       <c:choose>
-                                            <c:when test="${not empty selectedLocation}">
-                                                <a class="page-link"
-                                                   href="${pageContext.request.contextPath}/stadiums?page=${i}&location=${selectedLocation}">${i}</a>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <a class="page-link"
-                                                   href="${pageContext.request.contextPath}/stadiums?page=${i}">${i}</a>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </a>
+                                    <c:choose>
+                                        <c:when test="${not empty selectedLocation}">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/stadiums?page=${i}&location=${selectedLocation}">${i}</a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a class="page-link" href="${pageContext.request.contextPath}/stadiums?page=${i}">${i}</a>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </li>
                             </c:forEach>
                         </ul>
@@ -130,5 +132,62 @@
 </main>
 
 <%@ include file="/includes/footer.jsp" %>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const suggestedBox = document.getElementById("suggested-stadiums");
+
+    function fetchSuggestions(lat, lon) {
+        console.log("📍 Gửi tọa độ:", lat, lon);
+
+        const params = new URLSearchParams();
+        params.append("latitude", lat);
+        params.append("longitude", lon);
+
+        fetch("${pageContext.request.contextPath}/suggest-stadiums", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: params.toString()
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Không thể lấy gợi ý sân bóng");
+            return response.text();
+        })
+        .then(html => {
+            suggestedBox.innerHTML = html;
+        })
+        .catch(error => {
+            console.error("❌ Lỗi khi fetch gợi ý sân:", error);
+            suggestedBox.innerHTML = "<p class='text-danger'>Không thể gợi ý sân bóng.</p>";
+        });
+    }
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                fetchSuggestions(lat, lon);
+            },
+            (error) => {
+                console.warn("⚠️ Không lấy được tọa độ thật, dùng fake:", error.message);
+                // Tọa độ fake tại Quảng Nam
+                fetchSuggestions(15.978673, 108.262237);
+            },
+            {
+                timeout: 5000
+            }
+        );
+    } else {
+        console.warn("⚠️ Trình duyệt không hỗ trợ geolocation, dùng tọa độ giả.");
+        fetchSuggestions(15.978673, 108.262237); // fallback
+    }
+});
+</script>
+
+
+
 </body>
 </html>
