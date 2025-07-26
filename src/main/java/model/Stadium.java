@@ -12,6 +12,10 @@ public class Stadium {
     private Date createdAt;
     private String phoneNumber;
     private int OwnerID;
+    private Double latitude;
+    private Double longitude;
+    private Double distance; // dùng để sắp xếp sân gần
+
 
     public Stadium() {
     }
@@ -91,4 +95,30 @@ public class Stadium {
     public void setOwnerID(int OwnerID) {
         this.OwnerID = OwnerID;
     }
+    
+    
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
+    
 }

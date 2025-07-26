@@ -232,3 +232,44 @@ main .section-separator:before {
 .detail span {
     font-size: 1.4rem;
 }
+
+/* Suggested stadiums section */
+#suggested-stadiums {
+    margin-top: 12px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    font-size: 1.4rem;
+    color: #333;
+    min-height: 60px;
+    line-height: 1.6;
+}
+
+#suggested-stadiums p {
+    margin: 0;
+    color: #444;
+}
+
+#suggested-stadiums .stadium-item {
+    margin-bottom: 12px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#suggested-stadiums .stadium-item:last-child {
+    border-bottom: none;
+}
+
+#suggested-stadiums .stadium-name {
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #19458a;
+}
+
+#suggested-stadiums .stadium-location,
+#suggested-stadiums .stadium-phone {
+    font-size: 1.3rem;
+    color: #555;
+}
+
