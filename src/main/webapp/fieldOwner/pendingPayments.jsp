@@ -8,26 +8,517 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh Sách Thanh Toán Chờ Xác Nhận</title>
+    <title>Thanh Toán Chờ Xác Nhận - Field Manager</title>
 
-    <!-- Bootstrap + Font Awesome -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css"  rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"  rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- CSS riêng -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/FOPayment.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 50%, #dbeafe 100%);
+            min-height: 100vh;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        /* Top Header */
+        .top-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 80px;
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.08);
+        }
+
+        .top-header .container-fluid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo h3 {
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+        }
+
+        .logo h3 a.item {
+            text-decoration: none;
+            color: #3b82f6;
+            transition: all 0.3s ease;
+        }
+
+        .logo h3 a.item:hover {
+            transform: scale(1.1);
+            text-decoration: none;
+        }
+
+        .user-greeting {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 300px;
+            padding: 40px;
+            width: calc(100% - 300px);
+            margin-top: 80px;
+        }
+
+        /* Page Title */
+        .page-title {
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 32px;
+            margin-bottom: 32px;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title i {
+            color: #3b82f6;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 32px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 32px 80px rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .stat-card .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            margin: 0 auto 20px;
+        }
+
+        .stat-card.pending-count .icon {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .stat-card.pending-amount .icon {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .stat-card.urgent-pending .icon {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .stat-card h4 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+
+        .stat-card p {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        /* Card Styles */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 32px 80px rgba(59, 130, 246, 0.12);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 32px 40px;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h5 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-body {
+            padding: 0;
+        }
+
+        /* Table Styles */
+        .table-responsive {
+            border-radius: 0 0 24px 24px;
+            overflow: hidden;
+        }
+
+        .table {
+            background: transparent;
+            border-collapse: collapse;
+            width: 100%;
+            margin: 0;
+        }
+
+        .table th {
+            background: rgba(59, 130, 246, 0.05);
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 24px 20px;
+            border: none;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table td {
+            padding: 24px 20px;
+            border: none;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.05);
+            vertical-align: middle;
+        }
+
+        .table tr {
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(59, 130, 246, 0.03);
+            transform: scale(1.005);
+        }
+
+        /* Payment ID Styling */
+        .payment-id {
+            font-weight: 700;
+            color: #3b82f6;
+            font-size: 16px;
+        }
+
+        /* User Name Styling */
+        .user-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 16px;
+        }
+
+        /* Amount Styling */
+        .amount {
+            font-weight: 700;
+            color: #2563eb;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .amount i {
+            color: #3b82f6;
+            font-size: 16px;
+        }
+
+        /* Payment Method Badge */
+        .payment-method {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .payment-method.vnpay {
+            background: rgba(220, 38, 127, 0.1);
+            color: #be185d;
+        }
+
+        .payment-method.momo {
+            background: rgba(168, 85, 247, 0.1);
+            color: #7c3aed;
+        }
+
+        .payment-method.cash {
+            background: rgba(34, 197, 94, 0.1);
+            color: #059669;
+        }
+
+        /* Date Styling */
+        .payment-date {
+            color: #64748b;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.25);
+            text-decoration: none;
+            color: white;
+        }
+
+        /* Pending Status Indicator */
+        .pending-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .pending-indicator i {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #cbd5e1;
+            margin-bottom: 24px;
+        }
+
+        .empty-state h3 {
+            color: #64748b;
+            margin-bottom: 12px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .empty-state p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 24px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .page-title {
+                font-size: 28px;
+            }
+
+            .card-header {
+                padding: 24px;
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .table th,
+            .table td {
+                padding: 16px 12px;
+                font-size: 14px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .btn {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            .top-header .container-fluid {
+                padding: 0 24px;
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start !important;
+            }
+
+            .amount {
+                font-size: 16px;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-delay-1 { animation-delay: 0.1s; animation-fill-mode: both; }
+        .animate-delay-2 { animation-delay: 0.2s; animation-fill-mode: both; }
+        .animate-delay-3 { animation-delay: 0.3s; animation-fill-mode: both; }
+
+        /* Utility Classes */
+        .d-flex { display: flex; }
+        .justify-content-between { justify-content: space-between; }
+        .align-items-center { align-items: center; }
+        .me-2 { margin-right: 0.5rem; }
+        .mb-4 { margin-bottom: 1.5rem; }
+        .p-0 { padding: 0; }
+        .mb-0 { margin-bottom: 0; }
+        .text-start { text-align: start; }
+        .btn-sm { font-size: 12px; padding: 6px 12px; }
+    </style>
 </head>
 <body>
 
 <!-- Top Header -->
 <div class="top-header">
-    <div class="container-fluid d-flex justify-content-between align-items-center">
+    <div class="container-fluid">
         <div class="logo">
             <h3>
                 <a class="item" href="<%= request.getContextPath() %>/home.jsp">
-                    <i class="fas fa-futbol me-2"></i>
+                    <i class="fas fa-futbol"></i>
                 </a>
-                Field Manager Page
+                Field Manager
             </h3>
         </div>
 
@@ -58,53 +549,186 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <div class="container-fluid">
-            <h2 class="mb-4">Danh Sách Thanh Toán Chờ Xác Nhận</h2>
-            <div class="card">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Mã Booking</th>
-                                    <th>Tên Người Dùng</th>
-                                    <th>Số Tiền</th>
-                                    <th>Phương Thức</th>
-                                    <th>Ngày Tạo Yêu Cầu</th>
-                                    <th>Hành Động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach items="${payments}" var="p">
-                                    <tr>
-                                        <td>${p.bookingId}</td>
-                                        <td>${paymentDAO.getUserNameByBookingId(p.bookingId)}</td>
-                                        <td class="text-start">
-                                            <fmt:formatNumber value="${p.amount}" type="number" maxFractionDigits="0" groupingUsed="true"/> ₫
-                                        </td>
-                                        <td>${p.paymentMethod}</td>
-                                        <td>${p.paymentDate}</td>
-                                        <td>
-                                            <a href="process-payment?action=Completed&id=${p.paymentId}" class="btn btn-success btn-sm">
-                                                <i class="fa-solid fa-check"></i> Xác Nhận
-                                            </a>
-                                            <a href="process-payment?action=Failed&id=${p.paymentId}" class="btn btn-danger btn-sm">
-                                                <i class="fa-solid fa-trash-can"></i> Hủy
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
-                    </div>
+        <!-- Page Title -->
+        <h1 class="page-title fade-in">
+            <i class="fas fa-hourglass-half"></i>
+            Thanh Toán Chờ Xác Nhận
+        </h1>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card pending-count fade-in animate-delay-1">
+                <div class="icon"><i class="fas fa-clock"></i></div>
+                <h4><c:out value="${payments != null ? payments.size() : 0}"/></h4>
+                <p>Đang chờ xác nhận</p>
+            </div>
+            <div class="stat-card pending-amount fade-in animate-delay-2">
+                <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <h4>
+                    <c:set var="totalPendingAmount" value="0"/>
+                    <c:forEach items="${payments}" var="p">
+                        <c:set var="totalPendingAmount" value="${totalPendingAmount + p.amount}"/>
+                    </c:forEach>
+                    <fmt:formatNumber value="${totalPendingAmount}" type="number" maxFractionDigits="0" groupingUsed="true"/>
+                </h4>
+                <p>Tổng giá trị chờ (₫)</p>
+            </div>
+            <div class="stat-card urgent-pending fade-in animate-delay-3">
+                <div class="icon"><i class="fas fa-bolt"></i></div>
+                <h4>
+                    <c:set var="urgentCount" value="0"/>
+                    <jsp:useBean id="now" class="java.util.Date"/>
+                    <fmt:formatDate value="${now}" pattern="yyyy-MM-dd" var="today"/>
+                    <c:forEach items="${payments}" var="p">
+                        <c:if test="${p.paymentDate.toString().startsWith(today)}">
+                            <c:set var="urgentCount" value="${urgentCount + 1}"/>
+                        </c:if>
+                    </c:forEach>
+                    ${urgentCount}
+                </h4>
+                <p>Cần xử lý ngay</p>
+            </div>
+        </div>
+
+        <!-- Pending Payments Table -->
+        <div class="card fade-in">
+            <div class="card-header">
+                <h5>
+                    <i class="fas fa-list-check"></i>
+                    Danh sách thanh toán chờ xác nhận
+                </h5>
+                <div class="pending-indicator">
+                    <i class="fas fa-circle"></i>
+                    ${payments != null ? payments.size() : 0} yêu cầu
                 </div>
+            </div>
+            <div class="card-body p-0">
+                <c:choose>
+                    <c:when test="${payments != null && not empty payments}">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Mã Booking</th>
+                                        <th>Tên Người Dùng</th>
+                                        <th>Số Tiền</th>
+                                        <th>Phương Thức</th>
+                                        <th>Ngày Tạo Yêu Cầu</th>
+                                        <th>Hành Động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach items="${payments}" var="p">
+                                        <tr>
+                                            <td>
+                                                <span class="payment-id">#${p.bookingId}</span>
+                                            </td>
+                                            <td>
+                                                <span class="user-name">${paymentDAO.getUserNameByBookingId(p.bookingId)}</span>
+                                            </td>
+                                            <td>
+                                                <div class="amount">
+                                                    <i class="fas fa-clock"></i>
+                                                    <fmt:formatNumber value="${p.amount}" type="number" maxFractionDigits="0" groupingUsed="true"/> ₫
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="payment-method ${p.paymentMethod.toLowerCase()}">
+                                                    <c:choose>
+                                                        <c:when test="${p.paymentMethod.toLowerCase().contains('vnpay')}">
+                                                            <i class="fas fa-credit-card"></i>
+                                                        </c:when>
+                                                        <c:when test="${p.paymentMethod.toLowerCase().contains('momo')}">
+                                                            <i class="fas fa-mobile-alt"></i>
+                                                        </c:when>
+                                                        <c:when test="${p.paymentMethod.toLowerCase().contains('cash')}">
+                                                            <i class="fas fa-money-bill"></i>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <i class="fas fa-payment"></i>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                    ${p.paymentMethod}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="payment-date">
+                                                    <i class="fas fa-calendar" style="color: #64748b; margin-right: 6px;"></i>
+                                                    ${p.paymentDate}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a href="process-payment?action=Completed&id=${p.paymentId}" 
+                                                       class="btn btn-success btn-sm"
+                                                       onclick="return confirm('Bạn có chắc chắn muốn xác nhận thanh toán này?')">
+                                                        <i class="fas fa-check"></i> Xác Nhận
+                                                    </a>
+                                                    <a href="process-payment?action=Failed&id=${p.paymentId}" 
+                                                       class="btn btn-danger btn-sm"
+                                                       onclick="return confirm('Bạn có chắc chắn muốn hủy thanh toán này?')">
+                                                        <i class="fas fa-times"></i> Hủy
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>Không có thanh toán chờ xác nhận</h3>
+                            <p>Tất cả thanh toán đã được xử lý</p>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
     </main>
 </div>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script> 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Add fade-in animation to table rows
+        const tableRows = document.querySelectorAll('tbody tr');
+        tableRows.forEach((row, index) => {
+            row.style.animationDelay = `${index * 0.05}s`;
+            row.classList.add('fade-in');
+        });
+
+        // Add loading effect for action buttons
+        const actionBtns = document.querySelectorAll('.btn');
+        actionBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                // Add loading state
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+                this.style.pointerEvents = 'none';
+                this.style.opacity = '0.7';
+                
+                // Let the default action proceed after a brief delay
+                setTimeout(() => {
+                    // Note: In real implementation, the page will redirect
+                    // This is just for visual feedback
+                }, 500);
+            });
+        });
+
+        // Highlight urgent payments (today's requests)
+        const today = new Date().toISOString().split('T')[0];
+        const rows = document.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const dateCell = row.querySelector('.payment-date');
+            if (dateCell && dateCell.textContent.includes(today)) {
+                row.style.background = 'rgba(59, 130, 246, 0.05)';
+                row.style.borderLeft = '4px solid #3b82f6';
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

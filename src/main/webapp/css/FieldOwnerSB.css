@@ -1,81 +1,137 @@
+/* Modern Sidebar CSS - Following the blue theme design */
+
 .navigation-sidebar {
-    width: 280px;
-    background: white;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.08);
+    width: 300px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(59, 130, 246, 0.1);
     position: fixed;
     left: 0;
     top: 80px;
     height: calc(100vh - 80px);
     overflow-y: auto;
     z-index: 999;
-}
-
-.nav-header {
-    padding: 25px 0px 25px 15px;
-    border-bottom: 1px solid #f0f0f0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.nav-header h5 {
-    margin: 0;
-    font-weight: 600;
-    font-size: 18px;
+    box-shadow: 8px 0 32px rgba(59, 130, 246, 0.08);
 }
 
 .nav-menu {
-    padding: 0;
+    padding: 24px 0;
     list-style: none;
+    margin: 0;
 }
 
 .nav-item {
-    border-bottom: 1px solid #f0f0f0;
+    margin: 0 16px 8px 16px;
 }
 
 .nav-item:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
 }
 
 .nav-link {
     display: flex;
     align-items: center;
-    padding: 18px 15px;
-    color: #495057;
+    padding: 16px 20px;
+    color: #64748b;
     text-decoration: none;
-    transition: all 0.3s ease;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    font-weight: 500;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 
 .nav-link:hover {
-    background: #f8f9fa;
-    color: #667eea;
+    background: rgba(59, 130, 246, 0.08);
+    color: #3b82f6;
     text-decoration: none;
+    transform: translateX(4px);
 }
 
 .nav-link.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
     color: white;
-    font-weight: bold;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
 }
 
-.nav-link.active::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: #fff;
+.nav-link.active:hover {
+    transform: translateX(0);
+    box-shadow: 0 12px 32px rgba(59, 130, 246, 0.35);
 }
 
 .nav-link i {
     width: 20px;
-    margin-right: 12px;
+    margin-right: 16px;
     font-size: 16px;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    text-align: center;
 }
 
 .nav-link span {
-    font-weight: 500;
-    font-size: 15px;
+    font-size: 14px;
+    font-weight: inherit;
+    letter-spacing: 0.25px;
+}
+
+/* User Menu at Bottom */
+.user-menu {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(248, 250, 252, 0.8);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(59, 130, 246, 0.1);
+    padding: 16px 0;
+}
+
+.user-menu .nav-menu {
+    padding: 0;
+}
+
+.user-menu .nav-item {
+    margin: 0 16px 4px 16px;
+}
+
+.user-menu .nav-link {
+    padding: 12px 20px;
+    font-size: 14px;
+}
+
+.user-menu .nav-link i {
+    margin-right: 12px;
+    font-size: 14px;
+}
+
+/* Scrollbar Styling */
+.navigation-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.navigation-sidebar::-webkit-scrollbar-track {
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: 3px;
+}
+
+.navigation-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.2);
+    border-radius: 3px;
+}
+
+.navigation-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navigation-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        width: 280px;
+    }
+
+    .navigation-sidebar.show {
+        transform: translateX(0);
+    }
 }

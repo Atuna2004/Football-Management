@@ -1,26 +1,8 @@
+/* ===== Reset và thiết lập chung ===== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
-
-.country-select {
-    position: relative;
-    z-index: 999;
-}
-
-.country-list {
-    z-index: 10000 !important;
-    position: absolute !important;
-    background-color: white;
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    width: 100%;
-}
-
-.form-group {
-    position: relative;
 }
 
 body {
@@ -38,10 +20,11 @@ body {
     padding: 24px;
 }
 
+/* ===== Header ===== */
 .header {
     text-align: center;
     margin-bottom: 40px;
-    padding: 32px 0 24px 0;
+    padding: 32px 0 24px;
     background: linear-gradient(135deg, #6c63ff 0%, #48b1f3 100%);
     color: #fff;
     border-radius: 18px;
@@ -72,6 +55,23 @@ body {
     transition: box-shadow 0.3s;
 }
 
+/* ===== Country Selector ===== */
+.country-select {
+    position: relative;
+    z-index: 999;
+}
+
+.country-list {
+    z-index: 10000 !important;
+    position: absolute !important;
+    background-color: white;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+/* ===== Profile Layout ===== */
 .profile-container {
     display: grid;
     grid-template-columns: 1fr 2fr;
@@ -109,7 +109,6 @@ body {
     cursor: pointer;
     box-shadow: 0 2px 16px rgba(76, 110, 245, 0.10);
     transition: transform 0.3s, box-shadow 0.3s;
-    will-change: transform;
 }
 .avatar-circle:hover {
     transform: scale(1.07) rotate(-2deg);
@@ -122,9 +121,9 @@ body {
     border: 2px solid #6c63ff;
     padding: 8px 18px;
     border-radius: 22px;
-    cursor: pointer;
     font-size: 13px;
     font-weight: bold;
+    cursor: pointer;
     transition: all 0.3s;
 }
 .upload-btn:hover {
@@ -133,6 +132,7 @@ body {
     border-color: #fff;
 }
 
+/* ===== Navigation ===== */
 .nav-menu {
     list-style: none;
     padding: 0;
@@ -149,15 +149,14 @@ body {
     border: 2px solid #e0e7ef;
     border-radius: 12px;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(.4,2,.6,1);
-    width: 100%;
-    text-align: left;
     font-size: 15px;
     color: #232946;
-    box-shadow: 0 2px 8px rgba(76, 110, 245, 0.04);
     font-weight: 500;
+    box-shadow: 0 2px 8px rgba(76, 110, 245, 0.04);
+    transition: all 0.3s cubic-bezier(.4,2,.6,1);
 }
-.nav-link:hover, .nav-link.active {
+.nav-link:hover,
+.nav-link.active {
     background: #6c63ff;
     color: #fff;
     border-color: #48b1f3;
@@ -165,6 +164,7 @@ body {
     box-shadow: 0 4px 16px rgba(76, 110, 245, 0.10);
 }
 
+/* ===== Nội dung chính ===== */
 .main-content {
     background: #fff;
     border: 2px solid #e0e7ef;
@@ -173,16 +173,6 @@ body {
     box-shadow: 0 8px 32px rgba(76, 110, 245, 0.10);
     animation: fadeIn 0.7s cubic-bezier(.4,2,.6,1);
     min-height: 600px;
-}
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 .section {
@@ -196,20 +186,22 @@ body {
     animation: fadeIn 0.7s cubic-bezier(.4,2,.6,1);
 }
 
-.section-title {
-    font-size: 25px;
-    margin-bottom: 22px;
-    color: #232946;
-    border-bottom: 3px solid #6c63ff;
-    padding-bottom: 10px;
-    font-weight: bold;
-    letter-spacing: 0.5px;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
+/* ===== Form ===== */
 .form-group {
     margin-bottom: 22px;
+    position: relative;
 }
-
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -228,8 +220,8 @@ input, select, textarea {
     padding: 13px 16px;
     border: 2px solid #e0e7ef;
     border-radius: 9px;
-    font-size: 15px;
     background: #f4f6fb;
+    font-size: 15px;
     color: #232946;
     transition: border 0.3s, box-shadow 0.3s;
     box-shadow: 0 1px 4px rgba(76, 110, 245, 0.04);
@@ -240,48 +232,69 @@ input:focus, select:focus, textarea:focus {
     outline: none;
 }
 
+/* ===== Buttons ===== */
 .btn {
-    padding: 13px 28px;
+    display: inline-block;
+    padding: 10px 18px;
     border: none;
-    border-radius: 9px;
-    cursor: pointer;
-    font-size: 15px;
+    border-radius: 6px;
+    font-size: 1rem;
     font-weight: bold;
-    transition: all 0.3s cubic-bezier(.4,2,.6,1);
-    margin-right: 10px;
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
     box-shadow: 0 2px 8px rgba(76, 110, 245, 0.06);
+    margin-right: 10px;
 }
+
 .btn-primary {
-    background: #6c63ff;
-    color: #fff;
-    border: 2px solid #6c63ff;
+    background-color: #007bff;
 }
 .btn-primary:hover {
-    background: #fff;
-    color: #6c63ff;
-    border-color: #6c63ff;
+    background-color: #0056b3;
 }
+
+.btn-warning {
+    background-color: #ffc107;
+    color: black;
+}
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
 .btn-success {
-    background: #48b1f3;
-    color: #fff;
+    background-color: #48b1f3;
     border: 2px solid #48b1f3;
+    color: #fff;
 }
 .btn-success:hover {
     background: #fff;
     color: #48b1f3;
-    border-color: #48b1f3;
 }
+
 .btn-danger {
-    background: #b8c6db;
-    color: #232946;
+    background-color: #b8c6db;
     border: 2px solid #b8c6db;
+    color: #232946;
 }
 .btn-danger:hover {
     background: #fff;
-    color: #b8c6db;
-    border-color: #b8c6db;
 }
 
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 5px;
+    font-size: 14px;
+    border: none;
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* ===== Stats Section ===== */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -298,7 +311,6 @@ input:focus, select:focus, textarea:focus {
     border: 2px solid #e0e7ef;
     box-shadow: 0 2px 12px rgba(76, 110, 245, 0.10);
     transition: transform 0.3s, box-shadow 0.3s;
-    animation: fadeIn 0.7s cubic-bezier(.4,2,.6,1);
 }
 .stat-card:hover {
     transform: translateY(-7px) scale(1.04);
@@ -311,16 +323,17 @@ input:focus, select:focus, textarea:focus {
     margin-bottom: 7px;
 }
 
+/* ===== Notifications ===== */
 .notification {
     padding: 16px 20px;
     border-radius: 10px;
     margin-bottom: 22px;
-    display: none;
     font-size: 16px;
     font-weight: 500;
-    box-shadow: 0 2px 12px rgba(76, 110, 245, 0.08);
     opacity: 0;
+    display: none;
     transition: opacity 0.5s, background 0.3s;
+    box-shadow: 0 2px 12px rgba(76, 110, 245, 0.08);
 }
 .notification.success {
     background: #e0e7ef;
@@ -337,6 +350,14 @@ input:focus, select:focus, textarea:focus {
     display: block;
 }
 
+.email-note {
+    display: block;
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 900px) {
     .profile-container {
         grid-template-columns: 1fr;
@@ -346,6 +367,7 @@ input:focus, select:focus, textarea:focus {
         padding: 24px 10px;
     }
 }
+
 @media (max-width: 600px) {
     .header h1 {
         font-size: 1.5em;
@@ -360,28 +382,6 @@ input:focus, select:focus, textarea:focus {
 
 .form-actions {
     display: flex;
-    justify-content: space-between; /* Canh đều sang 2 bên */
+    justify-content: space-between;
     align-items: center;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    color: white;
-    text-decoration: none;
-    padding: 10px 16px;
-    border-radius: 5px;
-    font-size: 14px;
-    border: none;
-    cursor: pointer;
-}
-
-.btn-secondary:hover {
-    background-color: #5a6268;
-}
-
-.email-note {
-    display: block;
-    font-size: 0.9rem;
-    color: #6c757d;
-    margin-top: 5px;
 }

@@ -6,6 +6,7 @@
 package controller.Food;
 
 import dao.FoodItemDAO;
+import dao.StadiumDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -15,6 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.FoodItem;
+import model.Stadium;
+import model.User;
 
 /**
  *
@@ -23,7 +26,7 @@ import model.FoodItem;
 @WebServlet("/food-search")
 public class SearchFoodServlet extends HttpServlet {
     private final FoodItemDAO foodItemDAO = new FoodItemDAO();
-   
+    private final StadiumDAO stadiumDAO = new StadiumDAO();
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -56,18 +59,28 @@ public class SearchFoodServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-     @Override
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         String keyword = request.getParameter("search");   // name="search" trên input
 
+        // Kiểm tra đăng nhập
+        User currentUser = (User) request.getSession().getAttribute("currentUser");
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/account/login.jsp");
+            return;
+        }
+        
+        int ownerId = currentUser.getUserID(); 
+        
         // Lọc theo tên
-        List<FoodItem> foodItems = foodItemDAO.searchByName(keyword);
-
+        List<FoodItem> foodItems = foodItemDAO.searchByName(keyword, ownerId);
+        List<Stadium> stadiums = stadiumDAO.getStadiumsByOwnerId(ownerId);
         // Đẩy dữ liệu sang JSP
         request.setAttribute("foodItems", foodItems);
         request.setAttribute("search", keyword); // để giữ lại chữ vừa gõ
+        request.setAttribute("stadiums", stadiums);
 
         request.getRequestDispatcher("fieldOwner/FoodItemList.jsp")
                .forward(request, response);

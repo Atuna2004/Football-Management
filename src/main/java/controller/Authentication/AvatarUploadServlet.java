@@ -1,109 +1,96 @@
-//package controller.Authentication;
-//
-//import java.io.File;
-//import java.io.IOException;
-//import java.nio.file.Paths;
-//import java.sql.Connection;
-//import connect.DBConnection;
-//import jakarta.servlet.ServletException;
-//import jakarta.servlet.annotation.MultipartConfig;
-//import jakarta.servlet.annotation.WebServlet;
-//import jakarta.servlet.http.HttpServlet;
-//import jakarta.servlet.http.HttpServletRequest;
-//import jakarta.servlet.http.HttpServletResponse;
-//import jakarta.servlet.http.HttpSession;
-//import jakarta.servlet.http.Part;
-//import java.sql.PreparedStatement;
-//import model.User;
-//import java.text.SimpleDateFormat;
-//import java.util.Date;
-//
-//@WebServlet("/uploadAvatar")
-//@MultipartConfig(
-//    fileSizeThreshold = 1024 * 1024 * 2,     // 2MB
-//    maxFileSize = 1024 * 1024 * 10,          // 10MB
-//    maxRequestSize = 1024 * 1024 * 50        // 50MB
-//)
-//public class AvatarUploadServlet extends HttpServlet {
-//
-//    private static final String UPLOAD_DIR = "images/avatars";
-//    private static final String[] ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg"};
-//
-//    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//        
-//        HttpSession session = request.getSession();
-//        User currentUser = (User) session.getAttribute("currentUser");
-//
-//        if (currentUser == null) {
-//            response.sendRedirect(request.getContextPath() + "/account/login.jsp");
-//            return;
-//        }
-//
-//        try {
-//            Part filePart = request.getPart("avatar");
-//            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-//
-//            // Kiểm tra phần mở rộng có hợp lệ không
-//            String fileExt = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
-//            boolean isValidFile = false;
-//            for (String ext : ALLOWED_EXTENSIONS) {
-//                if (ext.equals(fileExt)) {
-//                    isValidFile = true;
-//                    break;
-//                }
-//            }
-//
-//            if (!isValidFile) {
-//                session.setAttribute("errorMessage", "Chỉ hỗ trợ các định dạng: .png, .jpg, .jpeg");
-//                response.sendRedirect(request.getContextPath() + "/user/profile.jsp");
-//                return;
-//            }
-//
-//            // Tạo đường dẫn lưu trữ file
-//            String appPath = request.getServletContext().getRealPath("");
-//            String uploadPath = appPath + File.separator + UPLOAD_DIR;
-//            File uploadDir = new File(uploadPath);
-//            if (!uploadDir.exists()) {
-//                uploadDir.mkdirs();
-//            }
-//
-//            // Tên file duy nhất
-//            String uniqueFileName = generateUniqueFileName(fileName);
-//            String filePath = uploadPath + File.separator + uniqueFileName;
-//
-//            // Lưu file vào server
-//            filePart.write(filePath);
-//
-//            // Cập nhật DB
-//            String avatarUrl = "/" + UPLOAD_DIR + "/" + uniqueFileName;
-//
-//            try (Connection conn = DBConnection.getConnection()) {
-//                String sql = "UPDATE [User] SET AvatarUrl = ? WHERE UserID = ?";
-//                PreparedStatement ps = conn.prepareStatement(sql);
-//                ps.setString(1, avatarUrl);
-//                ps.setInt(2, currentUser.getUserID());
-//                ps.executeUpdate();
-//
-//                // Cập nhật session
-//                currentUser.setAvatarUrl(avatarUrl);
-//                session.setAttribute("currentUser", currentUser);
-//            }
-//
-//            session.setAttribute("successMessage", "Đã cập nhật avatar thành công!");
-//            response.sendRedirect(request.getContextPath() + "/user/profile.jsp");
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            session.setAttribute("errorMessage", "Lỗi khi tải lên ảnh đại diện.");
-//            response.sendRedirect(request.getContextPath() + "/user/profile.jsp");
-//        }
-//    }
-//
-//    // Hàm tạo tên file duy nhất
-//    private String generateUniqueFileName(String originalName) {
-//        String ext = originalName.substring(originalName.lastIndexOf("."));
-//        String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-//        return timestamp + ext;
-//    }
-//}
+package controller.Authentication;
+
+import config.CloudinaryUtils;
+import dao.AccountDAO;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import model.User;
+import java.io.IOException;
+import java.sql.SQLException;
+
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2,
+        maxFileSize = 1024 * 1024 * 10,
+        maxRequestSize = 1024 * 1024 * 50)
+public class AvatarUploadServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        System.out.println("[AvatarUploadServlet] doPost called");
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            System.out.println("[AvatarUploadServlet] No user in session, redirecting to login");
+            response.sendRedirect(request.getContextPath() + "/account/login.jsp");
+            return;
+        }
+        Integer userID = currentUser.getUserID();
+        System.out.println("[AvatarUploadServlet] UserID: " + userID);
+
+        Part filePart = request.getPart("avatar");
+        if (filePart == null || filePart.getSize() == 0) {
+            System.out.println("[AvatarUploadServlet] No file selected");
+            request.setAttribute("error", "Please select an image to upload");
+            request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
+            return;
+        }
+
+        System.out.println("[AvatarUploadServlet] File name: " + filePart.getSubmittedFileName());
+        System.out.println("[AvatarUploadServlet] File size: " + filePart.getSize() + " bytes");
+        System.out.println("[AvatarUploadServlet] Content type: " + filePart.getContentType());
+
+        String contentType = filePart.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            System.out.println("[AvatarUploadServlet] File is not an image, contentType: " + contentType);
+            request.setAttribute("error", "Only image files are allowed");
+            request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
+            return;
+        }
+
+        if (filePart.getSize() > 1024 * 1024 * 10) {
+            System.out.println("[AvatarUploadServlet] File size exceeds 10MB limit: " + filePart.getSize());
+            request.setAttribute("error", "File size exceeds the 10MB limit");
+            request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
+            return;
+        }
+
+        try (java.sql.Connection conn = connect.DBConnection.getConnection()) {
+            AccountDAO dao = new AccountDAO(conn); // Truyền connection vào DAO
+            System.out.println("[AvatarUploadServlet] Starting Cloudinary upload for userID: " + userID);
+
+            String avatarUrl = CloudinaryUtils.uploadImage(filePart, userID);
+            System.out.println("[AvatarUploadServlet] Cloudinary upload successful: " + avatarUrl);
+
+            boolean updated = dao.updateAvatar(userID, avatarUrl);
+            System.out.println("[AvatarUploadServlet] Avatar updated in DB: " + updated);
+
+            // Cập nhật currentUser trong session
+            User updatedUser = dao.getUserById(userID);
+            System.out.println("[AvatarUploadServlet] Retrieved updated user: " + (updatedUser != null ? updatedUser.getEmail() : "null"));
+            session.setAttribute("currentUser", updatedUser);
+            session.setAttribute("success", "Ảnh đại diện đã được cập nhật thành công");
+
+        } catch (IOException e) {
+            System.out.println("[AvatarUploadServlet] IOException during upload/update: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại sau.");
+            request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
+            return; // Thêm return ở đây
+        } catch (SQLException e) {
+            System.out.println("[AvatarUploadServlet] SQLException during DB update: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "Có lỗi xảy ra khi cập nhật cơ sở dữ liệu. Vui lòng thử lại sau.");
+            request.getRequestDispatcher("/account/profile.jsp").forward(request, response);
+            return; // Thêm return ở đây
+        }
+
+        System.out.println("[AvatarUploadServlet] Redirecting to profile.jsp");
+        response.sendRedirect(request.getContextPath() + "/account/profile.jsp");
+    }
+}

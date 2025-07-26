@@ -6,6 +6,7 @@
 package controller.Food;
 
 import dao.FoodItemDAO;
+import dao.StadiumDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -17,7 +18,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.List;
 import model.FoodItem;
+import model.Stadium;
+import model.User;
 
 @WebServlet("/add-food")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024,   // 1 MB
@@ -61,16 +65,26 @@ public class AddFoodServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            User currentUser = (User) request.getSession().getAttribute("currentUser");
+            if (currentUser == null) {
+                response.sendRedirect(request.getContextPath() + "/login.jsp"); // hoặc thông báo lỗi
+                return;
+            }
+            int ownerId = currentUser.getUserID();
+            StadiumDAO stadiumDAO = new StadiumDAO();
+            List<Stadium> stadiums = stadiumDAO.getStadiumsByOwnerId(ownerId);
+
+            request.setAttribute("stadiums", stadiums);
+            request.setAttribute("showModal", true); // để mở lại modal luôn nếu vào add
+            request.getRequestDispatcher("/fieldOwner/FooItemList.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(500, "Lỗi lấy danh sách sân");
+        }
     } 
 
-    /** 
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -120,14 +134,14 @@ public class AddFoodServlet extends HttpServlet {
             } else {
                 req.setAttribute("error", "Thêm món thất bại!");
                 req.setAttribute("showModal", true);                         // để mở lại modal
-                req.getRequestDispatcher("/food-app.jsp").forward(req, resp);
+                req.getRequestDispatcher("/fieldOwner/FoodItemList.jsp").forward(req, resp);
             }
 
         } catch (Exception ex) {
             ex.printStackTrace();
             req.setAttribute("error", "Có lỗi: " + ex.getMessage());
             req.setAttribute("showModal", true);
-            req.getRequestDispatcher("/food-app.jsp").forward(req, resp);
+            req.getRequestDispatcher("/fieldOwner/FoodItemList.jsp").forward(req, resp);
         }
     }
 

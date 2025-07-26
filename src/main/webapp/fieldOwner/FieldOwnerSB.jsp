@@ -9,14 +9,14 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/FieldOwnerSB.css">
 
     <!-- Các CSS khác nếu cần -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <!-- Left Navigation Sidebar -->
 <nav class="navigation-sidebar">
     <ul class="nav-menu">
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/fieldOwner/FODB.jsp" class="nav-link">
+            <a href="${pageContext.request.contextPath}/dashboard" class="nav-link">
                 <i class="fas fa-chart-line"></i>
                 <span>Dashboard</span>
             </a>
@@ -53,7 +53,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="${pageContext.request.contextPath}/owner/reports" class="nav-link">
                 <i class="fas fa-chart-bar"></i>
                 <span>Báo cáo</span>
             </a>
@@ -71,15 +71,9 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/tournaments" class="nav-link">
+            <a href="${pageContext.request.contextPath}/tournament" class="nav-link">
                 <i class="fas fa-trophy"></i>
                 <span>Giải đấu</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="fa-solid fa-utensils"></i>
-                <span>Đồ ăn</span>
             </a>
         </li>
     </ul>

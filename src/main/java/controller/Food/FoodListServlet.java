@@ -76,7 +76,7 @@ public class FoodListServlet extends HttpServlet {
         
         List<Stadium> stadiums = stadiumDAO.getStadiumsByOwnerId(ownerId);
         
-        request.setAttribute("stadiumList", stadiums);
+        request.setAttribute("stadiums", stadiums);
 
         // Nếu chưa đăng nhập hoặc không phải chủ sân
         if (currentUser == null) {

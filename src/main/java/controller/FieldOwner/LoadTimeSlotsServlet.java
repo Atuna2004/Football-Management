@@ -22,7 +22,7 @@ public class LoadTimeSlotsServlet extends HttpServlet {
                 LocalDate.now().plusWeeks(1).with(java.time.DayOfWeek.MONDAY);
 
         TimeSlotDAO timeSlotDAO = new TimeSlotDAO();
-        List<TimeSlot> timeSlots = timeSlotDAO.getTimeSlotsByStadiumAndWeek(stadiumId, startOfWeek);
+        List<TimeSlot> timeSlots = timeSlotDAO.getTimeSlotsByStadiumAndWeekForFieldOwner(stadiumId, startOfWeek);
 
         request.setAttribute("timeSlots", timeSlots);
         request.setAttribute("startOfWeek", startOfWeek);

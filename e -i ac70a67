@@ -1,0 +1,703 @@
+[33mcommit abfba2caa03c194f2eb29514aca49e0aa93221a6[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mlistener[m[33m)[m
+Author: Nguyễn Phan Anh <nguyenphananh49@gmail.com>
+Date:   Fri Jul 25 13:40:39 2025 +0700
+
+    admin listener
+
+[33mcommit 275eeea5ff20bb927e553f7c6c0c33ab0f06ffe3[m[33m ([m[1;32mfix-listener[m[33m)[m
+Author: Nguyễn Phan Anh <nguyenphananh49@gmail.com>
+Date:   Fri Jul 25 13:39:24 2025 +0700
+
+    fix admin listener
+
+[33mcommit fe994ff09fbbd75fcec329e5edc575087121c579[m
+Author: Nguyễn Phan Anh <nguyenphananh49@gmail.com>
+Date:   Fri Jul 25 13:36:33 2025 +0700
+
+    fix listener
+
+[33mcommit ac70a6711e8e47f3b7dfd2cf3c38b0f4267ffb20[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Merge: e490a22 28f4aa6
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Fri Jul 25 12:54:00 2025 +0700
+
+    Merge pull request #33 from Atuna2004/tourament+food
+    
+    crud tourament + fix food
+
+[33mcommit 28f4aa6ae2e6a170a45405ca068e7c03ea69be5b[m
+Merge: a929723 e490a22
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Fri Jul 25 12:53:48 2025 +0700
+
+    Merge branch 'main' into tourament+food
+
+[33mcommit a92972395db94cfe5a449e38086928a9c82c61bc[m
+Author: Hoang Vinh <vinh03072005@gmail.com>
+Date:   Fri Jul 25 12:50:05 2025 +0700
+
+    crud tourament + fix food
+
+[33mcommit e490a220335b0d4c435795bf52c9df37499ec225[m
+Merge: b42ed2c df70a52
+Author: ngocnguyenic <127330323+ngocnguyenic@users.noreply.github.com>
+Date:   Thu Jul 24 22:30:31 2025 +0700
+
+    Merge pull request #32 from Atuna2004/UI1.1
+    
+    Fix toggle password
+
+[33mcommit df70a52419c035a42565ee74f5d19afa43c1fe49[m
+Author: hnn <hoangngocnguyen.ic@gmail.com>
+Date:   Thu Jul 24 22:28:29 2025 +0700
+
+    Fix toggle password
+
+[33mcommit b42ed2c1b093a05e6de3537de9d3b9e7c8542807[m
+Merge: a8e02c1 38dfa4a
+Author: ngocnguyenic <127330323+ngocnguyenic@users.noreply.github.com>
+Date:   Thu Jul 24 22:17:33 2025 +0700
+
+    Merge pull request #31 from Atuna2004/UI1.1
+    
+    fix listener admin page va mot chut ui
+
+[33mcommit 38dfa4a7ee891d73b4de63d35f05614a411f603c[m
+Author: hnn <hoangngocnguyen.ic@gmail.com>
+Date:   Thu Jul 24 22:17:05 2025 +0700
+
+    fix listener admin page va mot chut ui
+
+[33mcommit a8e02c1a16f87f46a3a65003adf6bee2429c07f0[m
+Merge: 3a6ce0f b98ab92
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Thu Jul 24 22:13:43 2025 +0700
+
+    Merge pull request #30 from Atuna2004/fix-hashpass
+    
+    fix lai signup va update password trong profile
+
+[33mcommit b98ab92e753a2c7fa85f7160078450a92f4d7450[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Thu Jul 24 22:12:02 2025 +0700
+
+    fix lai signup va update password trong profile
+
+[33mcommit 3a6ce0fb93a2ae59a41fdfc84bbf39945c0f4d9b[m
+Merge: 8fa59a9 d6a0704
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Thu Jul 24 21:29:43 2025 +0700
+
+    Merge pull request #29 from Atuna2004/stadiumlistfo-fix
+    
+    Them search theo debounce cho stadium list
+
+[33mcommit d6a0704743260f84208bc30401acf6d4c9fde129[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Thu Jul 24 21:29:05 2025 +0700
+
+    Them search theo debounce cho stadium list
+
+[33mcommit 8fa59a93ba2e72ddedf6641628177838f33bbd02[m
+Merge: 9682036 2ff1db4
+Author: ngocnguyenic <127330323+ngocnguyenic@users.noreply.github.com>
+Date:   Thu Jul 24 21:09:09 2025 +0700
+
+    Merge pull request #28 from Atuna2004/UI1.0
+    
+    Mot chut ui
+
+[33mcommit 2ff1db42a17627c81274b8bd42873e46f00b24d5[m[33m ([m[1;31morigin/UI1.0[m[33m)[m
+Merge: fa3809d 9682036
+Author: ngocnguyenic <127330323+ngocnguyenic@users.noreply.github.com>
+Date:   Thu Jul 24 21:08:54 2025 +0700
+
+    Merge branch 'main' into UI1.0
+
+[33mcommit fa3809da6e2e095b3cbc03cd707b984e98b34819[m
+Author: hnn <hoangngocnguyen.ic@gmail.com>
+Date:   Thu Jul 24 21:05:43 2025 +0700
+
+    Mot chut ui
+
+[33mcommit 9682036f664321c1ae96086bd9cd39a2c625c6cf[m
+Merge: 35b9547 150db80
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Thu Jul 24 21:03:22 2025 +0700
+
+    Merge pull request #27 from Atuna2004/excel+logic
+    
+    Them xuat file excel doanh thu + fix logic tao field moi
+
+[33mcommit 150db802af3b65b8cabb9a8c2f73836e09729ca2[m[33m ([m[1;31morigin/excel+logic[m[33m)[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Thu Jul 24 20:59:33 2025 +0700
+
+    Them xuat file excel doanh thu + fix logic tao field moi
+
+[33mcommit 35b954746388a9a7f528e7d69f4aa00da17515f2[m
+Merge: f409550 dce622f
+Author: ngocnguyenic <127330323+ngocnguyenic@users.noreply.github.com>
+Date:   Wed Jul 23 16:11:32 2025 +0700
+
+    Merge pull request #26 from Atuna2004/ai
+    
+    fix dbconnect
+
+[33mcommit dce622f8d6e88ddc5019eca3fd78471af3e02b8f[m[33m ([m[1;31morigin/ai[m[33m)[m
+Author: Nguyễn Phan Anh <nguyenphananh49@gmail.com>
+Date:   Wed Jul 23 15:51:47 2025 +0700
+
+    fix dbconnect
+
+[33mcommit f40955072bec9f4c37f6eea75bffdada58a4647b[m
+Merge: 3908327 f95a7bd
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Wed Jul 23 15:27:09 2025 +0700
+
+    Merge pull request #25 from Atuna2004/chart+logic
+    
+    Them chart va sua lai logic code
+
+[33mcommit f95a7bd4c348f3a073faf6aa3b5e1d7628869a54[m[33m ([m[1;31morigin/chart+logic[m[33m)[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Wed Jul 23 12:58:23 2025 +0700
+
+    fix logic chart va logic add field + process payment
+
+[33mcommit 42dafd991b14cf18b597ca26b4fb4526bd1cb1f7[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Wed Jul 23 11:39:42 2025 +0700
+
+    Them chart va sua lai logic code
+
+[33mcommit 39083272042835f75d048211959b2bad5a97ba83[m
+Merge: af9f2b8 19f05a2
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Mon Jul 21 17:06:03 2025 +0700
+
+    Merge pull request #23 from Atuna2004/stadium
+    
+    Stadium
+
+[33mcommit 19f05a2c811de94e686ed2317eb4dbedc6355b12[m[33m ([m[1;31morigin/stadium[m[33m)[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Mon Jul 21 17:05:07 2025 +0700
+
+    fix conflict
+
+[33mcommit 56914bd894a305595b408e2f8c9e08416213226f[m
+Merge: 58700db 96aa716
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Fri Jul 18 16:35:00 2025 +0700
+
+    fix conflict
+
+[33mcommit 96aa716467c18607f0e2d13b4c178389570e58d6[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Fri Jul 18 15:07:55 2025 +0700
+
+    fix conflict dbconnection
+
+[33mcommit af9f2b8f910236f11dac7dacb16cae41eecdee76[m
+Merge: 2f7a6f7 51646f1
+Author: ngocnguyenic <127330323+ngocnguyenic@users.noreply.github.com>
+Date:   Fri Jul 18 14:45:53 2025 +0700
+
+    Merge pull request #22 from Atuna2004/rep0rt
+    
+    Add report for user and fix report for admin
+
+[33mcommit 51646f173b9b73dd1cec8e8744c242689a84d39d[m[33m ([m[1;31morigin/rep0rt[m[33m)[m
+Merge: db2db73 2f7a6f7
+Author: ngocnguyenic <127330323+ngocnguyenic@users.noreply.github.com>
+Date:   Fri Jul 18 14:45:33 2025 +0700
+
+    Merge branch 'main' into rep0rt
+
+[33mcommit db2db735a481befb3a8abc5ac1acb9b8126955aa[m
+Author: hnn <hoangngocnguyen.ic@gmail.com>
+Date:   Fri Jul 18 14:40:24 2025 +0700
+
+    Add report for user and fix report for admin
+
+[33mcommit 2f7a6f7311b0d9957b951a49f7ef206012ffd1c2[m
+Merge: 840b649 3cfb642
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Fri Jul 18 14:12:24 2025 +0700
+
+    Merge pull request #21 from Atuna2004/fieldOwner
+    
+    Field owner
+
+[33mcommit 3cfb642d54f039710c5e5368f21e70f1a84cd776[m[33m ([m[1;31morigin/fieldOwner[m[33m)[m
+Merge: 96402ce 840b649
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Fri Jul 18 14:06:14 2025 +0700
+
+    Fix conflict cho field owner
+
+[33mcommit 96402ce14e67a6a42b7878b75ebb4a65e989101e[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Fri Jul 18 13:18:48 2025 +0700
+
+    Add request fo, add timeslot manager
+
+[33mcommit 58700db538b2d340ca0c8ac2f5d44192e1a2c8b2[m
+Merge: 9ba2fc9 840b649
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Thu Jul 17 21:20:45 2025 +0700
+
+    fix conflict merge main
+
+[33mcommit 9ba2fc95f98f6c651e42c34a8de8875246533b17[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Thu Jul 17 14:32:21 2025 +0700
+
+    add qr code checkin
+
+[33mcommit 840b64937a85bd87f8a10ad728b740a512194315[m
+Merge: 7bf5f95 8c9846e
+Author: VinhHoang03 <vinh03072005@gmail.com>
+Date:   Fri Jul 4 14:45:28 2025 +0700
+
+    Merge pull request #20 from Atuna2004/fo-customer
+    
+    Fo customer
+
+[33mcommit 8c9846e5c71c59113155472ff8b04630faed08ce[m[33m ([m[1;31morigin/fo-customer[m[33m)[m
+Merge: ed3103b 7bf5f95
+Author: Hoang Vinh <vinh03072005@gmail.com>
+Date:   Fri Jul 4 14:43:07 2025 +0700
+
+    add food and fix conflict
+
+[33mcommit d720c038aa4de1114d5a4506ba1db20f9e9b87fc[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Fri Jul 4 14:01:21 2025 +0700
+
+    add ma giam gia
+
+[33mcommit ed3103b9cca2a520e5d25bb245b1995b1df3f4d6[m
+Author: Hoang Vinh <vinh03072005@gmail.com>
+Date:   Fri Jul 4 13:32:50 2025 +0700
+
+    add crud food
+
+[33mcommit 7bf5f953efdece6b912de3a18363711f53e3c9c0[m
+Merge: aabc450 3f886ba
+Author: ngocnguyenic <127330323+ngocnguyenic@users.noreply.github.com>
+Date:   Fri Jul 4 13:29:25 2025 +0700
+
+    Merge pull request #19 from Atuna2004/hash-pass
+    
+    Hash pass
+
+[33mcommit 3f886ba192ec0f9f64392ad640eb7c849f60bee8[m[33m ([m[1;31morigin/hash-pass[m[33m)[m
+Merge: 5aa9919 aabc450
+Author: hnn <hoangngocnguyen.ic@gmail.com>
+Date:   Fri Jul 4 13:28:44 2025 +0700
+
+    fix conflict
+
+[33mcommit 5aa9919cb48d6d94867af626d25a96b3f5c19149[m
+Author: hnn <hoangngocnguyen.ic@gmail.com>
+Date:   Fri Jul 4 13:22:53 2025 +0700
+
+    add fb and report
+
+[33mcommit aabc45016b96616424b3d9181edc7933e8e13fef[m
+Author: phanhng123 <140701398+phanhng123@users.noreply.github.com>
+Date:   Mon Jun 23 16:37:29 2025 +0700
+
+    Update AuthFilter.java
+
+[33mcommit fbd6b531f2aae5f249692983c8d4d9fe38f6a832[m
+Merge: f9447a7 0e274e8
+Author: phanhng123 <140701398+phanhng123@users.noreply.github.com>
+Date:   Mon Jun 23 16:35:58 2025 +0700
+
+    Merge pull request #18 from Atuna2004/adminnnnnn
+    
+    Adminnnnnn
+
+[33mcommit 0e274e8b5afa4437dd3d974a683f2259dc5f6e41[m[33m ([m[1;31morigin/adminnnnnn[m[33m)[m
+Merge: 583479e f9447a7
+Author: phanhng123 <140701398+phanhng123@users.noreply.github.com>
+Date:   Mon Jun 23 16:35:51 2025 +0700
+
+    Merge branch 'main' into adminnnnnn
+
+[33mcommit 583479ef84a4ac2a13e71e65a45303115a168b27[m
+Author: Nguyễn Phan Anh <nguyenphananh49@gmail.com>
+Date:   Mon Jun 23 16:15:33 2025 +0700
+
+    crud admin
+
+[33mcommit f9447a795437b09ed001e7e4b3ed12d1e331e322[m
+Merge: 5d960a8 5f4b04d
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Fri Jun 20 20:31:20 2025 +0700
+
+    Merge pull request #17 from Atuna2004/stadium
+    
+    Stadium
+
+[33mcommit 3add4c6edede3e06c845ac1aab20202b15d3f37a[m
+Author: Nguyễn Phan Anh <nguyenphananh49@gmail.com>
+Date:   Fri Jun 20 12:45:10 2025 +0700
+
+    crud admin
+
+[33mcommit 5f4b04dc37f2a683aefadcc1ce0a7d02e7e1b0a9[m
+Merge: aeb4753 5d960a8
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Fri Jun 20 12:02:37 2025 +0700
+
+    add gg map, gmail and booking history
+
+[33mcommit aeb4753b972fdb4c9c4e86a80c8a5497bf92596c[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Fri Jun 20 11:42:44 2025 +0700
+
+    add gg map, gmail and booking history
+
+[33mcommit 5d960a8aa800ec3df9cf97a160092cdc4b63686b[m
+Merge: 28e37e1 5726741
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Fri Jun 20 11:41:13 2025 +0700
+
+    Merge pull request #16 from Atuna2004/crud-field-stadium
+    
+    them crud san, them booking cua fieldowner
+
+[33mcommit 57267415bfb9bf2442a9b10e1cb5f7058ee0cae0[m[33m ([m[1;31morigin/crud-field-stadium[m[33m)[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Fri Jun 20 02:11:30 2025 +0700
+
+    them crud san, them booking cua fieldowner
+
+[33mcommit 28e37e1c253545fb8d98621e6ca1a61e1c3dc6ce[m
+Merge: f4e86f0 421a8a1
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Wed Jun 18 15:37:31 2025 +0700
+
+    Merge pull request #14 from Atuna2004/dev
+    
+    lam trang admin va show duoc user
+
+[33mcommit 421a8a17b8b4b67114ef9365f26bbb5948deeb58[m[33m ([m[1;31morigin/dev[m[33m)[m
+Merge: 1a5e979 f4e86f0
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Wed Jun 18 15:37:18 2025 +0700
+
+    Merge branch 'main' into dev
+
+[33mcommit 1a5e979eef26f3958a43a99d736f44b8938dbf8c[m
+Author: Nguyễn Phan Anh <nguyenphananh49@gmail.com>
+Date:   Wed Jun 18 15:21:40 2025 +0700
+
+    lam trang admin va show duoc user
+
+[33mcommit f4e86f0f8b0959a0a68b9651f17465b20e1683e4[m
+Merge: 5a98ca0 be938b1
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Wed Jun 18 15:16:22 2025 +0700
+
+    Merge pull request #13 from Atuna2004/stadium
+    
+    fix merge field-owner
+
+[33mcommit be938b1071d209a19d013060cef8d95825efa501[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Wed Jun 18 15:15:43 2025 +0700
+
+    fix merge field-owner
+
+[33mcommit 5a98ca030725010b28acacd74c3f7b8302d84690[m
+Merge: 5b9d366 3dab31a
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Wed Jun 18 14:08:03 2025 +0700
+
+    Merge pull request #12 from Atuna2004/stadium
+    
+    add payment
+
+[33mcommit 3dab31a550613bf5f0358f47b271bf7beb38c977[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Wed Jun 18 14:07:25 2025 +0700
+
+    add payment
+
+[33mcommit 5b9d36671efa5503fc2f8f982cbcdfdaa4db9565[m
+Merge: 8e085f8 7ed670a
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Wed Jun 18 12:54:16 2025 +0700
+
+    Merge pull request #11 from Atuna2004/field-owner
+    
+    Tinh chinh forgot password, them dashboard cho field owner  va stadiu…
+
+[33mcommit 7ed670ab144bcaaa94843cca2f5ef9ac62c3d313[m[33m ([m[1;31morigin/field-owner[m[33m)[m
+Merge: 1b97200 8e085f8
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Wed Jun 18 12:53:23 2025 +0700
+
+    Merge branch 'main' into field-owner
+
+[33mcommit 1b97200f10a14355fbf40ba9ab264ee20a2ee042[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Wed Jun 18 12:49:19 2025 +0700
+
+    Tinh chinh forgot password, them dashboard cho field owner  va stadium list
+
+[33mcommit 8e085f88922bd0fef23738bb1c3a84dd4b0050b6[m
+Merge: ec94c61 f04a259
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Mon Jun 16 14:51:49 2025 +0700
+
+    Merge pull request #10 from Atuna2004/food-ui
+    
+    add food ui
+
+[33mcommit f04a259c44166b92fc3d3cc59ce2f3dd5cc2b987[m[33m ([m[1;31morigin/food-ui[m[33m)[m
+Author: Hoang Vinh <vinh03072005@gmail.com>
+Date:   Mon Jun 16 14:45:48 2025 +0700
+
+    add food ui
+
+[33mcommit ec94c61e57e8a09c27405e0c6969d5c1e0784b98[m
+Merge: d8dcd0d bdba707
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Mon Jun 16 13:05:35 2025 +0700
+
+    Merge pull request #9 from Atuna2004/stadium
+    
+    add list stadium and timeslot
+
+[33mcommit bdba7073e5a08b74d2dbdb30a006bff7dafba036[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Mon Jun 16 13:00:27 2025 +0700
+
+    add list stadium and timeslot
+
+[33mcommit d8dcd0d21f1eec4ce169cea9d1de06dba3dedc04[m
+Merge: e3beb4f f861519
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Mon Jun 9 12:52:11 2025 +0700
+
+    Merge pull request #8 from Atuna2004/dev
+    
+    bai hoan chinh
+
+[33mcommit f8615192e66a5a548b61ee4c63ecdffdf00e4e64[m
+Author: Nguyễn Phan Anh <nguyenphananh49@gmail.com>
+Date:   Mon Jun 9 12:50:08 2025 +0700
+
+    bai hoan chinh
+
+[33mcommit e3beb4f1394b848cc4be9f6d45197beacf123458[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Wed Jun 4 15:09:01 2025 +0700
+
+    fix doi mat khau
+
+[33mcommit 9a2abe5140fce509833d446ca3b90cb2dcde0f04[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Wed Jun 4 14:40:52 2025 +0700
+
+    fix web xml conflict
+
+[33mcommit 47334ca650792c7eea04e3ea922a5fd34dcc730b[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Wed Jun 4 14:33:51 2025 +0700
+
+    Add new servlets for password change and avatar upload
+
+[33mcommit 8659c3d5e8578af295e14d323f168fc9ad9adf8e[m
+Merge: eae6038 606be81
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Wed Jun 4 14:32:39 2025 +0700
+
+    Resolve merge conflict in AccountDAO.java
+
+[33mcommit eae6038f9eabf9b231c324c2f55fecd1b4d39142[m
+Merge: 2773071 f0b40b4
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Wed Jun 4 14:29:04 2025 +0700
+
+    Resolve merge conflicts fix-login-register
+
+[33mcommit 606be811eb80543653544b18dbdffa49e98d0856[m[33m ([m[1;31morigin/fix-login-register[m[33m)[m
+Merge: c715562 f0b40b4
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Wed Jun 4 12:47:33 2025 +0700
+
+    Them quem mat khau
+
+[33mcommit c715562e4ad2eff078e9b6cf37fc52a6f5892ddc[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Wed Jun 4 12:40:11 2025 +0700
+
+    Them quen mat khau
+
+[33mcommit 2773071e8874cf3a13dca7edbf85f30ecee5d56a[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Tue Jun 3 22:42:16 2025 +0700
+
+    fix loi merge nhanh profile
+
+[33mcommit b4b119e0b1119c5cde7c2832dc478b2e12a228ae[m
+Merge: d95a57c a905ab2
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Tue Jun 3 22:14:56 2025 +0700
+
+    Merge pull request #5 from Atuna2004/profile
+    
+    Profile
+
+[33mcommit a905ab27a548097ebec7d2257d8effdadf631699[m[33m ([m[1;31morigin/profile[m[33m)[m
+Merge: ed64cf5 d95a57c
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Tue Jun 3 22:14:13 2025 +0700
+
+    Resolve merge conflicts (ignore compiled class files)
+
+[33mcommit ed64cf5651fbbe2453884ec2a48bb40edc031254[m
+Author: Nguyễn Phan Anh <nguyenphananh49@gmail.com>
+Date:   Tue Jun 3 21:48:53 2025 +0700
+
+    da update dc profile, thieu ava
+
+[33mcommit d95a57c6158addf961190b27ad46303a4e4bec29[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Tue Jun 3 20:20:19 2025 +0700
+
+    fix loi mat constant
+
+[33mcommit a7c1a73a82e9afd3dcf2dd02cc5270f42acc8923[m
+Merge: fd72714 2f97b47
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Tue Jun 3 20:10:32 2025 +0700
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit fd72714e1738d7d4ad8cb570b159bc30a701c6de[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Tue Jun 3 19:52:47 2025 +0700
+
+    add stadium ui + servlet and forgotPassword ui
+
+[33mcommit 2f97b4755c4f56e4bc4724031be4e20d6a78d9bd[m
+Merge: 1b50ba0 837836c
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Mon Jun 2 23:40:57 2025 +0700
+
+    Merge pull request #4 from Atuna2004/fix-login-register
+    
+    Fix login register
+
+[33mcommit f0b40b4e6993cbe4cc9206cd22caa50a9df00784[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Mon Jun 2 23:35:44 2025 +0700
+
+    Da fix khong luu vao db khi signup
+
+[33mcommit 837836cd35419d775884c1228965efcb8d499a33[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Mon Jun 2 23:35:44 2025 +0700
+
+    Da fix khong luu vao db khi signup
+
+[33mcommit cbc1390f42bb2c2fd474130b1bdd043ec7b4b0fc[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Mon Jun 2 23:02:07 2025 +0700
+
+    Sửa lại tiếng việt cho mail
+
+[33mcommit ab8798294ab6b34fdbc5e9fd2679591044486afb[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Mon Jun 2 23:02:07 2025 +0700
+
+    Sửa lại tiếng việt cho mail
+
+[33mcommit 1b50ba07bca315f6098e3ece70fc3f07fb505b16[m
+Merge: 52a57d6 a18d8f3
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Mon Jun 2 22:57:35 2025 +0700
+
+    Merge pull request #3 from Atuna2004/fix-login-register
+    
+    Them otp va fix lai signup
+
+[33mcommit bedd7e08a71b85cf7080108eb0e06fe2c2762072[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Mon Jun 2 22:52:42 2025 +0700
+
+    Them otp va fix lai signup
+
+[33mcommit a18d8f36b6b3f3d87fe988881d9d675a134228c0[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Mon Jun 2 22:52:42 2025 +0700
+
+    Them otp va fix lai signup
+
+[33mcommit 52a57d68f021f7e1b86b402776851005ebde2923[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Mon Jun 2 17:03:15 2025 +0700
+
+    add gg login
+
+[33mcommit 4f9335418faedd6a16b68f40b147da72b29d5df4[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Mon Jun 2 17:03:15 2025 +0700
+
+    add gg login
+
+[33mcommit acd5107bb69c69413c7f17a0be8c6dedf80a46f5[m
+Merge: aa526f2 dc93349
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Fri May 30 00:22:32 2025 +0700
+
+    Merge pull request #1 from Atuna2004/fix-login-register
+    
+    da fix login va them reigster
+
+[33mcommit a67c37d0a3471a2a36fd0f8020db80fcc6247fd3[m
+Merge: aa526f2 dc93349
+Author: Atuna2004 <nguyenngocanhtuankr912@gmail.com>
+Date:   Fri May 30 00:22:32 2025 +0700
+
+    Merge pull request #1 from Atuna2004/fix-login-register
+    
+    da fix login va them reigster
+
+[33mcommit dc93349d9f2d534a8b4fcbd609dfe51ca11dbd16[m
+Author: HBBBBBB645 <hoangbao28102005@gmail.com>
+Date:   Fri May 30 00:12:57 2025 +0700
+
+    da fix login va them reigster
+
+[33mcommit aa526f20b52884084b812b953d5bda5a997c0c73[m[33m ([m[1;31morigin/login-ui[m[33m)[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Thu May 29 23:16:07 2025 +0700
+
+    add login and profile ui
+
+[33mcommit c51d76b84ed69211f74b1b64a9d23fe9ab7e7c48[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Fri May 23 14:17:08 2025 +0700
+
+    avc
+
+[33mcommit b02619a63da7380e0a05b7dc8384a2beefc97334[m[33m ([m[1;31morigin/codestructure[m[33m)[m
+Author: phanhhh <nguyenphananh49@gmail.com>
+Date:   Mon May 19 20:24:27 2025 +0700
+
+    da them model va db connect
+
+[33mcommit 43237436163d01bff83915b8c8a24f2bf7b7b639[m
+Author: Anh Tuan <nguyenngocanhtuankr912@gmail.com>
+Date:   Mon May 19 20:09:46 2025 +0700
+
+    first commit

@@ -19,7 +19,6 @@ public class User {
     private Date dateOfBirth;
     private String address;
 
-
     private List<Role> roles = new ArrayList<>();
 
     public User() {
@@ -37,6 +36,7 @@ public class User {
         this.isActive = isActive;
         this.googleID = googleID;
         this.avatarUrl = avatarUrl;
+        this.facebookID = null;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
         this.roles = roles != null ? roles : new ArrayList<>();
@@ -54,6 +54,7 @@ public class User {
         this.isActive = isActive;
         this.googleID = googleID;
         this.avatarUrl = avatarUrl;
+        this.facebookID = null;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
     }
@@ -68,12 +69,13 @@ public class User {
 
     public String getRole() {
         if (roles == null || roles.isEmpty()) {
-            return "Chưa phân vai";
+            return "Chưa có vai trò";
         }
+
         return roles.stream()
                 .map(Role::getRoleName)
-                .reduce((r1, r2) -> r1 + ", " + r2)
-                .orElse("Chưa phân vai");
+                .filter(java.util.Objects::nonNull)
+                .collect(java.util.stream.Collectors.joining(", "));
     }
 
     public boolean isAdmin() {
@@ -95,6 +97,13 @@ public class User {
             return false;
         }
         return roles.stream().anyMatch(r -> "user".equalsIgnoreCase(r.getRoleName()));
+    }
+
+    public int getPrimaryRoleID() {
+        if (roles != null && !roles.isEmpty()) {
+            return roles.get(0).getRoleID();
+        }
+        return -1;
     }
 
     public int getUserID() {
@@ -169,6 +178,14 @@ public class User {
         this.avatarUrl = avatarUrl;
     }
 
+    public String getFacebookID() {
+        return facebookID;
+    }
+
+    public void setFacebookID(String facebookID) {
+        this.facebookID = facebookID;
+    }
+
     public Date getDateOfBirth() {
         return dateOfBirth;
     }
@@ -184,22 +201,4 @@ public class User {
     public void setAddress(String address) {
         this.address = address;
     }
-
-
-    public String getFacebookID() {
-        return facebookID;
-    }
-
-    public void setFacebookID(String facebookID) {
-        this.facebookID = facebookID;
-    }
-
-    public int getPrimaryRoleID() {
-        if (roles != null && !roles.isEmpty()) {
-            return roles.get(0).getRoleID(); // lấy role đầu tiên
-        }
-        return -1; // hoặc 3 nếu muốn default User
-    }
-
 }
-
