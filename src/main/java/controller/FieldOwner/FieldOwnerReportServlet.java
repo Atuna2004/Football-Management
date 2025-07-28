@@ -60,14 +60,11 @@ public class FieldOwnerReportServlet extends HttpServlet {
             conn = DBConnection.getConnection();
             ReportDAO reportDAO = new ReportDAO(conn);
 
-            // You can implement filtering here based on request parameters (search, status)
-            // For now, it fetches all reports for the owner.
             ownerReports = reportDAO.getReportsByOwnerId(ownerId);
             LOGGER.log(Level.INFO, "Successfully fetched {0} reports for owner ID: {1}", new Object[]{ownerReports.size(), ownerId});
 
             request.setAttribute("reports", ownerReports);
 
-            // Forward to the JSP
             request.getRequestDispatcher("/fieldOwner/FieldOwnerReport.jsp").forward(request, response);
 
         } catch (SQLException e) {
@@ -85,21 +82,12 @@ public class FieldOwnerReportServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Handles the HTTP POST method for updating report status and deleting reports.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
 
-        // 1. Authentication and Authorization Check (Crucial for security)
         if (session == null || (session.getAttribute("loggedInUser") == null && session.getAttribute("currentUser") == null)) {
             LOGGER.warning("Unauthorized POST attempt to update report. Redirecting to login.");
             response.sendRedirect(request.getContextPath() + "/account/login.jsp");
@@ -121,7 +109,6 @@ public class FieldOwnerReportServlet extends HttpServlet {
             return;
         }
 
-        // 2. Get parameters from the request
         String reportIDStr = request.getParameter("reportID");
         String action = request.getParameter("action");
         String newStatus = request.getParameter("newStatus");
@@ -143,32 +130,26 @@ public class FieldOwnerReportServlet extends HttpServlet {
 
         Connection conn = null;
         try {
-            // 3. Get database connection and DAO
             conn = DBConnection.getConnection();
             ReportDAO reportDAO = new ReportDAO(conn);
 
-            // 4. Check if this is a delete action
             if ("delete".equals(action)) {
                 LOGGER.info("Processing delete request for Report ID: " + reportID + " by owner: " + currentUser.getEmail());
                 boolean deleted = reportDAO.deleteReport(reportID);
                 
                 if (deleted) {
                     LOGGER.info("Report ID " + reportID + " deleted successfully by owner: " + currentUser.getEmail());
-                    // Set success message in session
                     session.setAttribute("successMessage", "Báo cáo đã được xóa thành công!");
                 } else {
                     LOGGER.warning("Report deletion failed - report not found. Report ID: " + reportID);
-                    // Set error message in session
                     session.setAttribute("errorMessage", "Không tìm thấy báo cáo để xóa!");
                 }
                 
             } else if (newStatus != null && !newStatus.trim().isEmpty()) {
-                // This is a status update action
                 LOGGER.info("Processing status update for Report ID: " + reportID + " to status: " + newStatus + " by owner: " + currentUser.getEmail());
                 reportDAO.updateReportStatus(reportID, newStatus);
                 LOGGER.info("Report ID " + reportID + " status updated to: " + newStatus + " by owner: " + currentUser.getEmail());
                 
-                // Set success message in session
                 session.setAttribute("successMessage", "Trạng thái báo cáo đã được cập nhật thành công!");
                 
             } else {
@@ -176,7 +157,6 @@ public class FieldOwnerReportServlet extends HttpServlet {
                 session.setAttribute("errorMessage", "Hành động không hợp lệ!");
             }
 
-            // 5. Redirect back to the reports page
             response.sendRedirect(request.getContextPath() + "/owner/reports");
 
         } catch (SQLException e) {
