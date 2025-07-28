@@ -8,9 +8,16 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 import dao.StadiumDAO;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import model.Stadium;
 import model.User;
+
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,  // 1MB
+    maxFileSize = 10 * 1024 * 1024,   // 10MB
+    maxRequestSize = 10 * 1024 * 1024 // 10MB
+)
 
 @WebServlet("/stadium/config")
 public class StadiumServlet extends HttpServlet {
