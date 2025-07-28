@@ -2,6 +2,7 @@ package controller.Checkin;
 
 import dao.BookingDAO;
 import model.Booking;
+import model.User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,6 +16,17 @@ public class AdminCheckinServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        // ✅ Kiểm tra quyền
+        HttpSession session = req.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("currentUser") : null;
+
+        if (user == null || !(user.isAdmin() || user.isFieldOwner())) {
+            resp.sendRedirect(req.getContextPath() + "/access-denied.jsp");
+            return;
+        }
+
+        // ✅ Tiếp tục xử lý token
         String token = req.getParameter("token");
 
         if (token == null || token.isEmpty()) {
@@ -39,6 +51,16 @@ public class AdminCheckinServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        // ✅ Kiểm tra quyền
+        HttpSession session = req.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("currentUser") : null;
+
+        if (user == null || !(user.isAdmin() || user.isFieldOwner())) {
+            resp.sendRedirect(req.getContextPath() + "/access-denied.jsp");
+            return;
+        }
+
+        // ✅ Xử lý check-in
         int bookingId = Integer.parseInt(req.getParameter("bookingId"));
         BookingDAO bookingDAO = new BookingDAO();
 

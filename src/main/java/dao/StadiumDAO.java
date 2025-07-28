@@ -24,7 +24,7 @@ public class StadiumDAO {
         }
         return stadiumList;
     }
-
+    
     public List<Stadium> getAllStadiumsForFieldOwner() {
         List<Stadium> stadiumList = new ArrayList<>();
         String sql = "SELECT * FROM Stadium";
@@ -95,8 +95,8 @@ public class StadiumDAO {
         return false;
     }
 
-    public boolean deactivateStadium(int id) {
-        String sql = "UPDATE Stadium SET Status = 'inactive' WHERE stadiumID = ?";
+    public boolean deleteStadium(int id) {
+        String sql = "DELETE FROM Stadium WHERE stadiumID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -265,43 +265,38 @@ public class StadiumDAO {
         return stadiumList;
     }
 
-    public boolean updateStadiumImage(int stadiumId, String imageURL) {
-        String sql = "UPDATE Stadium SET ImageURL = ? WHERE stadiumID = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, imageURL);
-            ps.setInt(2, stadiumId);
-
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     private Stadium mapResultSetToStadium(ResultSet rs) throws SQLException {
         Stadium stadium = new Stadium(
-                rs.getInt("stadiumID"),
-                rs.getString("name"),
-                rs.getString("location"),
-                rs.getString("description"),
-                rs.getString("status"),
-                rs.getTimestamp("createdAt"),
-                rs.getString("phoneNumber"),
-                rs.getInt("OwnerID")
+            rs.getInt("stadiumID"),
+            rs.getString("name"),
+            rs.getString("location"),
+            rs.getString("description"),
+            rs.getString("status"),
+            rs.getTimestamp("createdAt"),
+            rs.getString("phoneNumber"),
+            rs.getInt("OwnerID")
         );
 
+        // ✅ LẤY TỌA ĐỘ
         try {
-            stadium.setLatitude(rs.getDouble("latitude"));
-            stadium.setLongitude(rs.getDouble("longitude"));
+            stadium.setLatitude(rs.getObject("Latitude", Double.class));
+            stadium.setLongitude(rs.getObject("Longitude", Double.class));
         } catch (SQLException e) {
+            stadium.setLatitude(null);
+            stadium.setLongitude(null);
+        }
+
+        // Optional
+        try {
+            stadium.setImageURL(rs.getString("ImageURL"));
+        } catch (SQLException e) {
+            stadium.setImageURL(null);
         }
 
         return stadium;
     }
 
-
+    
     public List<Stadium> getStadiumsByOwner(int ownerId) {
         List<Stadium> list = new ArrayList<>();
         String sql = "SELECT StadiumID, Name FROM Stadium WHERE OwnerID = ?";
@@ -327,13 +322,13 @@ public class StadiumDAO {
 
         return list;
     }
-
+    
     public List<Stadium> searchStadiumsByOwner(int ownerId, String keyword, int page, int recordsPerPage) {
         List<Stadium> stadiumList = new ArrayList<>();
         String sql = "SELECT * FROM Stadium " +
-                "WHERE OwnerID = ? AND (name LIKE ? OR location LIKE ?) " +
-                "ORDER BY stadiumID " +
-                "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+                     "WHERE OwnerID = ? AND (name LIKE ? OR location LIKE ?) " +
+                     "ORDER BY stadiumID " +
+                     "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, ownerId);
@@ -353,7 +348,7 @@ public class StadiumDAO {
 
     public int getTotalSearchCountByOwner(int ownerId, String keyword) {
         String sql = "SELECT COUNT(*) AS total FROM Stadium " +
-                "WHERE OwnerID = ? AND (name LIKE ? OR location LIKE ?)";
+                     "WHERE OwnerID = ? AND (name LIKE ? OR location LIKE ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, ownerId);
@@ -367,5 +362,61 @@ public class StadiumDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public boolean insertStadiumWithImage(Stadium stadium) {
+        String sql = "INSERT INTO Stadium(name, location, description, status, createdAt, phoneNumber, OwnerID, ImageURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, stadium.getName());
+            ps.setString(2, stadium.getLocation());
+            ps.setString(3, stadium.getDescription());
+            ps.setString(4, stadium.getStatus());
+            ps.setTimestamp(5, new Timestamp(stadium.getCreatedAt().getTime()));
+            ps.setString(6, stadium.getPhoneNumber());
+            ps.setInt(7, stadium.getOwnerID());
+            ps.setString(8, stadium.getImageURL());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateStadiumWithImage(Stadium stadium) {
+        String sql = "UPDATE Stadium SET name = ?, location = ?, description = ?, status = ?, phoneNumber = ?, ImageURL = ? WHERE stadiumID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, stadium.getName());
+            ps.setString(2, stadium.getLocation());
+            ps.setString(3, stadium.getDescription());
+            ps.setString(4, stadium.getStatus());
+            ps.setString(5, stadium.getPhoneNumber());
+            ps.setString(6, stadium.getImageURL());
+            ps.setInt(7, stadium.getStadiumID());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateStadiumImage(int stadiumId, String imageURL) {
+        String sql = "UPDATE Stadium SET ImageURL = ? WHERE stadiumID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, imageURL);
+            ps.setInt(2, stadiumId);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
