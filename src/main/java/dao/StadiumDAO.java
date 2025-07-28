@@ -265,8 +265,7 @@ public class StadiumDAO {
         return stadiumList;
     }
 
-    // ✅ Hàm chung để tạo đối tượng Stadium từ ResultSet
-   private Stadium mapResultSetToStadium(ResultSet rs) throws SQLException {
+    private Stadium mapResultSetToStadium(ResultSet rs) throws SQLException {
         Stadium stadium = new Stadium(
                 rs.getInt("stadiumID"),
                 rs.getString("name"),
@@ -277,18 +276,15 @@ public class StadiumDAO {
                 rs.getString("phoneNumber"),
                 rs.getInt("OwnerID")
         );
-
-        // Thêm phần này để lấy GPS nếu có
+        
         try {
-            stadium.setLatitude(rs.getDouble("latitude"));
-            stadium.setLongitude(rs.getDouble("longitude"));
+            stadium.setImageURL(rs.getString("ImageURL"));
         } catch (SQLException e) {
-            // Nếu cột chưa có trong DB (cũ), bỏ qua
+            stadium.setImageURL(null);
         }
-
+        
         return stadium;
     }
-
     
     public List<Stadium> getStadiumsByOwner(int ownerId) {
         List<Stadium> list = new ArrayList<>();
@@ -316,7 +312,6 @@ public class StadiumDAO {
         return list;
     }
     
-    // Tìm kiếm sân theo ownerID và từ khóa (tên hoặc vị trí)
     public List<Stadium> searchStadiumsByOwner(int ownerId, String keyword, int page, int recordsPerPage) {
         List<Stadium> stadiumList = new ArrayList<>();
         String sql = "SELECT * FROM Stadium " +
@@ -340,7 +335,6 @@ public class StadiumDAO {
         return stadiumList;
     }
 
-    // Đếm tổng số sân theo owner và từ khóa tìm kiếm
     public int getTotalSearchCountByOwner(int ownerId, String keyword) {
         String sql = "SELECT COUNT(*) AS total FROM Stadium " +
                      "WHERE OwnerID = ? AND (name LIKE ? OR location LIKE ?)";
@@ -357,5 +351,61 @@ public class StadiumDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public boolean insertStadiumWithImage(Stadium stadium) {
+        String sql = "INSERT INTO Stadium(name, location, description, status, createdAt, phoneNumber, OwnerID, ImageURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, stadium.getName());
+            ps.setString(2, stadium.getLocation());
+            ps.setString(3, stadium.getDescription());
+            ps.setString(4, stadium.getStatus());
+            ps.setTimestamp(5, new Timestamp(stadium.getCreatedAt().getTime()));
+            ps.setString(6, stadium.getPhoneNumber());
+            ps.setInt(7, stadium.getOwnerID());
+            ps.setString(8, stadium.getImageURL());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateStadiumWithImage(Stadium stadium) {
+        String sql = "UPDATE Stadium SET name = ?, location = ?, description = ?, status = ?, phoneNumber = ?, ImageURL = ? WHERE stadiumID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, stadium.getName());
+            ps.setString(2, stadium.getLocation());
+            ps.setString(3, stadium.getDescription());
+            ps.setString(4, stadium.getStatus());
+            ps.setString(5, stadium.getPhoneNumber());
+            ps.setString(6, stadium.getImageURL());
+            ps.setInt(7, stadium.getStadiumID());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateStadiumImage(int stadiumId, String imageURL) {
+        String sql = "UPDATE Stadium SET ImageURL = ? WHERE stadiumID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, imageURL);
+            ps.setInt(2, stadiumId);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
