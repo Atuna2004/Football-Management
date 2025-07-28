@@ -4,34 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Báo Cáo Doanh Thu</title>
-    
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/revenueReport.css">
 </head>
 <body>
 
-<!-- Top Header -->
 <div class="top-header">
-    <div class="container-fluid d-flex justify-content-between align-items-center">
-        <div class="logo">
+    <div class="container-fluid d-flex justify-content-between align-items-center" style="padding-left: 0; padding-right: 0; max-width: 100%;">
+        <div class="logo" style="padding-left: 40px;">
             <h3>
-                <a href="<%= request.getContextPath() %>/home.jsp">
+                <a class="item" href="<%= request.getContextPath() %>/home.jsp">
                     <i class="fas fa-futbol me-2"></i>
-                    Field Manager Page
                 </a>
+                Field Manager Page
             </h3>
         </div>
         <%
             Object userObj = session.getAttribute("currentUser");
             if (userObj != null) {
         %>
-            <div class="user-greeting">
+            <div class="user-greeting" style="margin-right: 40px;">
                 <i class="fas fa-user-circle"></i>
                 Xin chào, <%= ((model.User) userObj).getFullName() %>
             </div>

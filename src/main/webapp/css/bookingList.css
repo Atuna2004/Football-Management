@@ -1,0 +1,421 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 50%, #dbeafe 100%);
+    min-height: 100vh;
+    color: #1e293b;
+    line-height: 1.6;
+}
+
+.top-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    padding: 20px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 80px;
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.08);
+}
+
+.top-header .container-fluid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.logo h3 {
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+.logo h3 a.item {
+    text-decoration: none;
+    color: #3b82f6;
+    transition: all 0.3s ease;
+}
+
+.logo h3 a.item:hover {
+    transform: scale(1.1);
+    text-decoration: none;
+}
+
+.user-greeting {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.main-content {
+    margin-left: 300px;
+    padding: 40px;
+    min-height: calc(100vh - 80px);
+    margin-top: 80px;
+}
+
+.page-title {
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 32px;
+    margin-bottom: 32px;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-title i {
+    color: #3b82f6;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 32px 80px rgba(59, 130, 246, 0.12);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    padding: 32px 40px;
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h5 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-body {
+    padding: 0;
+}
+
+.table-responsive {
+    border-radius: 0 0 24px 24px;
+    overflow: hidden;
+}
+
+.table {
+    background: transparent;
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0;
+}
+
+.table th {
+    background: rgba(59, 130, 246, 0.05);
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 24px 20px;
+    border: none;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table td {
+    padding: 24px 20px;
+    border: none;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.05);
+    vertical-align: middle;
+}
+
+.table tr {
+    transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background: rgba(59, 130, 246, 0.03);
+    transform: scale(1.005);
+}
+
+.customer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.customer-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 16px;
+}
+
+.customer-contact {
+    color: #64748b;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stadium-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stadium-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 16px;
+}
+
+.field-details {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.booking-id {
+    font-weight: 700;
+    color: #3b82f6;
+    font-size: 16px;
+}
+
+.amount {
+    font-weight: 700;
+    color: #059669;
+    font-size: 16px;
+}
+
+.date-time {
+    color: #1e293b;
+    font-weight: 500;
+}
+
+.food-orders {
+    color: #64748b;
+    font-style: italic;
+}
+
+.badge {
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge.bg-success {
+    background: rgba(16, 185, 129, 0.1) !important;
+    color: #059669;
+}
+
+.badge.bg-warning {
+    background: rgba(245, 158, 11, 0.1) !important;
+    color: #d97706;
+}
+
+.badge.bg-danger {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #dc2626;
+}
+
+.badge.bg-primary {
+    background: rgba(59, 130, 246, 0.1) !important;
+    color: #2563eb;
+}
+
+.badge.bg-secondary {
+    background: rgba(100, 116, 139, 0.1) !important;
+    color: #64748b;
+}
+
+.status-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-completed .status-icon {
+    background: #059669;
+}
+
+.status-pending .status-icon {
+    background: #d97706;
+}
+
+.status-cancelled .status-icon {
+    background: #dc2626;
+}
+
+.status-confirmed .status-icon {
+    background: #2563eb;
+}
+
+.created-at {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 80px 40px;
+}
+
+.empty-state i {
+    font-size: 64px;
+    color: #cbd5e1;
+    margin-bottom: 24px;
+}
+
+.empty-state h3 {
+    color: #64748b;
+    margin-bottom: 12px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.empty-state p {
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.error-state {
+    text-align: center;
+    padding: 80px 40px;
+}
+
+.error-state i {
+    font-size: 64px;
+    color: #fbbf24;
+    margin-bottom: 24px;
+}
+
+.error-state h3 {
+    color: #d97706;
+    margin-bottom: 12px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.error-state p {
+    color: #92400e;
+    font-size: 14px;
+}
+
+.action-btn {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding: 24px;
+    }
+
+    .page-title {
+        font-size: 28px;
+    }
+
+    .card-header,
+    .table th,
+    .table td {
+        padding: 16px;
+    }
+
+    .table-responsive {
+        font-size: 14px;
+    }
+
+    .customer-info,
+    .stadium-info {
+        gap: 2px;
+    }
+
+    .top-header .container-fluid {
+        padding: 0 24px;
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start !important;
+    }
+}
+
+.fade-in {
+    animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.d-flex {
+    display: flex;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.align-items-center {
+    align-items: center;
+}

@@ -13,21 +13,20 @@
 </head>
 <body>
 <div class="top-header">
-    <div class="container-fluid">
-        <div class="logo">
+    <div class="container-fluid d-flex justify-content-between align-items-center" style="padding-left: 0; padding-right: 0; max-width: 100%;">
+        <div class="logo" style="padding-left: 40px;">
             <h3>
                 <a class="item" href="<%= request.getContextPath() %>/home.jsp">
-                    <i class="fas fa-futbol"></i>
+                    <i class="fas fa-futbol me-2"></i>
                 </a>
-                Field Manager
+                Field Manager Page
             </h3>
         </div>
-
         <%
             User currentUser = (User) session.getAttribute("currentUser");
             if (currentUser != null) {
         %>
-        <div class="user-greeting">
+        <div class="user-greeting" style="margin-right: 40px">
             <i class="fas fa-user-circle"></i>
             Xin chào, <%= currentUser.getFullName() != null ? currentUser.getFullName() : currentUser.getEmail() %>
         </div>
@@ -224,7 +223,7 @@
                 setTimeout(() => {
                     this.innerHTML = originalText;
                     this.disabled = false;
-                }, 3000);
+                }, 6000);
             });
         });
 
