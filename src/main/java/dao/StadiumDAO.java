@@ -267,24 +267,35 @@ public class StadiumDAO {
 
     private Stadium mapResultSetToStadium(ResultSet rs) throws SQLException {
         Stadium stadium = new Stadium(
-                rs.getInt("stadiumID"),
-                rs.getString("name"),
-                rs.getString("location"),
-                rs.getString("description"),
-                rs.getString("status"),
-                rs.getTimestamp("createdAt"),
-                rs.getString("phoneNumber"),
-                rs.getInt("OwnerID")
+            rs.getInt("stadiumID"),
+            rs.getString("name"),
+            rs.getString("location"),
+            rs.getString("description"),
+            rs.getString("status"),
+            rs.getTimestamp("createdAt"),
+            rs.getString("phoneNumber"),
+            rs.getInt("OwnerID")
         );
-        
+
+        // ✅ LẤY TỌA ĐỘ
+        try {
+            stadium.setLatitude(rs.getObject("Latitude", Double.class));
+            stadium.setLongitude(rs.getObject("Longitude", Double.class));
+        } catch (SQLException e) {
+            stadium.setLatitude(null);
+            stadium.setLongitude(null);
+        }
+
+        // Optional
         try {
             stadium.setImageURL(rs.getString("ImageURL"));
         } catch (SQLException e) {
             stadium.setImageURL(null);
         }
-        
+
         return stadium;
     }
+
     
     public List<Stadium> getStadiumsByOwner(int ownerId) {
         List<Stadium> list = new ArrayList<>();

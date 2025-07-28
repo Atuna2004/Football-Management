@@ -46,11 +46,11 @@ public class CheckoutServlet extends HttpServlet {
             cartFoodTotal += item.getFoodItem().getPrice() * item.getQuantity();
         }
 
-        // ✅ Kiểm tra tổng tiền món đã được đặt trước đó
+        // Tổng món ăn đã đặt trước đó
         FoodOrderDAO foodOrderDAO = new FoodOrderDAO();
         double existingFoodTotal = foodOrderDAO.getFoodOrderTotal(bookingId);
 
-        // ✅ Ghi đơn món mới nếu có trong giỏ hàng
+        // Ghi đơn món mới nếu có
         if (!cart.isEmpty()) {
             int foodOrderId = foodOrderDAO.createFoodOrder(userId, stadiumId, bookingId, cartFoodTotal);
             if (foodOrderId != -1) {
@@ -60,6 +60,26 @@ public class CheckoutServlet extends HttpServlet {
         }
 
         double totalAmount = ticketPrice + existingFoodTotal + cartFoodTotal;
+
+        // ✅ Truyền thông tin cho cả hai trường hợp VNPay và Cash
+        request.setAttribute("ticketPrice", ticketPrice);
+        request.setAttribute("foodPrice", existingFoodTotal + cartFoodTotal);
+        request.setAttribute("totalAmount", totalAmount);
+        request.setAttribute("bookingId", bookingId);
+        request.setAttribute("stadiumId", stadiumId);
+        request.setAttribute("paymentMethod", method);
+
+        request.setAttribute("customerName", currentUser.getFullName());
+        request.setAttribute("customerPhone", currentUser.getPhone());
+        request.setAttribute("customerEmail", currentUser.getEmail());
+
+        request.setAttribute("bookingDate", booking.getFormattedCreatedAt().split(" ")[0]); // "dd/MM/yyyy"
+        request.setAttribute("bookingTime", booking.getTimeSlot());
+        request.setAttribute("subdivision", booking.getStadiumName()); // Đặt tên sân/khu
+
+        if (booking.getTotalAmount() < totalAmount) {
+            request.setAttribute("discountedTotalAmount", booking.getTotalAmount());
+        }
 
         if ("offline".equalsIgnoreCase(method)) {
             PaymentDAO paymentDAO = new PaymentDAO();
@@ -71,10 +91,9 @@ public class CheckoutServlet extends HttpServlet {
                 throw new RuntimeException("Không thể ghi nhận thanh toán");
             }
 
-            // ✅ Cập nhật trạng thái booking sang Confirmed
             bookingDAO.updateBookingStatus(bookingId, "Confirmed");
 
-            // ✅ Gửi email xác nhận
+            // Gửi email
             try {
                 String email = currentUser.getEmail();
                 String subject = "Xác nhận đơn đặt sân #" + bookingId;
@@ -97,16 +116,8 @@ public class CheckoutServlet extends HttpServlet {
 
                 EmailService.sendEmail(email, subject, message);
             } catch (Exception e) {
-                e.printStackTrace(); // hoặc dùng logger
+                e.printStackTrace();
             }
-
-            // ✅ Hiển thị trang kết quả
-            request.setAttribute("ticketPrice", ticketPrice);
-            request.setAttribute("foodPrice", existingFoodTotal + cartFoodTotal);
-            request.setAttribute("totalAmount", totalAmount);
-            request.setAttribute("bookingId", bookingId);
-            request.setAttribute("stadiumId", stadiumId);
-            request.setAttribute("paymentMethod", method);
 
             session.removeAttribute("cart");
 
@@ -114,14 +125,7 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        // Nếu là VNPay hoặc phương thức khác → sang trang xác nhận
-        request.setAttribute("ticketPrice", ticketPrice);
-        request.setAttribute("foodPrice", existingFoodTotal + cartFoodTotal);
-        request.setAttribute("totalAmount", totalAmount);
-        request.setAttribute("bookingId", bookingId);
-        request.setAttribute("stadiumId", stadiumId);
-        request.setAttribute("paymentMethod", method);
-
+        // Nếu là VNPay
         request.getRequestDispatcher("/order-confirm.jsp").forward(request, response);
     }
 }

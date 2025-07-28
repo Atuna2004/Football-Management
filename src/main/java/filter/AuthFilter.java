@@ -36,12 +36,20 @@ public class AuthFilter implements Filter {
             return;
         }
 
-        if (path.startsWith("/admin")) {
+        if (path.equals("/admincheck")) {
+            // Cho cả Admin và Owner vào
+            if (currentUser == null || (!currentUser.isAdmin() && !currentUser.isFieldOwner())) {
+                res.sendRedirect(req.getContextPath() + "/unauthorized.jsp");
+                return;
+            }
+        } else if (path.startsWith("/admin")) {
+            // Các trang admin khác chỉ cho admin
             if (currentUser == null || !currentUser.isAdmin()) {
                 res.sendRedirect(req.getContextPath() + "/unauthorized.jsp");
                 return;
             }
         }
+
 
         if (path.startsWith("/fieldOwner")) {
             if (currentUser == null || !currentUser.isFieldOwner()) {

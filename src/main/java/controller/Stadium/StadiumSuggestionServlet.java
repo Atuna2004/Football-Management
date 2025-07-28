@@ -59,6 +59,10 @@ public class StadiumSuggestionServlet extends HttpServlet {
                 double distance = GeoUtil.haversine(userLat, userLon, lat, lon);
                 stadium.setDistance(distance);
                 validStadiums.add(stadium);
+                
+                  // 👉 LOG HERE
+        System.out.printf("✅ Sân gần hợp lệ: %s - %.2f km (lat=%.6f, lon=%.6f)%n",
+                stadium.getName(), distance, lat, lon);
             }
         }
 
