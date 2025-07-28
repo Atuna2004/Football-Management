@@ -8,6 +8,14 @@
         <servlet-name>SubmitReportServlet</servlet-name>
         <servlet-class>controller.Stadium.SubmitReportServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ChatBotServlet</servlet-name>
+        <servlet-class>controller.ChatBot.ChatBotServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ChatBotServlet</servlet-name>
+        <url-pattern>/ChatBotServlet</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminDashboardServlet</servlet-name>
         <url-pattern>/adminDashboard</url-pattern>

@@ -84,17 +84,41 @@
                         // currentUser đã được khai báo ở trên, không cần khai báo lại
                         if (currentUser != null) {
                     %>
-                        <div class="dropdown">
-                            <a href="#" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
-                               aria-expanded="false">
-                                <i class="fa-solid fa-user"></i>
-                                <%= currentUser.getFullName() != null ? currentUser.getFullName() : currentUser.getEmail() %>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="<%= request.getContextPath() %>/account/profile.jsp">Hồ sơ</a></li>
-                                <li><a class="dropdown-item" href="<%= request.getContextPath() %>/booking-history">Lịch sử đặt hàng</a></li>
-                                <li><a class="dropdown-item" href="<%= request.getContextPath() %>/logout">Đăng xuất</a></li>
-                            </ul>
+                        <div class="user-dropdown">
+                            <div class="user-info">
+                                <% if (currentUser.getAvatarUrl() != null && !currentUser.getAvatarUrl().isEmpty()) {
+                                    String avatarPath = currentUser.getAvatarUrl();
+                                    // Kiểm tra xem đường dẫn có phải là URL đầy đủ không
+                                    boolean isFullUrl = avatarPath.toLowerCase().startsWith("http://") ||
+                                                      avatarPath.toLowerCase().startsWith("https://") ||
+                                                      avatarPath.toLowerCase().startsWith("data:image");
+                                    String finalAvatarUrl = isFullUrl ? avatarPath :
+                                        request.getContextPath() + "/uploads/avatars/" + avatarPath;
+                                %>
+                                    <img src="<%= finalAvatarUrl %>" alt="Avatar" class="user-avatar">
+                                <% } else { %>
+                                    <div class="user-avatar-placeholder">
+                                        <%= currentUser.getFullName().substring(0, 1).toUpperCase() %>
+                                    </div>
+                                <% } %>
+                                <span><%= currentUser.getFullName() %></span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="dropdown-menu">
+                                <a href="${pageContext.request.contextPath}/account/profile.jsp" class="dropdown-item">
+                                    <i class="fas fa-user"></i>
+                                    Hồ sơ
+                                </a>
+                                <a href="${pageContext.request.contextPath}/booking-history" class="dropdown-item">
+                                    <i class="fas fa-history"></i>
+                                    Lịch sử đặt sân
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="${pageContext.request.contextPath}/logout" class="dropdown-item">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Đăng xuất
+                                </a>
+                            </div>
                         </div>
                     <%
                         } else {
@@ -131,7 +155,7 @@
 
     function requestOwnerGuest(event) {
         event.preventDefault(); // Prevent the default link behavior
-        const confirmRequest = confirm("Bạn cần đăng nhập trước khi gửi yêu cầu làm chủ sân.");
+        const confirmRequest = confirm("Bạn cần đăng nhập trước khi gửi yêu c��u làm chủ sân.");
         if (confirmRequest) {
             window.location.href = "<%= request.getContextPath() %>/account/login.jsp";
         }
@@ -140,5 +164,4 @@
 </script>
 
 </body>
-</html> 
 </html>
