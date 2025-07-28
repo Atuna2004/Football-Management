@@ -6,7 +6,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
+
 import model.Stadium;
 
 @WebServlet("/stadium-detail")
@@ -22,7 +24,7 @@ public class StadiumDetailServlet extends HttpServlet {
 
         int stadiumId = Integer.parseInt(idStr);
         StadiumDAO dao = new StadiumDAO();
-        Stadium stadium = dao.getStadiumById(stadiumId); // bạn cần có hàm này
+        Stadium stadium = dao.getStadiumById(stadiumId);
 
         if (stadium == null) {
             request.setAttribute("errorMessage", "Không tìm thấy sân bóng.");

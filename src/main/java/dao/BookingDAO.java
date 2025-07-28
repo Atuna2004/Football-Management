@@ -394,4 +394,21 @@ public class BookingDAO {
 
         return false;
     }
+    
+    public boolean updateTotalAmount(int bookingId, double newTotalAmount) {
+        String sql = "UPDATE Booking SET TotalAmount = ? WHERE BookingID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setDouble(1, newTotalAmount);
+            ps.setInt(2, bookingId);
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
 }

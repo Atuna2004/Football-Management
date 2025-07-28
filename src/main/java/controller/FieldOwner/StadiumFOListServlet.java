@@ -34,11 +34,9 @@ public class StadiumFOListServlet extends HttpServlet {
         Integer ownerId = currentUser.getUserID();
         StadiumDAO stadiumDAO = new StadiumDAO();
 
-        // 🔹 LẤY TỪ KHÓA TÌM KIẾM
         String search = request.getParameter("search");
         if (search == null) search = "";
 
-        // 🔹 PHÂN TRANG
         int page = 1;
         try {
             String pageParam = request.getParameter("page");
@@ -52,20 +50,16 @@ public class StadiumFOListServlet extends HttpServlet {
         int totalStadiums;
         int totalPages;
 
-        // 🔹 XỬ LÝ TÌM KIẾM
         if (search.trim().isEmpty()) {
-            // Không tìm kiếm: lấy tất cả sân
             totalStadiums = stadiumDAO.getTotalStadiumCountByOwnerId(ownerId);
             totalPages = (int) Math.ceil((double) totalStadiums / RECORDS_PER_PAGE);
             pagedStadiums = stadiumDAO.getStadiumsByOwnerIdAndPage(ownerId, page, RECORDS_PER_PAGE);
         } else {
-            // Có tìm kiếm
             totalStadiums = stadiumDAO.getTotalSearchCountByOwner(ownerId, search);
             totalPages = (int) Math.ceil((double) totalStadiums / RECORDS_PER_PAGE);
             pagedStadiums = stadiumDAO.searchStadiumsByOwner(ownerId, search, page, RECORDS_PER_PAGE);
         }
 
-        // 🔹 Kiểm tra trang vượt quá
         if (page > totalPages && totalPages > 0) {
             page = totalPages;
             if (search.trim().isEmpty()) {
@@ -75,13 +69,11 @@ public class StadiumFOListServlet extends HttpServlet {
             }
         }
 
-        // 🔹 GỬI DỮ LIỆU VỀ JSP
         request.setAttribute("stadiums", pagedStadiums);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
-        request.setAttribute("search", search); // để giữ lại ô tìm kiếm
+        request.setAttribute("search", search);
 
-        // 🔹 Chuyển đến JSP
         request.getRequestDispatcher("/fieldOwner/StadiumList.jsp").forward(request, response);
     }
 }

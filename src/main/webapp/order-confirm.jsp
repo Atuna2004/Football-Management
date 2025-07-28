@@ -317,10 +317,12 @@
                         Phương thức thanh toán
                     </div>
 
-                    <form action="${pageContext.request.contextPath}/checkout" method="get" onsubmit="return confirmCashPayment();">
+                    <form action="${pageContext.request.contextPath}/checkout" method="post" onsubmit="return confirmCashPayment();">
                         <input type="hidden" name="stadiumId" value="${stadiumId}" />
                         <input type="hidden" name="bookingId" value="${bookingId}" />
                         <input type="hidden" name="method" value="offline" />
+                        <input type="hidden" name="discountCode" value="${discountCode}" />
+                        <input type="hidden" name="totalAmount" value="${discountedTotalAmount != null ? discountedTotalAmount : totalAmount}" />
                         <button type="submit" class="payment-button btn-cash">
                             <i class="fas fa-money-bill-wave"></i>
                             Thanh toán tại sân
@@ -331,6 +333,7 @@
                         <input type="hidden" name="stadiumId" value="${stadiumId}" />
                         <input type="hidden" name="bookingId" value="${bookingId}" />
                         <input type="hidden" name="method" value="vnpay" />
+                        <input type="hidden" name="discountCode" value="${discountCode}" />
                         <input type="hidden" name="totalAmount" value="${discountedTotalAmount != null ? discountedTotalAmount : totalAmount}" />
                         <button type="submit" class="payment-button btn-vnpay">
                             <i class="fab fa-cc-visa"></i>

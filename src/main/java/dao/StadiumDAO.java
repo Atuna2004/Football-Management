@@ -95,8 +95,8 @@ public class StadiumDAO {
         return false;
     }
 
-    public boolean deleteStadium(int id) {
-        String sql = "DELETE FROM Stadium WHERE stadiumID = ?";
+    public boolean deactivateStadium(int id) {
+        String sql = "UPDATE Stadium SET Status = 'inactive' WHERE stadiumID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -106,7 +106,7 @@ public class StadiumDAO {
         }
         return false;
     }
-
+    
     public List<Stadium> getStadiumsByPage(int page, int recordsPerPage) {
         List<Stadium> stadiumList = new ArrayList<>();
         String sql = "SELECT * FROM Stadium ORDER BY stadiumID LIMIT ? OFFSET ?";
@@ -416,6 +416,35 @@ public class StadiumDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public String getStadiumNameById(int stadiumId) throws SQLException {
+        String sql = "SELECT Name FROM Stadium WHERE StadiumID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, stadiumId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("Name");
+                }
+            }
+        }
+        return "Sân không xác định";
+    }
+    
+    public boolean isStadiumBelongsToOwner(int stadiumId, int ownerId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Stadium WHERE StadiumID = ? AND OwnerID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, stadiumId);
+            ps.setInt(2, ownerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
         }
         return false;
     }

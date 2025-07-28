@@ -35,38 +35,50 @@ public class ConfirmCashServlet extends HttpServlet {
         int stadiumId = Integer.parseInt(request.getParameter("stadiumId"));
         int bookingId = Integer.parseInt(request.getParameter("bookingId"));
 
+        // ✅ Nhận giá đã giảm (nếu có)
+        String totalRaw = request.getParameter("totalAmount");
+        double totalAfterDiscount = (totalRaw != null) ? Double.parseDouble(totalRaw) : 0;
+
         BookingDAO bookingDAO = new BookingDAO();
         Booking booking = bookingDAO.getBookingById(bookingId);
         double ticketPrice = (booking != null) ? booking.getPrice() : 0;
 
-        double totalFood = 0;
+        double cartFoodTotal = 0;
         for (CartItem item : cart) {
-            totalFood += item.getFoodItem().getPrice() * item.getQuantity();
+            cartFoodTotal += item.getFoodItem().getPrice() * item.getQuantity();
         }
 
-        double totalAmount = ticketPrice + totalFood;
-
+        // ✅ Ghi đơn món mới nếu có
         FoodOrderDAO foodOrderDAO = new FoodOrderDAO();
         if (!cart.isEmpty()) {
-            int foodOrderId = foodOrderDAO.createFoodOrder(userId, stadiumId, bookingId, totalAmount);
+            int foodOrderId = foodOrderDAO.createFoodOrder(userId, stadiumId, bookingId, cartFoodTotal);
             if (foodOrderId != -1) {
                 foodOrderDAO.insertOrderItems(foodOrderId, cart);
                 foodOrderDAO.reduceStock(cart);
             }
         }
 
-        session.removeAttribute("cart");
+        // ✅ Cập nhật lại totalAmount vào bảng Booking (QUAN TRỌNG)
+        bookingDAO.updateTotalAmount(bookingId, totalAfterDiscount);
 
+        // ✅ Ghi thanh toán
         PaymentDAO paymentDAO = new PaymentDAO();
-        boolean success = paymentDAO.createPayment(bookingId, totalAmount, "CashOnArrival", "Pending", null);
+        boolean success = paymentDAO.createPayment(bookingId, totalAfterDiscount, "CashOnArrival", "Pending", null);
 
         if (!success) {
             throw new RuntimeException("Không thể ghi dữ liệu thanh toán");
         }
 
+        // ✅ Xoá giỏ hàng
+        session.removeAttribute("cart");
+
+        // ✅ Trả dữ liệu sang payment-success.jsp
         request.setAttribute("ticketPrice", ticketPrice);
-        request.setAttribute("foodPrice", totalFood);
-        request.setAttribute("totalAmount", totalAmount);
+        request.setAttribute("foodPrice", cartFoodTotal);
+        request.setAttribute("totalAmount", totalAfterDiscount);
+        request.setAttribute("paymentMethod", "offline");
+
         request.getRequestDispatcher("/payment-success.jsp").forward(request, response);
     }
 }
+
