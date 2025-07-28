@@ -419,4 +419,33 @@ public class StadiumDAO {
         }
         return false;
     }
+    
+    public String getStadiumNameById(int stadiumId) throws SQLException {
+        String sql = "SELECT Name FROM Stadium WHERE StadiumID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, stadiumId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("Name");
+                }
+            }
+        }
+        return "Sân không xác định";
+    }
+    
+    public boolean isStadiumBelongsToOwner(int stadiumId, int ownerId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Stadium WHERE StadiumID = ? AND OwnerID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, stadiumId);
+            ps.setInt(2, ownerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
 }

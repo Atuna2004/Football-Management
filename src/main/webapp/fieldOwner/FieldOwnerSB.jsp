@@ -342,7 +342,7 @@
                     <i class="fas fa-chart-bar"></i>
                     <span>Báo cáo</span>
                 </a>
-                <a href="${pageContext.request.contextPath}/fieldOwner/revenueReport.jsp" class="dropdown-item">
+                <a href="${pageContext.request.contextPath}/revenue-report" class="dropdown-item">
                     <i class="fas fa-dollar-sign"></i>
                     <span>Doanh thu</span>
                 </a>
