@@ -76,27 +76,16 @@
                 <span>Giải đấu</span>
             </a>
         </li>
-    </ul>
-
-    <!-- User Menu at Bottom -->
-    <div class="user-menu">
-        <c:if test="${not empty currentUser}">
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/account/profile.jsp">
-                        <i class="fa-regular fa-circle-user"></i>
-                        <span>Hồ sơ</span>
-                    </a>
-                </li>
+        
+        
                 <li class="nav-item">
                     <a class="nav-link" href="${pageContext.request.contextPath}/logout">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Đăng xuất</span>
                     </a>
                 </li>
-            </ul>
-        </c:if>
-    </div>
+    </ul>
+
 </nav>
 
 <!-- JavaScript xử lý active menu -->
