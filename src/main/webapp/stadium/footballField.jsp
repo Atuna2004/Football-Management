@@ -165,25 +165,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                fetchSuggestions(lat, lon);
-            },
-            (error) => {
-                console.warn("⚠️ Không lấy được tọa độ thật, dùng fake:", error.message);
-                // Tọa độ fake tại Quảng Nam
-                fetchSuggestions(15.978673, 108.262237);
-            },
-            {
-                timeout: 5000
-            }
-        );
-    } else {
-        console.warn("⚠️ Trình duyệt không hỗ trợ geolocation, dùng tọa độ giả.");
-        fetchSuggestions(15.978673, 108.262237); // fallback
-    }
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            fetchSuggestions(lat, lon);
+        },
+        (error) => {
+            console.error("❌ Không lấy được vị trí thật từ trình duyệt:", error.message);
+            document.getElementById("suggested-stadiums").innerHTML =
+                "<p class='text-danger'>Không thể xác định vị trí của bạn.</p>";
+        },
+        {
+            timeout: 5000
+        }
+    );
+} else {
+    document.getElementById("suggested-stadiums").innerHTML =
+        "<p class='text-danger'>Trình duyệt của bạn không hỗ trợ định vị.</p>";
+}
+
 });
 </script>
 

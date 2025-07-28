@@ -95,8 +95,8 @@ public class StadiumDAO {
         return false;
     }
 
-    public boolean deleteStadium(int id) {
-        String sql = "DELETE FROM Stadium WHERE stadiumID = ?";
+    public boolean deactivateStadium(int id) {
+        String sql = "UPDATE Stadium SET Status = 'inactive' WHERE stadiumID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -106,7 +106,7 @@ public class StadiumDAO {
         }
         return false;
     }
-
+    
     public List<Stadium> getStadiumsByPage(int page, int recordsPerPage) {
         List<Stadium> stadiumList = new ArrayList<>();
         String sql = "SELECT * FROM Stadium ORDER BY stadiumID LIMIT ? OFFSET ?";
