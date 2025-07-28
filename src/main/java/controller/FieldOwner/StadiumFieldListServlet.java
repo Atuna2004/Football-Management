@@ -8,6 +8,7 @@ import model.Stadium;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -24,14 +25,12 @@ public class StadiumFieldListServlet extends HttpServlet {
             FieldDAO fieldDAO = new FieldDAO(conn);
             List<Field> fields = fieldDAO.getFieldsByStadiumId(stadiumId);
 
-            // Lấy thông tin sân từ StadiumDAO
             StadiumDAO stadiumDAO = new StadiumDAO();
             Stadium stadium = stadiumDAO.getStadiumById(stadiumId);
 
-            // Set dữ liệu vào request để gửi sang JSP
             request.setAttribute("fields", fields);
             request.setAttribute("stadiumId", stadiumId);
-            request.setAttribute("stadiumName", stadium.getName()); // <-- đây là phần bạn cần
+            request.setAttribute("stadiumName", stadium.getName());
 
             RequestDispatcher dispatcher = request.getRequestDispatcher("/fieldOwner/StadiumFieldList.jsp");
             dispatcher.forward(request, response);
