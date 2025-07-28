@@ -293,6 +293,24 @@
                         </div>
                     </div>
 
+                        
+                    <!-- FORM NHẬP MÃ GIẢM GIÁ -->
+<div class="section-title payment-section">
+    <i class="fas fa-ticket-alt"></i>
+    Nhập mã giảm giá
+</div>
+
+<form method="get" action="${pageContext.request.contextPath}/checkout">
+    <input type="hidden" name="stadiumId" value="${stadiumId}" />
+    <input type="hidden" name="bookingId" value="${bookingId}" />
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" name="discountCode"
+               placeholder="Nhập mã (nếu có)" value="${discountCode}" />
+        <button class="btn btn-outline-primary" type="submit">Áp dụng</button>
+    </div>
+</form>
+
+                        
                     <!-- PAYMENT INFO -->
                     <div class="section-title payment-section">
                         <i class="fas fa-credit-card"></i>

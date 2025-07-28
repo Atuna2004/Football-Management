@@ -28,6 +28,7 @@ public class FoodItemDAO {
                 item.setPrice(rs.getDouble("Price"));
                 item.setStockQuantity(rs.getInt("StockQuantity"));
                 item.setActive(rs.getBoolean("IsActive"));
+                item.setImageUrl(rs.getString("ImageUrl")); //
 
                 list.add(item);
             }

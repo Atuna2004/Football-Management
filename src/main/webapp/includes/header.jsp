@@ -101,8 +101,8 @@
                                         <%= currentUser.getFullName().substring(0, 1).toUpperCase() %>
                                     </div>
                                 <% } %>
-                                <span><%= currentUser.getFullName() %></span>
-                                <i class="fas fa-chevron-down"></i>
+                                <span style="color: white; cursor: pointer;"><%= currentUser.getFullName() %></span>
+                                <i class="fas fa-chevron-down" style="color: white; cursor: pointer;"></i>
                             </div>
                             <div class="dropdown-menu">
                                 <a href="${pageContext.request.contextPath}/account/profile.jsp" class="dropdown-item">
@@ -161,6 +161,25 @@
         }
         // If user clicks Cancel, nothing happens and they stay on the current page
     }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const userInfo = document.querySelector(".user-info");
+        const dropdown = document.querySelector(".user-dropdown .dropdown-menu");
+
+        if (userInfo && dropdown) {
+            userInfo.addEventListener("click", function (e) {
+                e.stopPropagation();
+                dropdown.classList.toggle("show");
+            });
+
+            // Ẩn dropdown khi click bên ngoài
+            document.addEventListener("click", function () {
+                dropdown.classList.remove("show");
+            });
+        }
+    });
 </script>
 
 </body>

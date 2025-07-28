@@ -36,6 +36,7 @@ public class CheckoutServlet extends HttpServlet {
         int stadiumId = Integer.parseInt(request.getParameter("stadiumId"));
         int bookingId = Integer.parseInt(request.getParameter("bookingId"));
         String method = request.getParameter("method");
+        String discountCode = request.getParameter("discountCode");
 
         BookingDAO bookingDAO = new BookingDAO();
         Booking booking = bookingDAO.getBookingById(bookingId);
@@ -46,45 +47,51 @@ public class CheckoutServlet extends HttpServlet {
             cartFoodTotal += item.getFoodItem().getPrice() * item.getQuantity();
         }
 
-        // Tổng món ăn đã đặt trước đó
         FoodOrderDAO foodOrderDAO = new FoodOrderDAO();
         double existingFoodTotal = foodOrderDAO.getFoodOrderTotal(bookingId);
 
-        // Ghi đơn món mới nếu có
-        if (!cart.isEmpty()) {
-            int foodOrderId = foodOrderDAO.createFoodOrder(userId, stadiumId, bookingId, cartFoodTotal);
-            if (foodOrderId != -1) {
-                foodOrderDAO.insertOrderItems(foodOrderId, cart);
-                foodOrderDAO.reduceStock(cart);
-            }
-        }
-
         double totalAmount = ticketPrice + existingFoodTotal + cartFoodTotal;
 
-        // ✅ Truyền thông tin cho cả hai trường hợp VNPay và Cash
+        // Áp dụng mã giảm giá GIAM10 → giảm 10%
+        double discountedTotal = totalAmount;
+        if (discountCode != null && discountCode.equalsIgnoreCase("GIAM10")) {
+            discountedTotal = totalAmount * 0.9;
+            request.setAttribute("discountedTotalAmount", discountedTotal);
+        }
+
+        // Truyền dữ liệu cho JSP
         request.setAttribute("ticketPrice", ticketPrice);
         request.setAttribute("foodPrice", existingFoodTotal + cartFoodTotal);
         request.setAttribute("totalAmount", totalAmount);
         request.setAttribute("bookingId", bookingId);
         request.setAttribute("stadiumId", stadiumId);
         request.setAttribute("paymentMethod", method);
+        request.setAttribute("discountCode", discountCode); // giữ lại input đã nhập
 
         request.setAttribute("customerName", currentUser.getFullName());
         request.setAttribute("customerPhone", currentUser.getPhone());
         request.setAttribute("customerEmail", currentUser.getEmail());
 
-        request.setAttribute("bookingDate", booking.getFormattedCreatedAt().split(" ")[0]); // "dd/MM/yyyy"
+        request.setAttribute("bookingDate", booking.getFormattedCreatedAt().split(" ")[0]);
         request.setAttribute("bookingTime", booking.getTimeSlot());
-        request.setAttribute("subdivision", booking.getStadiumName()); // Đặt tên sân/khu
-
-        if (booking.getTotalAmount() < totalAmount) {
-            request.setAttribute("discountedTotalAmount", booking.getTotalAmount());
-        }
+        request.setAttribute("subdivision", booking.getStadiumName());
 
         if ("offline".equalsIgnoreCase(method)) {
+            // Chỉ tại bước xác nhận thanh toán mới ghi đơn hàng vào DB
+            if (!cart.isEmpty()) {
+                int foodOrderId = foodOrderDAO.createFoodOrder(userId, stadiumId, bookingId, cartFoodTotal);
+                if (foodOrderId != -1) {
+                    foodOrderDAO.insertOrderItems(foodOrderId, cart);
+                    foodOrderDAO.reduceStock(cart);
+                }
+            }
+
+            double finalPayment = (discountCode != null && discountCode.equalsIgnoreCase("GIAM10"))
+                    ? discountedTotal : totalAmount;
+
             PaymentDAO paymentDAO = new PaymentDAO();
             boolean success = paymentDAO.createPayment(
-                bookingId, totalAmount, "CashOnArrival", "Pending", null
+                bookingId, finalPayment, "CashOnArrival", "Pending", null
             );
 
             if (!success) {
@@ -93,7 +100,6 @@ public class CheckoutServlet extends HttpServlet {
 
             bookingDAO.updateBookingStatus(bookingId, "Confirmed");
 
-            // Gửi email
             try {
                 String email = currentUser.getEmail();
                 String subject = "Xác nhận đơn đặt sân #" + bookingId;
@@ -111,7 +117,7 @@ public class CheckoutServlet extends HttpServlet {
                     bookingId,
                     ticketPrice,
                     existingFoodTotal + cartFoodTotal,
-                    totalAmount
+                    finalPayment
                 );
 
                 EmailService.sendEmail(email, subject, message);
@@ -125,7 +131,6 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        // Nếu là VNPay
         request.getRequestDispatcher("/order-confirm.jsp").forward(request, response);
     }
 }
