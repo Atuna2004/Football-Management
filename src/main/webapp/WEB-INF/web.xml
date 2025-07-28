@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+    <servlet>
+        <servlet-name>StadiumImageServlet</servlet-name>
+        <servlet-class>controller.Stadium.StadiumImageServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginFacebookServlet</servlet-name>
         <url-pattern>/LoginFacebookServlet</url-pattern>
@@ -19,6 +23,10 @@
     <servlet-mapping>
         <servlet-name>SubmitReportServlet</servlet-name>
         <url-pattern>/submit-report</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StadiumImageServlet</servlet-name>
+        <url-pattern>/stadium-image</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

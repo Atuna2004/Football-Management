@@ -11,7 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        * {
+        * 
+        {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -629,6 +630,41 @@
                 padding: 8px 12px;
                 margin: 0 2px;
             }
+        }
+             .current-image {
+            max-width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .image-upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .image-upload-area:hover {
+            border-color: #ffc107;
+            background-color: #fff8e1;
+        }
+        .image-upload-area.dragover {
+            border-color: #ffc107;
+            background-color: #fff8e1;
+        }
+        .current-image-container {
+            position: relative;
+            display: inline-block;
         }
 
         /* Animation Classes */

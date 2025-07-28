@@ -1,7 +1,8 @@
 package controller.FieldOwner;
 
-
+import config.CloudinaryUtils;
 import jakarta.servlet.*;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -13,6 +14,11 @@ import model.Stadium;
 import model.User;
 
 @WebServlet("/stadium/config")
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 2,  // 2MB
+    maxFileSize = 1024 * 1024 * 10,       // 10MB
+    maxRequestSize = 1024 * 1024 * 50     // 50MB
+)
 public class StadiumServlet extends HttpServlet {
     private StadiumDAO stadiumDAO = new StadiumDAO();
 
@@ -21,7 +27,6 @@ public class StadiumServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         if (action == null || action.isEmpty()) {
-            // Mặc định chuyển về danh sách sân
             response.sendRedirect(request.getContextPath() + "/fieldOwner/FOSTD");
             return;
         }
@@ -62,13 +67,14 @@ public class StadiumServlet extends HttpServlet {
         }
     }
 
-    // Hiển thị form tạo sân mới
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("/fieldOwner/createStadium.jsp").forward(request, response);
     }
 
-    // Xử lý tạo sân mới
     private void createStadium(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        System.out.println("=== CREATE STADIUM DEBUG ===");
+        System.out.println("Content-Type: " + request.getContentType());
+        
         request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
         String name = request.getParameter("name");
@@ -80,6 +86,9 @@ public class StadiumServlet extends HttpServlet {
         User currentUser = (User) session.getAttribute("currentUser");
         int OwnerID = currentUser.getUserID();
         
+        System.out.println("Stadium name: " + name);
+        System.out.println("Owner ID: " + OwnerID);
+        
         Stadium stadium = new Stadium();
         stadium.setName(name);
         stadium.setLocation(location);
@@ -89,7 +98,40 @@ public class StadiumServlet extends HttpServlet {
         stadium.setCreatedAt(createdAt);
         stadium.setOwnerID(OwnerID);
 
-        if (stadiumDAO.insertStadium(stadium)) {
+        String imageURL = null;
+        try {
+            Part imagePart = request.getPart("stadiumImage");
+            System.out.println("Image part: " + (imagePart != null ? "Found" : "NULL"));
+            if (imagePart != null) {
+                System.out.println("Image size: " + imagePart.getSize() + " bytes");
+                System.out.println("Image content type: " + imagePart.getContentType());
+            }
+            
+            if (imagePart != null && imagePart.getSize() > 0) {
+                System.out.println("Uploading image to Cloudinary...");
+                imageURL = CloudinaryUtils.uploadImage(imagePart, OwnerID);
+                stadium.setImageURL(imageURL);
+                System.out.println("✅ Image uploaded successfully: " + imageURL);
+            } else {
+                System.out.println("⚠️ No image to upload");
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Error with image upload: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        boolean success;
+        if (stadium.getImageURL() != null && !stadium.getImageURL().trim().isEmpty()) {
+            System.out.println("✅ Calling insertStadiumWithImage() - Image URL: " + stadium.getImageURL());
+            success = stadiumDAO.insertStadiumWithImage(stadium);
+        } else {
+            System.out.println("⚠️ Calling insertStadium() - No image URL");
+            success = stadiumDAO.insertStadium(stadium);
+        }
+
+        System.out.println("Insert result: " + success);
+        
+        if (success) {
             response.sendRedirect(request.getContextPath() + "/fieldOwner/FOSTD");
         } else {
             request.setAttribute("errorMessage", "Có lỗi khi thêm sân.");
@@ -97,16 +139,25 @@ public class StadiumServlet extends HttpServlet {
         }
     }
 
-    // Hiển thị form sửa sân
     private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int stadiumId = Integer.parseInt(request.getParameter("id"));
         Stadium stadium = stadiumDAO.getStadiumById(stadiumId);
+        
+        System.out.println("=== SHOW EDIT FORM DEBUG ===");
+        System.out.println("Stadium ID: " + stadiumId);
+        System.out.println("Stadium found: " + (stadium != null ? stadium.getName() : "NULL"));
+        if (stadium != null) {
+            System.out.println("Current image URL: " + stadium.getImageURL());
+        }
+        
         request.setAttribute("stadium", stadium);
         request.getRequestDispatcher("/fieldOwner/updateStadium.jsp").forward(request, response);
     }
 
-    // Xử lý cập nhật sân
     private void updateStadium(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        System.out.println("===== UPDATE STADIUM DEBUG =====");
+        System.out.println("Content-Type: " + request.getContentType());
+        
         request.setCharacterEncoding("UTF-8");
 
         int stadiumID = Integer.parseInt(request.getParameter("stadiumID"));
@@ -116,6 +167,9 @@ public class StadiumServlet extends HttpServlet {
         String status = request.getParameter("status");
         String phoneNumber = request.getParameter("phoneNumber");
 
+        System.out.println("Stadium ID: " + stadiumID);
+        System.out.println("Stadium name: " + name);
+
         Stadium stadium = new Stadium();
         stadium.setStadiumID(stadiumID);
         stadium.setName(name);
@@ -124,15 +178,54 @@ public class StadiumServlet extends HttpServlet {
         stadium.setStatus(status);
         stadium.setPhoneNumber(phoneNumber);
 
-        if (stadiumDAO.updateStadium(stadium)) {
+        String imageURL = null;
+        try {
+            Part imagePart = request.getPart("stadiumImage");
+            System.out.println("Image part found: " + (imagePart != null));
+            if (imagePart != null) {
+                System.out.println("Image size: " + imagePart.getSize() + " bytes");
+                System.out.println("Image content type: " + imagePart.getContentType());
+                System.out.println("Image name: " + imagePart.getSubmittedFileName());
+            }
+            
+            if (imagePart != null && imagePart.getSize() > 0) {
+                HttpSession session = request.getSession();
+                User currentUser = (User) session.getAttribute("currentUser");
+                int OwnerID = currentUser.getUserID();
+                System.out.println("🔄 Uploading new image to Cloudinary...");
+                imageURL = CloudinaryUtils.uploadImage(imagePart, OwnerID);
+                stadium.setImageURL(imageURL);
+                System.out.println("✅ New image uploaded successfully: " + imageURL);
+            } else {
+                System.out.println("⚠️ No new image to upload");
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Error with image processing: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // CRITICAL: Check which DAO method to call
+        boolean success;
+        if (stadium.getImageURL() != null && !stadium.getImageURL().trim().isEmpty()) {
+            System.out.println("✅ Calling updateStadiumWithImage() - Image URL: " + stadium.getImageURL());
+            success = stadiumDAO.updateStadiumWithImage(stadium);
+        } else {
+            System.out.println("⚠️ Calling updateStadium() - No image URL to save");
+            success = stadiumDAO.updateStadium(stadium);
+        }
+
+        System.out.println("📊 Database update result: " + success);
+
+        if (success) {
+            System.out.println("🎉 Update successful, redirecting...");
             response.sendRedirect(request.getContextPath() + "/fieldOwner/FOSTD");
         } else {
+            System.out.println("💥 Update failed!");
             request.setAttribute("errorMessage", "Cập nhật thất bại.");
             request.getRequestDispatcher("/fieldOwner/updateStadium.jsp").forward(request, response);
         }
     }
 
-    // Xử lý xóa sân
     private void deleteStadium(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int stadiumId = Integer.parseInt(request.getParameter("stadiumId"));
         if (stadiumDAO.deleteStadium(stadiumId)) {
