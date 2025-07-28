@@ -5,394 +5,317 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xác nhận thanh toán</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-blue: #2563eb;
-            --light-blue: #3b82f6;
-            --lighter-blue: #60a5fa;
-            --blue-50: #eff6ff;
-            --blue-100: #dbeafe;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-600: #4b5563;
-            --gray-900: #111827;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --vnpay-color: #00b894;
+            --cash-color: #fdcb6e;
+            --text-dark: #212529;
+            --text-light: #6c757d;
+            --background-light: #f8f9fa;
+            --border-color: #dee2e6;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--gray-50);
-            color: var(--gray-900);
-            line-height: 1.6;
-            padding: 2rem 1rem;
+            background: var(--background-light);
+            font-family: 'Inter', sans-serif;
+            padding: 40px 20px;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .payment-card {
-            background: white;
+        .confirmation-card {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
             border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            padding: 2.5rem;
-            border: 1px solid #e5e7eb;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
         }
 
-        .page-title {
-            font-size: 2rem;
-            font-weight: 600;
+        .card-header-custom {
+            background: var(--primary-color);
+            color: white;
+            padding: 24px;
             text-align: center;
-            margin-bottom: 2.5rem;
-            color: var(--primary-blue);
+        }
+
+        .card-header-custom h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .card-body-custom {
+            padding: 32px;
         }
 
         .section-title {
-            font-size: 1.125rem;
+            font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--gray-900);
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--blue-100);
+            margin-bottom: 20px;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 10px;
         }
 
-        .section-title i {
-            color: var(--primary-blue);
-        }
-
-        .info-group {
-            background: var(--blue-50);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            border: 1px solid var(--blue-100);
-        }
-
-        .info-item {
+        .info-block p {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--blue-100);
-        }
-
-        .info-item:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            font-weight: 500;
-            color: var(--gray-600);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .info-label i {
-            color: var(--primary-blue);
-            width: 16px;
-        }
-
-        .info-value {
-            font-weight: 500;
-            color: var(--gray-900);
-        }
-
-        .price-value {
-            font-weight: 600;
-            color: var(--primary-blue);
-            font-size: 1.125rem;
-        }
-
-        .payment-section {
-            margin-top: 2rem;
-        }
-
-        .payment-button {
-            width: 100%;
-            padding: 1rem 1.5rem;
+            margin-bottom: 12px;
             font-size: 1rem;
+            color: var(--text-light);
+        }
+
+        .info-block .info-value {
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .summary-block {
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .summary-block .total-price {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 15px;
+        }
+
+        .payment-options {
+            margin-top: 20px;
+        }
+
+        .payment-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
             font-weight: 500;
             border-radius: 8px;
             border: none;
-            margin-bottom: 1rem;
-            cursor: pointer;
+            margin-bottom: 15px;
+            text-align: left;
             transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            text-decoration: none;
+        }
+
+        .payment-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .btn-cash {
-            background-color: white;
-            color: var(--primary-blue);
-            border: 2px solid var(--primary-blue);
-        }
-
-        .btn-cash:hover {
-            background-color: var(--primary-blue);
-            color: white;
+            background-color: var(--cash-color);
+            color: #2d3436;
         }
 
         .btn-vnpay {
-            background-color: var(--primary-blue);
+            background-color: var(--vnpay-color);
             color: white;
         }
 
-        .btn-vnpay:hover {
-            background-color: var(--light-blue);
-            color: white;
+        .discount-section {
+            margin-top: 24px;
         }
 
-        .map-container {
-            margin-top: 1.5rem;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--blue-100);
+        .discount-input-group {
+            display: flex;
+            gap: 10px;
         }
 
-        .map-wrapper iframe {
-            width: 100%;
-            height: 200px;
+        .discount-input-group input {
+            flex-grow: 1;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            padding: 0 15px;
+        }
+
+        .discount-input-group button {
+            border-radius: 8px;
             border: none;
-        }
-
-        .contact-info {
-            background: var(--blue-50);
-            border: 1px solid var(--blue-100);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .contact-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--primary-blue);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background-color: var(--secondary-color);
             color: white;
-        }
-
-        .contact-text {
-            flex: 1;
-        }
-
-        .contact-label {
-            font-size: 0.875rem;
-            color: var(--gray-600);
+            padding: 0 20px;
             font-weight: 500;
         }
 
-        .contact-value {
-            font-weight: 600;
-            color: var(--gray-900);
+        .discount-result {
+            margin-top: 10px;
+            font-weight: 500;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem 0.5rem;
-            }
-
-            .payment-card {
-                padding: 2rem 1.5rem;
-                border-radius: 12px;
-            }
-
-            .page-title {
-                font-size: 1.75rem;
-                margin-bottom: 2rem;
-            }
-
-            .row > div {
-                margin-bottom: 2rem;
-            }
-
-            .info-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.25rem;
-                padding: 1rem 0;
-            }
+        .text-success {
+            color: var(--success-color) !important;
         }
 
-        @media (max-width: 480px) {
-            .payment-card {
-                padding: 1.5rem 1rem;
-            }
-
-            .page-title {
-                font-size: 1.5rem;
-            }
-
-            .payment-button {
-                padding: 0.875rem 1.25rem;
-                font-size: 0.9rem;
-            }
+        .text-danger {
+            color: #dc3545 !important;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="payment-card">
-            <h3 class="page-title">Xác nhận thanh toán</h3>
 
-            <div class="row">
-                <!-- LEFT COLUMN -->
-                <div class="col-md-6">
-                    <!-- PERSONAL DATA -->
-                    <div class="section-title">
-                        <i class="fas fa-user"></i>
-                        Thông tin khách hàng
-                    </div>
-                    
-                    <div class="info-group">
-                        <div class="info-item">
-                            <span class="info-label">
-                                <i class="fas fa-id-card"></i>
-                                Họ tên
-                            </span>
-                            <span class="info-value">${customerName}</span>
-                        </div>
-                        
-                        <div class="info-item">
-                            <span class="info-label">
-                                <i class="fas fa-phone"></i>
-                                SĐT
-                            </span>
-                            <span class="info-value">${customerPhone}</span>
-                        </div>
-                        
-                        <div class="info-item">
-                            <span class="info-label">
-                                <i class="fas fa-envelope"></i>
-                                Email
-                            </span>
-                            <span class="info-value">${customerEmail}</span>
-                        </div>
-                    </div>
+<div class="confirmation-card">
+    <div class="card-header-custom">
+        <h2><i class="fas fa-check-circle me-2"></i>Xác nhận thông tin đặt sân</h2>
+    </div>
 
-                    <!-- PAYMENT INFO -->
-                    <div class="section-title payment-section">
-                        <i class="fas fa-credit-card"></i>
-                        Phương thức thanh toán
-                    </div>
+    <div class="card-body-custom">
+        <div class="row">
+            <div class="col-md-7">
+                <div class="section-title"><i class="fas fa-user-circle"></i>Thông tin khách hàng</div>
+                <div class="info-block">
+                    <p>Họ tên: <span class="info-value">${customerName}</span></p>
+                    <p>Số điện thoại: <span class="info-value">${customerPhone}</span></p>
+                    <p>Email: <span class="info-value">${customerEmail}</span></p>
+                </div>
 
-                    <form action="${pageContext.request.contextPath}/checkout" method="get" onsubmit="return confirmCashPayment();">
-                        <input type="hidden" name="stadiumId" value="${stadiumId}" />
-                        <input type="hidden" name="bookingId" value="${bookingId}" />
-                        <input type="hidden" name="method" value="offline" />
-                        <button type="submit" class="payment-button btn-cash">
-                            <i class="fas fa-money-bill-wave"></i>
-                            Thanh toán tại sân
+                <div class="section-title mt-4"><i class="fas fa-credit-card"></i>Chọn phương thức thanh toán</div>
+                <div class="payment-options">
+                    <form id="paymentForm" method="post">
+                        <input type="hidden" name="stadiumId" value="${stadiumId}"/>
+                        <input type="hidden" name="bookingId" value="${bookingId}"/>
+                        <input type="hidden" name="totalAmount" id="finalAmountInput" value="${totalAmount}"/>
+                        <input type="hidden" name="discountCode" id="appliedDiscountCode" value=""/>
+                        <input type="hidden" name="method" id="paymentMethod" value=""/>
+
+                        <button type="button" class="payment-btn btn-cash" data-method="offline">
+                            <i class="fas fa-money-bill-wave me-2"></i> Thanh toán tại sân
                         </button>
-                    </form>
-
-                    <form action="${pageContext.request.contextPath}/payment" method="post" onsubmit="return confirmVNPayPayment();">
-                        <input type="hidden" name="stadiumId" value="${stadiumId}" />
-                        <input type="hidden" name="bookingId" value="${bookingId}" />
-                        <input type="hidden" name="method" value="vnpay" />
-                        <input type="hidden" name="totalAmount" value="${discountedTotalAmount != null ? discountedTotalAmount : totalAmount}" />
-                        <button type="submit" class="payment-button btn-vnpay">
-                            <i class="fab fa-cc-visa"></i>
-                            Thanh toán qua VNPay
+                        <button type="button" class="payment-btn btn-vnpay" data-method="vnpay">
+                            <i class="fab fa-cc-visa me-2"></i> Thanh toán qua VNPay
                         </button>
                     </form>
                 </div>
+            </div>
 
-                <!-- RIGHT COLUMN -->
-                <div class="col-md-6">
-                    <!-- BOOKING INFO -->
-                    <div class="section-title">
-                        <i class="fas fa-calendar-check"></i>
-                        Thông tin đặt sân
-                    </div>
-                    
-                    <div class="info-group">
-                        <div class="info-item">
-                            <span class="info-label">
-                                <i class="fas fa-map-marker-alt"></i>
-                                Khu
-                            </span>
-                            <span class="info-value">${subdivision}</span>
-                        </div>
-                        
-                        <div class="info-item">
-                            <span class="info-label">
-                                <i class="fas fa-tags"></i>
-                                Giá
-                            </span>
-                            <span class="price-value">
-                                <fmt:formatNumber value="${discountedTotalAmount != null ? discountedTotalAmount : totalAmount}" type="number" groupingUsed="true"/> đ
-                            </span>
-                        </div>
-                        
-                        <div class="info-item">
-                            <span class="info-label">
-                                <i class="fas fa-calendar"></i>
-                                Ngày
-                            </span>
-                            <span class="info-value">${bookingDate}</span>
-                        </div>
-                        
-                        <div class="info-item">
-                            <span class="info-label">
-                                <i class="fas fa-clock"></i>
-                                Thời gian
-                            </span>
-                            <span class="info-value">${bookingTime}</span>
+            <div class="col-md-5">
+                <div class="summary-block">
+                    <div class="section-title"><i class="fas fa-receipt"></i>Tóm tắt đơn hàng</div>
+                    <div class="info-block">
+                        <p>Sân bóng: <span class="info-value">${stadiumName}</span></p>
+                        <p>Ngày đặt: <span class="info-value">${bookingDate}</span></p>
+                        <p>Thời gian: <span class="info-value">${bookingTime}</span></p>
+                        <hr>
+                        <p class="mt-3">Thành tiền:</p>
+                        <p class="total-price" id="totalPriceDisplay" data-original-total="${totalAmount}">
+                            <fmt:formatNumber value="${totalAmount}" type="number" pattern="#,##0"/> VNĐ
+                        </p>
+                        <div id="discount-display" class="info-block" style="display: none;">
+                            <p class="text-success">Giảm giá: <span id="discount-amount" class="info-value"></span></p>
                         </div>
                     </div>
 
-                    <div class="map-container">
-                        <div class="map-wrapper">
-                            <iframe src="https://www.google.com/maps?q=Dan+Sport+Center+(B%C3%B3ng+%C4%90%C3%A1)&output=embed"></iframe>
+                    <div class="discount-section">
+                        <label for="discountCodeInput" class="form-label">Mã giảm giá</label>
+                        <div class="discount-input-group">
+                            <input type="text" class="form-control" id="discountCodeInput"
+                                   placeholder="Nhập mã ở đây...">
+                            <button type="button" id="applyDiscountBtn">Áp dụng</button>
                         </div>
-                    </div>
-
-                    <div class="contact-info">
-                        <div class="contact-icon">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <div class="contact-text">
-                            <div class="contact-label">Hotline hỗ trợ</div>
-                            <div class="contact-value">0935414999</div>
-                        </div>
+                        <div id="discount-result" class="discount-result mt-2"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        function confirmCashPayment() {
-            return confirm("💰 Bạn chắc chắn muốn thanh toán tại sân?");
-        }
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const paymentForm = document.getElementById('paymentForm');
+        const paymentMethodInput = document.getElementById('paymentMethod');
+        const paymentButtons = document.querySelectorAll('.payment-btn');
+        const applyDiscountBtn = document.getElementById('applyDiscountBtn');
+        const discountCodeInput = document.getElementById('discountCodeInput');
+        const discountResult = document.getElementById('discount-result');
+        const totalPriceDisplay = document.getElementById('totalPriceDisplay');
+        const finalAmountInput = document.getElementById('finalAmountInput');
+        const discountDisplay = document.getElementById('discount-display');
+        const discountAmountSpan = document.getElementById('discount-amount');
+        const appliedDiscountCodeInput = document.getElementById('appliedDiscountCode');
+        const originalTotal = parseFloat(totalPriceDisplay.dataset.originalTotal);
 
-        function confirmVNPayPayment() {
-            return confirm("🏦 Bạn chắc chắn muốn thanh toán qua VNPay?");
-        }
-    </script>
+        // Xử lý áp dụng mã giảm giá
+        applyDiscountBtn.addEventListener('click', function () {
+            const code = discountCodeInput.value.trim();
+            if (!code) {
+                discountResult.textContent = 'Vui lòng nhập mã giảm giá.';
+                discountResult.className = 'discount-result text-danger';
+                return;
+            }
+
+            // Tạo URL để gửi request
+            const url = new URL('${pageContext.request.contextPath}/apply-discount');
+            url.searchParams.append('code', code);
+            url.searchParams.append('bookingId', '${bookingId}');
+
+            // Gửi request AJAX
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const newTotal = data.newTotal;
+                        const discountAmount = originalTotal - newTotal;
+
+                        // Cập nhật giao diện
+                        totalPriceDisplay.textContent = newTotal.toLocaleString('vi-VN') + ' VNĐ';
+                        finalAmountInput.value = newTotal;
+                        discountAmountSpan.textContent = '- ' + discountAmount.toLocaleString('vi-VN') + ' VNĐ';
+                        discountDisplay.style.display = 'block';
+                        appliedDiscountCodeInput.value = code; // Lưu mã đã áp dụng
+
+                        discountResult.textContent = data.message;
+                        discountResult.className = 'discount-result text-success';
+                        applyDiscountBtn.disabled = true; // Vô hiệu hóa nút sau khi áp dụng thành công
+                        discountCodeInput.disabled = true;
+                    } else {
+                        discountResult.textContent = data.message;
+                        discountResult.className = 'discount-result text-danger';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    discountResult.textContent = 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+                    discountResult.className = 'discount-result text-danger';
+                });
+        });
+
+        // Xử lý nút thanh toán
+        paymentButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const method = this.dataset.method;
+                let confirmationMessage = '';
+
+                if (method === 'offline') {
+                    confirmationMessage = '💰 Bạn chắc chắn muốn thanh toán tại sân?';
+                    paymentForm.action = '${pageContext.request.contextPath}/checkout';
+                    paymentForm.method = 'get';
+                } else if (method === 'vnpay') {
+                    confirmationMessage = '🏦 Bạn chắc chắn muốn thanh toán qua VNPay?';
+                    paymentForm.action = '${pageContext.request.contextPath}/payment';
+                    paymentForm.method = 'post';
+                }
+
+                if (confirm(confirmationMessage)) {
+                    paymentMethodInput.value = method;
+                    paymentForm.submit();
+                }
+            });
+        });
+    });
+</script>
+
 </body>
 </html>

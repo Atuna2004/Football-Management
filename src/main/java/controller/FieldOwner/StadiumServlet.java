@@ -1,8 +1,8 @@
 package controller.FieldOwner;
 
-
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -21,17 +21,12 @@ import model.User;
 
 @WebServlet("/stadium/config")
 public class StadiumServlet extends HttpServlet {
-    private StadiumDAO stadiumDAO = new StadiumDAO();
+    private final StadiumDAO stadiumDAO = new StadiumDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-
-        if (action == null || action.isEmpty()) {
-            // Mặc định chuyển về danh sách sân
-            response.sendRedirect(request.getContextPath() + "/fieldOwner/FOSTD");
-            return;
-        }
+        if (action == null) action = "list";
 
         switch (action) {
             case "create":
@@ -39,9 +34,6 @@ public class StadiumServlet extends HttpServlet {
                 break;
             case "edit":
                 showEditForm(request, response);
-                break;
-            case "delete":
-                deleteStadium(request, response);
                 break;
             default:
                 response.sendRedirect(request.getContextPath() + "/fieldOwner/FOSTD");
@@ -61,7 +53,7 @@ public class StadiumServlet extends HttpServlet {
                 updateStadium(request, response);
                 break;
             case "delete":
-                deleteStadium(request, response);
+                deactivateStadium(request, response);
                 break;
             default:
                 response.sendRedirect(request.getContextPath() + "/fieldOwner/FOSTD");
@@ -69,32 +61,23 @@ public class StadiumServlet extends HttpServlet {
         }
     }
 
-    // Hiển thị form tạo sân mới
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("/fieldOwner/createStadium.jsp").forward(request, response);
     }
 
-    // Xử lý tạo sân mới
     private void createStadium(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
-        String name = request.getParameter("name");
-        String location = request.getParameter("location");
-        String description = request.getParameter("description");
-        String status = request.getParameter("status");
-        String phoneNumber = request.getParameter("phoneNumber");
-        Timestamp createdAt = new Timestamp(new Date().getTime());
         User currentUser = (User) session.getAttribute("currentUser");
-        int OwnerID = currentUser.getUserID();
-        
+
         Stadium stadium = new Stadium();
-        stadium.setName(name);
-        stadium.setLocation(location);
-        stadium.setDescription(description);
-        stadium.setStatus(status);
-        stadium.setPhoneNumber(phoneNumber);
-        stadium.setCreatedAt(createdAt);
-        stadium.setOwnerID(OwnerID);
+        stadium.setName(request.getParameter("name"));
+        stadium.setLocation(request.getParameter("location"));
+        stadium.setDescription(request.getParameter("description"));
+        stadium.setStatus(request.getParameter("status"));
+        stadium.setPhoneNumber(request.getParameter("phoneNumber"));
+        stadium.setCreatedAt(new Timestamp(new Date().getTime()));
+        stadium.setOwnerID(currentUser.getUserID());
 
         if (stadiumDAO.insertStadium(stadium)) {
             response.sendRedirect(request.getContextPath() + "/fieldOwner/FOSTD");
@@ -104,7 +87,6 @@ public class StadiumServlet extends HttpServlet {
         }
     }
 
-    // Hiển thị form sửa sân
     private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int stadiumId = Integer.parseInt(request.getParameter("id"));
         Stadium stadium = stadiumDAO.getStadiumById(stadiumId);
@@ -112,24 +94,16 @@ public class StadiumServlet extends HttpServlet {
         request.getRequestDispatcher("/fieldOwner/updateStadium.jsp").forward(request, response);
     }
 
-    // Xử lý cập nhật sân
     private void updateStadium(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.setCharacterEncoding("UTF-8");
 
-        int stadiumID = Integer.parseInt(request.getParameter("stadiumID"));
-        String name = request.getParameter("name");
-        String location = request.getParameter("location");
-        String description = request.getParameter("description");
-        String status = request.getParameter("status");
-        String phoneNumber = request.getParameter("phoneNumber");
-
         Stadium stadium = new Stadium();
-        stadium.setStadiumID(stadiumID);
-        stadium.setName(name);
-        stadium.setLocation(location);
-        stadium.setDescription(description);
-        stadium.setStatus(status);
-        stadium.setPhoneNumber(phoneNumber);
+        stadium.setStadiumID(Integer.parseInt(request.getParameter("stadiumID")));
+        stadium.setName(request.getParameter("name"));
+        stadium.setLocation(request.getParameter("location"));
+        stadium.setDescription(request.getParameter("description"));
+        stadium.setStatus(request.getParameter("status"));
+        stadium.setPhoneNumber(request.getParameter("phoneNumber"));
 
         if (stadiumDAO.updateStadium(stadium)) {
             response.sendRedirect(request.getContextPath() + "/fieldOwner/FOSTD");
@@ -139,13 +113,12 @@ public class StadiumServlet extends HttpServlet {
         }
     }
 
-    // Xử lý xóa sân
-    private void deleteStadium(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void deactivateStadium(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int stadiumId = Integer.parseInt(request.getParameter("stadiumId"));
-        if (stadiumDAO.deleteStadium(stadiumId)) {
-            request.getSession().setAttribute("successMessage", "Xóa sân thành công!");
+        if (stadiumDAO.deactivateStadium(stadiumId)) {
+            request.getSession().setAttribute("successMessage", "Ngừng hoạt động sân thành công!");
         } else {
-            request.getSession().setAttribute("errorMessage", "Xóa sân thất bại!");
+            request.getSession().setAttribute("errorMessage", "Thao tác thất bại!");
         }
         response.sendRedirect(request.getContextPath() + "/fieldOwner/FOSTD");
     }

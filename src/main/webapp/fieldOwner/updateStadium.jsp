@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -6,15 +6,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Chỉnh sửa sân bóng</title>
-    <!-- Bootstrap 5 CSS -->
+  
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Google Fonts - Roboto -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Custom CSS -->
+
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/crudStadium.css">
-    <!-- Leaflet CSS -->
+  <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin=""/>
@@ -157,47 +157,35 @@
         }
     </style>
 </head>
-<body>
-    <div class="container-fluid pt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-9 col-lg-8">
-                <div class="card shadow border-0">
-                    <div class="card-header bg-warning text-dark">
-                        <h4 class="mb-0">
-                            <i class="bi bi-pencil-square me-2"></i>
-                            Cập nhật sân bóng: ${stadium.name}
-                        </h4>
-                    </div>
-                    <div class="card-body p-4">
-                        <form action="${pageContext.request.contextPath}/stadium/config?action=update" method="post" enctype="multipart/form-data">
-                            <input type="hidden" name="stadiumID" value="${stadium.stadiumID}" />
-                            
-                            <!-- Thông tin sân bóng -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="bi bi-info-circle me-2"></i>
-                                    Thông tin sân bóng
-                                </h5>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="name" class="form-label">
-                                            <i class="bi bi-stadium me-1"></i>
-                                            Tên sân <span class="text-danger">*</span>
-                                        </label>
-                                        <input type="text" name="name" id="name" class="form-control" 
-                                               value="${stadium.name}" required placeholder="Nhập tên sân bóng" />
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="phoneNumber" class="form-label">
-                                            <i class="bi bi-telephone me-1"></i>
-                                            Số điện thoại
-                                        </label>
-                                        <input type="text" name="phoneNumber" id="phoneNumber" class="form-control" 
-                                               value="${stadium.phoneNumber}" placeholder="Nhập số điện thoại" />
+
+<div class="container-fluid py-5 background-container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Cập nhật sân bóng</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form action="${pageContext.request.contextPath}/stadium/config?action=update" method="post"
+                          id="updateStadiumForm" novalidate>
+                        <input type="hidden" name="stadiumID" value="${stadium.stadiumID}"/>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="name" class="form-label">
+                                        <i class="fas fa-signature me-2"></i>Tên sân
+                                    </label>
+                                    <input type="text" name="name" id="name" class="form-control"
+                                           value="${stadium.name}" required
+                                           pattern="^[a-zA-Z0-9\sÀ-ỹ]+$"
+                                           placeholder="Nhập tên sân bóng"/>
+                                    <div class="invalid-feedback">
+                                        Tên sân không được chứa ký tự đặc biệt
                                     </div>
                                 </div>
-
-                                <!-- Địa chỉ + Bản đồ Leaflet -->
+                            </div>
+                           <!-- Địa chỉ + Bản đồ Leaflet -->
                                 <div class="mb-3">
                                     <label for="location" class="form-label">
                                         <i class="bi bi-geo-alt me-1"></i>
@@ -220,135 +208,121 @@
                                 <input type="hidden" id="lat" name="latitude" value="${stadium.latitude}" />
                                 <input type="hidden" id="lng" name="longitude" value="${stadium.longitude}" />
 
-                                <div class="row">
-                                    <div class="col-md-8 mb-3">
-                                        <label for="description" class="form-label">
-                                            <i class="bi bi-card-text me-1"></i>
-                                            Mô tả
-                                        </label>
-                                        <textarea name="description" id="description" class="form-control" rows="4" 
-                                                  placeholder="Mô tả chi tiết về sân bóng...">${stadium.description}</textarea>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label for="status" class="form-label">
-                                            <i class="bi bi-toggle-on me-1"></i>
-                                            Trạng thái
-                                        </label>
-                                        <select name="status" id="status" class="form-select">
-                                            <option value="active" ${stadium.status == 'active' ? 'selected' : ''}>
-                                                <i class="bi bi-check-circle"></i> Hoạt động
-                                            </option>
-                                            <option value="inactive" ${stadium.status == 'inactive' ? 'selected' : ''}>
-                                                <i class="bi bi-x-circle"></i> Không hoạt động
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">
+                                <i class="fas fa-info-circle me-2"></i>Mô tả
+                            </label>
+                            <textarea name="description" id="description" class="form-control"
+                                      rows="4"
+                                      placeholder="Nhập mô tả chi tiết về sân bóng">${stadium.description}</textarea>
+                        </div>
 
-                            <!-- Hình ảnh sân bóng -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="bi bi-image me-2"></i>
-                                    Hình ảnh sân bóng
-                                </h5>
-                                <!-- Hình hiện tại -->
-                                <div class="current-image-section">
-                                    <label class="form-label fw-bold text-muted mb-3">
-                                        <i class="bi bi-eye me-1"></i>
-                                        Hình ảnh hiện tại:
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="status" class="form-label">
+                                        <i class="fas fa-toggle-on me-2"></i>Trạng thái
                                     </label>
-                                    <div class="text-center">
-                                        <c:choose>
-                                            <c:when test="${not empty stadium.imageURL}">
-                                                <div class="image-container">
-                                                    <img src="${stadium.imageURL}" alt="Stadium Image" class="current-image">
-                                                    <div class="mt-3">
-                                                        <span class="badge bg-success">
-                                                            <i class="bi bi-check-circle me-1"></i>
-                                                            Đã có hình ảnh
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <div class="no-image-placeholder">
-                                                    <i class="bi bi-image" style="font-size: 4rem; color: #dee2e6;"></i>
-                                                    <p class="mb-0 mt-3">
-                                                        <span class="badge bg-secondary">Chưa có hình ảnh</span>
-                                                    </p>
-                                                    <small class="text-muted">Hãy tải lên hình ảnh mới bên dưới</small>
-                                                </div>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </div>
+                                    <select name="status" id="status" class="form-select">
+                                        <option value="active" ${stadium.status == 'active' ? 'selected' : ''}>
+                                            <i class="fas fa-check-circle me-2"></i>Hoạt động
+                                        </option>
+                                        <option value="inactive" ${stadium.status == 'inactive' ? 'selected' : ''}>
+                                            <i class="fas fa-times-circle me-2"></i>Không hoạt động
+                                        </option>
+                                    </select>
                                 </div>
-
-                                <!-- Tải hình mới -->
-                                <div class="mt-4">
-                                    <label class="form-label fw-bold">
-                                        <i class="bi bi-cloud-upload me-1"></i>
-                                        Tải lên hình ảnh mới (tùy chọn):
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="phoneNumber" class="form-label">
+                                        <i class="fas fa-phone me-2"></i>Số điện thoại
                                     </label>
-                                    <div class="image-upload-area" id="imageUploadArea">
-                                        <input type="file" name="stadiumImage" id="stadiumImage" class="form-control" accept="image/*" style="display: none;" />
-                                        <div id="uploadPlaceholder">
-                                            <i class="bi bi-cloud-upload upload-icon"></i>
-                                            <h5 class="text-warning mb-3">Tải lên hình ảnh mới</h5>
-                                            <p class="mb-2">
-                                                Kéo thả hình ảnh vào đây hoặc 
-                                                <span class="text-primary fw-bold" style="cursor: pointer;" onclick="document.getElementById('stadiumImage').click()">
-                                                    nhấn để chọn file
-                                                </span>
-                                            </p>
-                                            <small class="text-muted">
-                                                <i class="bi bi-info-circle me-1"></i>
-                                                Hỗ trợ: JPG, PNG, GIF (Tối đa 10MB)
-                                            </small>
-                                        </div>
-                                        <div id="imagePreviewContainer" style="display: none;">
-                                            <div class="new-image-section">
-                                                <p class="text-success mb-3 fw-bold">
-                                                    <i class="bi bi-check-circle me-1"></i>
-                                                    Hình ảnh mới sẽ được cập nhật:
-                                                </p>
-                                                <img id="imagePreview" class="image-preview mb-3" alt="New Image Preview">
-                                                <div>
-                                                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeNewImage()">
-                                                        <i class="bi bi-trash me-1"></i>
-                                                        Hủy hình ảnh mới
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <input type="tel" name="phoneNumber" id="phoneNumber" class="form-control"
+                                           value="${stadium.phoneNumber}"
+                                           pattern="^0\d{9}$"
+                                           placeholder="Nhập số điện thoại liên hệ"/>
+                                    <div class="invalid-feedback">
+                                        Số điện thoại phải bắt đầu bằng số 0 và có đủ 10 số
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Nút hành động -->
-                            <div class="d-flex justify-content-between align-items-center pt-3">
-                                <a href="${pageContext.request.contextPath}/fieldOwner/FOSTD" class="btn btn-outline-secondary">
-                                    <i class="bi bi-arrow-left me-1"></i>
-                                    Quay lại
-                                </a>
-                                <div>
-                                    <button type="reset" class="btn btn-outline-warning me-2" onclick="resetForm()">
-                                        <i class="bi bi-arrow-clockwise me-1"></i>
-                                        Đặt lại
-                                    </button>
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="bi bi-check-circle me-1"></i>
-                                        Cập nhật sân bóng
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                        <div class="d-flex justify-content-end mt-4">
+                            <a href="${pageContext.request.contextPath}/fieldOwner/FOSTD"
+                               class="btn btn-secondary me-2">
+                                <i class="fas fa-times me-2"></i>Hủy
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>Cập nhật
+                            </button>
+                        </div>
+                    </form>
+
                 </div>
             </div>
         </div>
     </div>
 
+<script>
+    document.getElementById('updateStadiumForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const name = document.getElementById('name');
+        const location = document.getElementById('location');
+        const phoneNumber = document.getElementById('phoneNumber');
+        let isValid = true;
+
+        if (!name.value.match(/^[a-zA-Z0-9\sÀ-ỹ]+$/)) {
+            name.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            name.classList.remove('is-invalid');
+            name.classList.add('is-valid');
+        }
+
+        if (!location.value.match(/^.+,\s*.+,\s*.+$/)) {
+            location.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            location.classList.remove('is-invalid');
+            location.classList.add('is-valid');
+        }
+
+        if (!phoneNumber.value.match(/^0\d{9}$/)) {
+            phoneNumber.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            phoneNumber.classList.remove('is-invalid');
+            phoneNumber.classList.add('is-valid');
+        }
+
+        if (isValid) {
+            this.submit();
+        }
+    });
+
+    const inputs = [
+        {id: 'name', pattern: /^[a-zA-Z0-9\sÀ-ỹ]+$/},
+        {id: 'location', pattern: /^.+,\s*.+,\s*.+$/},
+        {id: 'phoneNumber', pattern: /^0\d{9}$/}
+    ];
+
+    inputs.forEach(input => {
+        document.getElementById(input.id).addEventListener('input', function () {
+            if (this.value && !this.value.match(input.pattern)) {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            } else if (this.value) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-invalid', 'is-valid');
+            }
+        });
+    });
+</script>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Leaflet JS -->
