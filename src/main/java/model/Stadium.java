@@ -3,7 +3,6 @@ package model;
 import java.util.Date;
 
 public class Stadium {
-
     private int stadiumID;
     private String name;
     private String location;
@@ -12,15 +11,16 @@ public class Stadium {
     private Date createdAt;
     private String phoneNumber;
     private int OwnerID;
-    private Double latitude;
-    private Double longitude;
-    private Double distance; // dùng để sắp xếp sân gần
+    private String imageURL; // Field for stadium image (from UI1.3)
+    private Double latitude;   // Field for latitude (from main)
+    private Double longitude;  // Field for longitude (from main)
+    private Double distance;   // Field for distance (from main) - typically calculated, not stored directly
 
-
+    // Default constructor
     public Stadium() {
     }
 
-
+    // Constructor without imageURL, latitude, longitude, and distance
     public Stadium(int stadiumID, String name, String location, String description, String status, Date createdAt, String phoneNumber, int OwnerID) {
         this.stadiumID = stadiumID;
         this.name = name;
@@ -31,6 +31,29 @@ public class Stadium {
         this.phoneNumber = phoneNumber;
         this.OwnerID = OwnerID;
     }
+
+    // Constructor with imageURL (from UI1.3)
+    public Stadium(int stadiumID, String name, String location, String description, String status, Date createdAt, String phoneNumber, int OwnerID, String imageURL) {
+        this(stadiumID, name, location, description, status, createdAt, phoneNumber, OwnerID); // Call existing constructor
+        this.imageURL = imageURL;
+    }
+
+    // Constructor with latitude and longitude (useful for creating Stadium objects with geographical data)
+    public Stadium(int stadiumID, String name, String location, String description, String status, Date createdAt, String phoneNumber, int OwnerID, Double latitude, Double longitude) {
+        this(stadiumID, name, location, description, status, createdAt, phoneNumber, OwnerID); // Call existing constructor
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+    
+    // Full constructor including all fields (excluding calculated 'distance')
+    public Stadium(int stadiumID, String name, String location, String description, String status, Date createdAt, String phoneNumber, int OwnerID, String imageURL, Double latitude, Double longitude) {
+        this(stadiumID, name, location, description, status, createdAt, phoneNumber, OwnerID, imageURL); // Call constructor with imageURL
+        this.latitude = latitude;
+        this.longitude = longitude;
+        // distance is typically calculated dynamically, not passed in constructor for storage
+    }
+
+    // --- Getters and Setters ---
 
     public int getStadiumID() {
         return stadiumID;
@@ -79,7 +102,7 @@ public class Stadium {
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
-    
+
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -95,8 +118,17 @@ public class Stadium {
     public void setOwnerID(int OwnerID) {
         this.OwnerID = OwnerID;
     }
-    
-    
+
+    // Getter and setter for imageURL (from UI1.3)
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
+
+    // Getters and setters for latitude, longitude, and distance (from main)
     public Double getLatitude() {
         return latitude;
     }
@@ -120,5 +152,4 @@ public class Stadium {
     public void setDistance(Double distance) {
         this.distance = distance;
     }
-    
 }
