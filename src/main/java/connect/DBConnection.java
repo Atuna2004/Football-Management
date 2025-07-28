@@ -1,6 +1,7 @@
 package connect;
 
 import config.ConfigAPIKey;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -8,10 +9,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DBConnection {
+    static {
+
+        System.setProperty("https.protocols", "TLSv1.2");
+    }
 
     public static Connection getConnection() {
         try {
-            // Đọc thông tin từ file config
+
             Class.forName(ConfigAPIKey.getProperty("db.driver"));
             Connection conn = DriverManager.getConnection(
                     ConfigAPIKey.getProperty("db.url"),
