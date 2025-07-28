@@ -301,12 +301,42 @@
                     <c:if test="${not empty currentFilter}">
                         <input type="hidden" name="filter" value="${currentFilter}">
                     </c:if>
-
+                    <div class="form-group">
+                        <label for="fullName"><i class="fas fa-user"></i> Họ tên</label>
+                        <input type="text" id="fullName" name="fullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group" id="passwordContainer">
+                        <label for="password"><i class="fas fa-lock"></i> Mật khẩu</label>
+                        <input type="password" id="password" name="password" required>
+                        <small>Khi sửa, để trống nếu không muốn đổi mật khẩu.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone"><i class="fas fa-phone"></i> Số điện thoại</label>
+                        <input type="text" id="phone" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="address"><i class="fas fa-map-marker-alt"></i> Địa chỉ</label>
+                        <input type="text" id="address" name="address">
+                    </div>
+                    <div class="form-group">
+                        <label for="dob"><i class="fas fa-birthday-cake"></i> Ngày sinh</label>
+                        <input type="date" id="dob" name="dateOfBirth">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="isActive" name="isActive" checked value="true">
+                        <label for="isActive">Tài khoản hoạt động</label>
+                    </div>
                     <div class="modal-actions">
-                        <button type="button" class="btn-cancel" onclick="closeModal()"><i class="fas fa-times"></i> Hủy
-                            bỏ
+                        <button type="button" class="btn-cancel" onclick="closeModal()">
+                            <i class="fas fa-times"></i> Hủy bỏ
                         </button>
-                        <button type="submit" class="btn-save"><i class="fas fa-save"></i> Lưu thay đổi</button>
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-save"></i> Lưu thay đổi
+                        </button>
                     </div>
                 </form>
             </div>
