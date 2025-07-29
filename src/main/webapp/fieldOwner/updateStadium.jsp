@@ -240,10 +240,10 @@
                                     </label>
                                     <input type="tel" name="phoneNumber" id="phoneNumber" class="form-control"
                                            value="${stadium.phoneNumber}"
-                                           pattern="^0\d{9}$"
+                                           pattern="^0\d{9,10}$"
                                            placeholder="Nhập số điện thoại liên hệ"/>
                                     <div class="invalid-feedback">
-                                        Số điện thoại phải bắt đầu bằng số 0 và có đủ 10 số
+                                        Số điện thoại phải bắt đầu bằng số 0 và có 10 hoặc 11 số
                                     </div>
                                 </div>
                             </div>
@@ -290,7 +290,7 @@
             location.classList.add('is-valid');
         }
 
-        if (!phoneNumber.value.match(/^0\d{9}$/)) {
+        if (!phoneNumber.value.match(/^0\d{9,10}$/)) {
             phoneNumber.classList.add('is-invalid');
             isValid = false;
         } else {
@@ -306,7 +306,7 @@
     const inputs = [
         {id: 'name', pattern: /^[a-zA-Z0-9\sÀ-ỹ]+$/},
         {id: 'location', pattern: /^.+,\s*.+,\s*.+$/},
-        {id: 'phoneNumber', pattern: /^0\d{9}$/}
+        {id: 'phoneNumber', pattern: /^0\d{9,10}$/}
     ];
 
     inputs.forEach(input => {

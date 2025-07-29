@@ -3,7 +3,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to c
 Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
 */
 /* 
-    Created on : Jun 2, 2025, 11:25:14 PM
+    Created on : Jun 2, 2025, 11:25:14 PM
     Author     : ADMIN
 */
 main {
@@ -273,3 +273,41 @@ main .section-separator:before {
     color: #555;
 }
 
+/* FIX DÍNH FOOTER - SPACING VỪA PHẢI */
+
+/* Tăng khoảng cách cho list-stadium nhưng vừa phải */
+.list-stadium {
+    padding: 10px 0 70px; /* Giảm từ 120px xuống 70px */
+    min-height: 432px;
+}
+
+/* Pagination styles - giảm spacing */
+nav[aria-label="Page navigation"] {
+    margin-top: 30px !important; /* Giảm từ 50px xuống 30px */
+    margin-bottom: 60px !important; /* Giảm từ 100px xuống 60px */
+    clear: both !important;
+    overflow: hidden;
+}
+
+.pagination {
+    margin-top: 20px !important; /* Giảm từ 30px xuống 20px */
+    margin-bottom: 0 !important;
+    padding: 10px 0; /* Giảm từ 20px xuống 10px */
+}
+
+/* Main container - giảm margin */
+main {
+    margin-bottom: 50px !important; /* Giảm từ 100px xuống 50px */
+    padding-bottom: 100px;
+}
+
+/* Loại bỏ các padding thừa */
+.col-sm-9 {
+    margin-bottom: 30px; /* Giảm từ 80px xuống 30px */
+}
+
+/* Footer separation */
+footer {
+    margin-top: 40px !important; /* Giảm từ 80px xuống 40px */
+    clear: both;
+}
