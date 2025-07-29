@@ -34,7 +34,7 @@ public class BookingDAO {
                 booking.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
                 booking.setOriginalAmount(rs.getDouble("OriginalAmount"));
                 booking.setFoodAmount(rs.getDouble("FoodAmount"));
-                booking.setTotalAmount(booking.getOriginalAmount() + booking.getFoodAmount());
+                booking.setTotalAmount(rs.getDouble("TotalAmount")); // Lấy trực tiếp từ DB
 
                 return booking;
             }
