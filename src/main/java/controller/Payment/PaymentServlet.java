@@ -32,12 +32,11 @@ public class PaymentServlet extends HttpServlet {
             int bookingId = Integer.parseInt(bookingIdRaw);
             int stadiumIdInt = Integer.parseInt(stadiumId);
 
-            // ✅ Lấy session
             HttpSession session = request.getSession(false);
             List<CartItem> cart = (session != null) ? (List<CartItem>) session.getAttribute("cart") : null;
             User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
 
-            // ✅ Ghi đơn món nếu có
+            // ✅ Tạo đơn đồ ăn nếu có
             if (cart != null && currentUser != null && !cart.isEmpty()) {
                 FoodOrderDAO foodOrderDAO = new FoodOrderDAO();
                 double cartFoodTotal = 0;
@@ -51,16 +50,23 @@ public class PaymentServlet extends HttpServlet {
                     foodOrderDAO.reduceStock(cart);
                 }
 
-                // ❌ Xoá giỏ hàng sau khi xử lý
                 session.removeAttribute("cart");
             }
 
-            // ✅ Lấy tổng tiền từ DB
+            // ✅ Lấy totalAmount đã giảm từ form hoặc fallback từ DB
             PaymentDAO dao = new PaymentDAO();
-            double amount = dao.getBookingTotalAmount(bookingId);
+            String totalAmountParam = request.getParameter("totalAmount");
+            double amount;
+            try {
+                amount = (totalAmountParam != null) ? Double.parseDouble(totalAmountParam) : dao.getBookingTotalAmount(bookingId);
+            } catch (NumberFormatException e) {
+                throw new ServletException("Số tiền không hợp lệ.", e);
+            }
 
+            // ✅ Cập nhật lại bảng Booking.TotalAmount để dùng lại sau
+            dao.updateBookingTotalAmount(bookingId, amount);
 
-            // ✅ Gửi sang VNPay nếu chọn VNPay
+            // ✅ Xử lý VNPay
             if ("vnpay".equalsIgnoreCase(method)) {
                 String vnp_TxnRef = Config.getRandomNumber(8);
                 String vnp_IpAddr = Config.getIpAddress(request);
@@ -79,7 +85,6 @@ public class PaymentServlet extends HttpServlet {
                 vnp_Params.put("vnp_ReturnUrl", Config.vnp_ReturnUrl);
                 vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
-                // Thời gian tạo + hết hạn
                 Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                 String createDate = sdf.format(calendar.getTime());
@@ -87,7 +92,6 @@ public class PaymentServlet extends HttpServlet {
                 calendar.add(Calendar.MINUTE, 15);
                 vnp_Params.put("vnp_ExpireDate", sdf.format(calendar.getTime()));
 
-                // Tạo hash + query
                 List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
                 Collections.sort(fieldNames);
                 StringBuilder hashData = new StringBuilder();
@@ -111,7 +115,6 @@ public class PaymentServlet extends HttpServlet {
                 query.append("&vnp_SecureHash=").append(secureHash);
                 String paymentUrl = Config.vnp_PayUrl + "?" + query;
 
-                // Ghi vào DB
                 boolean saved = dao.createPayment(bookingId, amount, "vnpay", "Pending", vnp_TxnRef);
                 if (saved) {
                     response.sendRedirect(paymentUrl);
