@@ -319,6 +319,8 @@ public class PaymentDAO {
             System.err.println("Lỗi cập nhật Booking.TotalAmount: " + e.getMessage());
             return false;
         }
+    }
+    
     // Thêm hàm mới
     public List<RevenueReport> getRevenueByOwnerAndPeriod(int ownerId, String period, String stadiumName) throws SQLException {
         List<RevenueReport> reports = new ArrayList<>();
