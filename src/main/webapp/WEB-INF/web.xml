@@ -63,10 +63,6 @@
         <servlet-name>LoginFacebookServlet</servlet-name>
         <servlet-class>controller.Authentication.LoginFacebookServlet</servlet-class>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>NewServlet</servlet-name>
-        <url-pattern>/newservlet</url-pattern>
-    </servlet-mapping>
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>controller.Authentication.LoginServlet</servlet-class>

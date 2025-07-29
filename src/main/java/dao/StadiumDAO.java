@@ -419,21 +419,6 @@ public class StadiumDAO {
         }
         return false;
     }
-
-    public boolean updateStadiumImage(int stadiumId, String imageURL) {
-        String sql = "UPDATE Stadium SET ImageURL = ? WHERE stadiumID = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, imageURL);
-            ps.setInt(2, stadiumId);
-
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
     
     public String getStadiumNameById(int stadiumId) throws SQLException {
         String sql = "SELECT Name FROM Stadium WHERE StadiumID = ?";
