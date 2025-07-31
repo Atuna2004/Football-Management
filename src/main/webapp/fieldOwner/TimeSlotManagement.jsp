@@ -44,10 +44,8 @@
     </div>
 </div>
 
-<!-- Sidebar -->
-<aside class="sidebar">
+<!-- Include Sidebar -->
 <%@ include file="FieldOwnerSB.jsp" %>
-</aside>
 
 <!-- Nội dung chính -->
 <main class="main-content">
@@ -59,7 +57,6 @@
     </div>
 
     <h2>Quản lý TimeSlot</h2>
-
 
     <!-- Form chọn sân và tuần -->
     <form method="get" action="${pageContext.request.contextPath}/LoadTimeSlotsServlet" class="controls-row">
