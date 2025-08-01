@@ -85,9 +85,8 @@ body {
     background: rgba(59, 130, 246, 0.1);
 }
 
-/* Main Content - Điều chỉnh để fit với sidebar từ FieldOwnerSB.jsp */
 .main-content {
-    margin-left: 300px; /* Khớp với width của navigation-sidebar từ FieldOwnerSB.jsp */
+    margin-left: 300px;
     min-height: 100vh;
     padding: 40px;
     background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 50%, #dbeafe 100%);
@@ -95,9 +94,8 @@ body {
     position: relative;
 }
 
-/* Back to Dashboard Button */
 .back-to-dashboard {
-    margin-top: 80px; /* Cách header đúng bằng chiều cao của header */
+    margin-top: 80px;
     margin-bottom: 32px;
     animation: fadeInUp 0.6s ease-out;
 }
@@ -123,7 +121,6 @@ body {
     box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
 }
 
-/* Page Title */
 h2 {
     color: #1e293b;
     font-weight: 700;
@@ -144,7 +141,6 @@ h2::before {
     font-size: 28px;
 }
 
-/* Form Controls */
 .controls-row {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
@@ -214,7 +210,6 @@ label {
     box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
 }
 
-/* Calendar Container */
 .calendar-container {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
@@ -226,13 +221,12 @@ label {
     animation: fadeInUp 0.6s ease-out 0.3s both;
 }
 
-/* Calendar Grid */
 .calendar-grid {
     display: grid;
-    grid-template-columns: 120px repeat(7, 1fr); /* Cột giờ + 7 ngày */
+    grid-template-columns: 120px repeat(7, 1fr);
     gap: 1px;
     background: rgba(59, 130, 246, 0.1);
-    min-width: 900px; /* Tăng min-width để phù hợp với main-content */
+    min-width: 900px;
 }
 
 .day-header {
@@ -270,7 +264,6 @@ label {
     gap: 4px;
 }
 
-/* Slot Box Styles */
 .slot-box {
     padding: 8px;
     border-radius: 8px;
@@ -309,7 +302,6 @@ label {
     accent-color: #3b82f6;
 }
 
-/* Status Classes */
 .available {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
     color: #065f46;
@@ -343,7 +335,6 @@ label {
     border-color: rgba(156, 163, 175, 0.5);
 }
 
-/* Button Group */
 .btn-group {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
@@ -395,15 +386,16 @@ label {
     box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
     .main-content {
         margin-left: 0;
         padding: 20px;
     }
+
     .back-to-dashboard {
-        margin-top: 100px; /* Tăng thêm để tránh menu mobile */
+        margin-top: 100px;
     }
+
     .calendar-grid {
         min-width: 800px;
         font-size: 10px;
@@ -415,6 +407,7 @@ label {
         margin-left: 0;
         padding: 20px;
     }
+
     .back-to-dashboard {
         margin-top: 20px;
     }
@@ -427,63 +420,76 @@ label {
         align-items: stretch !important;
         gap: 12px;
     }
+
     .user-greeting {
         font-size: 13px;
         padding: 10px 16px;
     }
+
     .main-content {
         padding: 16px;
         margin-left: 0;
     }
+
     .back-to-dashboard {
-        margin-top: 120px; /* Điều chỉnh cho mobile header cao hơn */
+        margin-top: 120px;
     }
+
     h2 {
         font-size: 24px;
     }
+
     .controls-row {
         padding: 20px;
         flex-direction: column;
         align-items: stretch;
     }
+
     .form-group {
         width: 100%;
     }
+
     .form-select {
         min-width: 100%;
     }
+
     .calendar-container {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
+
     .calendar-grid {
         grid-template-columns: 80px repeat(7, minmax(80px, 1fr));
         font-size: 10px;
-        min-width: 600px; /* Giảm để phù hợp mobile */
+        min-width: 600px;
     }
+
     .day-header,
     .time-slot {
         padding: 8px 4px;
         font-size: 9px;
     }
+
     .slot-cell {
         min-height: 80px;
         padding: 4px;
     }
+
     .slot-box {
         padding: 4px;
         font-size: 9px;
     }
+
     .btn-group {
         flex-direction: column;
         padding: 16px;
     }
+
     .btn-group .btn {
         min-width: 100%;
     }
 }
 
-/* Animation */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -495,24 +501,28 @@ label {
     }
 }
 
-/* Utility Classes (Bootstrap-like) */
 .d-flex {
     display: flex;
 }
+
 .justify-content-between {
     justify-content: space-between;
 }
+
 .align-items-center {
     align-items: center;
 }
+
 .me-2 {
     margin-right: 0.5rem;
 }
+
 .container-fluid {
     width: 100%;
     padding: 0 20px;
     margin: 0 auto;
 }
+
 .mt-4 {
     margin-top: 1.5rem;
 }

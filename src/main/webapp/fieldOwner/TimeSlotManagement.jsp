@@ -14,7 +14,8 @@
 </head>
 <body>
 <div class="top-header">
-    <div class="container-fluid d-flex justify-content-between align-items-center" style="padding-left: 0; padding-right: 0; max-width: 100%;">
+    <div class="container-fluid d-flex justify-content-between align-items-center"
+         style="padding-left: 0; padding-right: 0; max-width: 100%;">
         <div class="logo" style="padding-left: 40px;">
             <h3>
                 <a class="item" href="<%= request.getContextPath() %>/home.jsp">
@@ -27,29 +28,26 @@
             User currentUser = (User) session.getAttribute("currentUser");
             if (currentUser != null) {
         %>
-            <div class="user-greeting" style="margin-right: 40px;">
-                <i class="fas fa-user-circle"></i>
-                Xin chào, <%= currentUser.getFullName() != null ? currentUser.getFullName() : currentUser.getEmail() %>
-            </div>
+        <div class="user-greeting" style="margin-right: 40px;">
+            <i class="fas fa-user-circle"></i>
+            Xin chào, <%= currentUser.getFullName() != null ? currentUser.getFullName() : currentUser.getEmail() %>
+        </div>
         <%
-            } else {
+        } else {
         %>
-            <div class="account item">
-                <a class="register me-2" href="<%= request.getContextPath() %>/account/register.jsp">Đăng ký</a>
-                <a href="<%= request.getContextPath() %>/account/login.jsp">Đăng nhập</a>
-            </div>
+        <div class="account item">
+            <a class="register me-2" href="<%= request.getContextPath() %>/account/register.jsp">Đăng ký</a>
+            <a href="<%= request.getContextPath() %>/account/login.jsp">Đăng nhập</a>
+        </div>
         <%
             }
         %>
     </div>
 </div>
 
-<!-- Include Sidebar -->
 <%@ include file="FieldOwnerSB.jsp" %>
 
-<!-- Nội dung chính -->
 <main class="main-content">
-    <!-- Back to Dashboard Button -->
     <div class="back-to-dashboard">
         <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-primary">
             ← Quay về Dashboard
@@ -58,7 +56,6 @@
 
     <h2>Quản lý TimeSlot</h2>
 
-    <!-- Form chọn sân và tuần -->
     <form method="get" action="${pageContext.request.contextPath}/LoadTimeSlotsServlet" class="controls-row">
         <div class="form-group">
             <label for="stadiumId">Chọn sân:</label>
@@ -84,25 +81,22 @@
 
         if (timeSlots != null && !timeSlots.isEmpty()) {
 
-            // Tạo danh sách ngày trong tuần
             List<LocalDate> allDays = new ArrayList<>();
             for (int i = 0; i < 7; i++) {
                 allDays.add(startOfWeek.plusDays(i));
             }
 
-            // Lấy tất cả các mốc thời gian
             Set<LocalTime> allTimes = new TreeSet<>();
             for (TimeSlot ts : timeSlots) {
                 allTimes.add(ts.getStartTime());
             }
 
-            // Nhóm theo ngày và giờ
             Map<LocalDate, Map<LocalTime, List<TimeSlot>>> groupedByDateAndTime = new HashMap<>();
             for (TimeSlot ts : timeSlots) {
                 groupedByDateAndTime
-                    .computeIfAbsent(ts.getDate(), d -> new HashMap<>())
-                    .computeIfAbsent(ts.getStartTime(), t -> new ArrayList<>())
-                    .add(ts);
+                        .computeIfAbsent(ts.getDate(), d -> new HashMap<>())
+                        .computeIfAbsent(ts.getStartTime(), t -> new ArrayList<>())
+                        .add(ts);
             }
     %>
 
@@ -114,49 +108,48 @@
             <div class="calendar-grid">
                 <div class="time-slot"></div>
                 <% for (LocalDate date : allDays) { %>
-                    <div class="day-header">
-                        <%= date.getDayOfWeek() %><br/>
-                        <%= date %>
-                    </div>
+                <div class="day-header">
+                    <%= date.getDayOfWeek() %><br/>
+                    <%= date %>
+                </div>
                 <% } %>
 
                 <% for (LocalTime time : allTimes) { %>
-                    <div class="time-slot"><%= time %></div>
-                    <% for (LocalDate date : allDays) { %>
-                        <div class="slot-cell">
-                            <%
-                                List<TimeSlot> slots = groupedByDateAndTime
-                                    .getOrDefault(date, Collections.emptyMap())
-                                    .getOrDefault(time, Collections.emptyList());
+                <div class="time-slot"><%= time %>
+                </div>
+                <% for (LocalDate date : allDays) { %>
+                <div class="slot-cell">
+                    <%
+                        List<TimeSlot> slots = groupedByDateAndTime
+                                .getOrDefault(date, Collections.emptyMap())
+                                .getOrDefault(time, Collections.emptyList());
 
-                                for (TimeSlot ts : slots) {
-                                    String statusClass = "inactive";
-                                    if (ts.isActive()) {
-                                        statusClass = ts.isBooked() ? "booked" : "available";
-                                    }
-                            %>
-                                <div class="slot-box <%= statusClass %>">
-                                    <label>
-                                        <% if (ts.isBooked()) { %>
-                                            <!-- Đã đặt → không cho check -->
-                                            <input type="checkbox" disabled>
-                                            <span style="color: #dc3545; font-weight: bold;">
+                        for (TimeSlot ts : slots) {
+                            String statusClass = "inactive";
+                            if (ts.isActive()) {
+                                statusClass = ts.isBooked() ? "booked" : "available";
+                            }
+                    %>
+                    <div class="slot-box <%= statusClass %>">
+                        <label>
+                            <% if (ts.isBooked()) { %>
+                            <input type="checkbox" disabled>
+                            <span style="color: #dc3545; font-weight: bold;">
                                                 <%= ts.getFieldName() %><br/>
                                                 <%= ts.getPrice() %> VND<br/>
                                                 ĐÃ ĐẶT
                                             </span>
-                                        <% } else { %>
-                                            <!-- Chưa đặt → cho phép check -->
-                                            <input type="checkbox" name="timeSlotIds" value="<%= ts.getTimeSlotID() %>">
-                                            <%= ts.getFieldName() %><br/>
-                                            <%= ts.getPrice() %> VND<br/>
-                                            <%= ts.isActive() ? "Hoạt động" : "Ngưng hoạt động" %>
-                                        <% } %>
-                                    </label>
-                                </div>
+                            <% } else { %>
+                            <input type="checkbox" name="timeSlotIds" value="<%= ts.getTimeSlotID() %>">
+                            <%= ts.getFieldName() %><br/>
+                            <%= ts.getPrice() %> VND<br/>
+                            <%= ts.isActive() ? "Hoạt động" : "Ngưng hoạt động" %>
                             <% } %>
-                        </div>
+                        </label>
+                    </div>
                     <% } %>
+                </div>
+                <% } %>
                 <% } %>
             </div>
         </div>
@@ -172,7 +165,7 @@
     </form>
 
     <% } else if (request.getParameter("stadiumId") != null) { %>
-        <p>Không có khung giờ nào.</p>
+    <p>Không có khung giờ nào.</p>
     <% } %>
 </main>
 
@@ -180,7 +173,6 @@
     document.addEventListener("DOMContentLoaded", function () {
         const stadiumSelect = document.getElementById("stadiumId");
 
-        // Gọi servlet để lấy danh sách sân
         fetch('<%= request.getContextPath() %>/LoadStadiumListServlet')
             .then(response => {
                 if (!response.ok) {
@@ -189,10 +181,8 @@
                 return response.text();
             })
             .then(data => {
-                // Xóa toàn bộ option cũ
                 stadiumSelect.innerHTML = '';
 
-                // Nếu không có dữ liệu
                 if (!data.trim()) {
                     const option = document.createElement("option");
                     option.value = "";
@@ -201,10 +191,9 @@
                     return;
                 }
 
-                // Phân tích dữ liệu dạng: "1:Sân A;2:Sân B;"
                 const stadiumPairs = data.split(';').filter(pair => pair.trim() !== '');
                 stadiumPairs.forEach(pair => {
-                    const [id, name] = pair.split(':', 2); // Chỉ chia 2 phần: id và name
+                    const [id, name] = pair.split(':', 2);
                     if (id && name) {
                         const option = document.createElement("option");
                         option.value = id;
@@ -213,12 +202,10 @@
                     }
                 });
 
-                // Nếu có sân, tự động chọn sân đầu tiên
                 if (stadiumSelect.options.length > 0) {
                     stadiumSelect.selectedIndex = 0;
                 }
 
-                // Trigger sự kiện change (nếu cần load dữ liệu ngay)
                 stadiumSelect.dispatchEvent(new Event('change'));
             })
             .catch(error => {
