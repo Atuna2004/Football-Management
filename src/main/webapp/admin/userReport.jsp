@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Quản lý báo cáo người dùng</title>
+    <title>Xem báo cáo người dùng</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -144,15 +144,6 @@
             padding: 24px 32px;
         }
         
-        .card-footer {
-            padding: 24px 32px;
-            background: rgba(59, 130, 246, 0.02);
-            border-top: 1px solid var(--border-light);
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        
         .filter-controls {
             display: grid;
             grid-template-columns: 2fr 1fr; /* Set grid for search and status */
@@ -257,20 +248,6 @@
         .badge-report { background-color: var(--bg-light); color: var(--primary-color); }
         .badge-other { background-color: rgba(100, 116, 139, 0.1); color: #64748b; }
 
-        .btn {
-            padding: 10px 20px; border: 1px solid transparent; border-radius: 10px;
-            font-size: 14px; font-weight: 500; cursor: pointer;
-            transition: all 0.2s ease; text-decoration: none;
-            display: inline-flex; align-items: center; justify-content: center;
-            gap: 8px; flex-grow: 1;
-        }
-
-        .btn:hover { transform: translateY(-2px); }
-        .btn-success { background: #22c55e; color: white; }
-        .btn-success:hover { background: #16a34a; box-shadow: 0 7px 20px -5px rgba(34, 197, 94, 0.35); }
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-danger:hover { background: #dc2626; box-shadow: 0 7px 20px -5px rgba(239, 68, 68, 0.35); }
-        
         .no-data {
             text-align: center; padding: 60px 40px;
             color: var(--text-secondary);
@@ -283,7 +260,7 @@
         }
         @media (max-width: 768px) {
             .stats-grid, .filter-controls, .reports-container { grid-template-columns: 1fr; }
-            .card-body, .card-header, .card-footer { padding: 24px; }
+            .card-body, .card-header { padding: 24px; }
         }
 
     </style>
@@ -313,15 +290,6 @@
                     <div class="stat-icon"><i class="fas fa-inbox"></i></div>
                 </div>
             </div>
-            <div class="stat-card success">
-                <div class="stat-header">
-                    <div class="stat-info">
-                        <h3>${resolvedCount}</h3>
-                        <p>Đã giải quyết</p>
-                    </div>
-                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-                </div>
-            </div>
             <div class="stat-card danger">
                 <div class="stat-header">
                     <div class="stat-info">
@@ -335,7 +303,7 @@
 
         <div class="card">
              <div class="card-header">
-                <h2><i class="fas fa-flag"></i> Báo cáo từ người dùng</h2>
+                <h2><i class="fas fa-eye"></i> Xem báo cáo từ người dùng</h2>
             </div>
             <div class="card-body">
                 <div class="filter-controls">
@@ -374,7 +342,7 @@
                         <div class="user-info">
                             <div class="user-avatar">${fn:substring(report.userName, 0, 1)}</div>
                             <div>
-                                <strong>${report.userName}</strong>
+                                <strong>${report.userName}</strong><br>
                                 <small>${report.userEmail}</small>
                             </div>
                         </div>
@@ -403,17 +371,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="card-footer">
-                        <c:if test="${report.status == 'Pending'}">
-                             <button class="btn btn-success" onclick="updateReportStatus(${report.reportID}, 'Resolved')">
-                                <i class="fas fa-check"></i> Giải quyết
-                            </button>
-                        </c:if>
-                        <button class="btn btn-danger" onclick="deleteReport(${report.reportID})">
-                            <i class="fas fa-trash"></i> Xóa
-                        </button>
-                    </div>
                 </div>
             </c:forEach>
         </div>
@@ -421,69 +378,6 @@
 </div>
 
 <script>
-    function updateReportStatus(reportID, newStatus) {
-        // Status translations
-        const statusMessages = {
-            'Resolved': 'giải quyết báo cáo này'
-        };
-        
-        const actionMessage = statusMessages[newStatus] || `cập nhật trạng thái thành "${newStatus}"`;
-        
-        if (confirm(`Bạn có chắc chắn muốn ${actionMessage} không?`)) {
-            // Create and submit form
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = window.location.pathname;
-            form.style.display = 'none';
-
-            // Add report ID
-            const idInput = document.createElement('input');
-            idInput.type = 'hidden';
-            idInput.name = 'reportID';
-            idInput.value = reportID;
-            form.appendChild(idInput);
-
-            // Add new status
-            const statusInput = document.createElement('input');
-            statusInput.type = 'hidden';
-            statusInput.name = 'newStatus';
-            statusInput.value = newStatus;
-            form.appendChild(statusInput);
-
-            // Add to DOM and submit
-            document.body.appendChild(form);
-            form.submit();
-        }
-    }
-
-    function deleteReport(reportID) {
-        if (confirm('Bạn có chắc chắn muốn xóa báo cáo này không? Hành động này không thể hoàn tác.')) {
-            // Create and submit form
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = window.location.pathname;
-            form.style.display = 'none';
-
-            // Add report ID
-            const idInput = document.createElement('input');
-            idInput.type = 'hidden';
-            idInput.name = 'reportID';
-            idInput.value = reportID;
-            form.appendChild(idInput);
-
-            // Add delete action
-            const actionInput = document.createElement('input');
-            actionInput.type = 'hidden';
-            actionInput.name = 'action';
-            actionInput.value = 'delete';
-            form.appendChild(actionInput);
-
-            // Add to DOM and submit
-            document.body.appendChild(form);
-            form.submit();
-        }
-    }
-
     const statusFilter = document.getElementById("statusFilter");
     const searchInput = document.getElementById("searchInput");
 

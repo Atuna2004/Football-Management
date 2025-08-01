@@ -419,7 +419,7 @@ public class StadiumDAO {
         }
         return false;
     }
-
+  
     public String getStadiumNameById(int stadiumId) throws SQLException {
         String sql = "SELECT Name FROM Stadium WHERE StadiumID = ?";
         try (Connection conn = DBConnection.getConnection();

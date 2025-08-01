@@ -292,6 +292,35 @@ public class PaymentDAO {
         return -1;
     }
     
+    public double getConfirmedBookingAmount(int bookingId) {
+        String sql = "SELECT TotalAmount FROM Booking WHERE BookingID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, bookingId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("TotalAmount");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi khi lấy TotalAmount từ Booking: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public boolean updateBookingTotalAmount(int bookingId, double totalAmount) {
+        String sql = "UPDATE Booking SET TotalAmount = ? WHERE BookingID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDouble(1, totalAmount);
+            ps.setInt(2, bookingId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Lỗi cập nhật Booking.TotalAmount: " + e.getMessage());
+            return false;
+        }
+    }
+    
     // Thêm hàm mới
     public List<RevenueReport> getRevenueByOwnerAndPeriod(int ownerId, String period, String stadiumName) throws SQLException {
         List<RevenueReport> reports = new ArrayList<>();

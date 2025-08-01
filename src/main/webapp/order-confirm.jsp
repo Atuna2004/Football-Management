@@ -317,7 +317,7 @@
                         Phương thức thanh toán
                     </div>
 
-                    <form action="${pageContext.request.contextPath}/checkout" method="post" onsubmit="return confirmCashPayment();">
+                    <form action="${pageContext.request.contextPath}/confirm-cash" method="post" onsubmit="return confirmCashPayment();">
                         <input type="hidden" name="stadiumId" value="${stadiumId}" />
                         <input type="hidden" name="bookingId" value="${bookingId}" />
                         <input type="hidden" name="method" value="offline" />
