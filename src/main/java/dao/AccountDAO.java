@@ -462,6 +462,21 @@ public class AccountDAO {
         }
         return 0;
     }
+    // Add this method to your AccountDAO class
+public boolean ownsStadium(int userId, int stadiumId) throws SQLException {
+    String sql = "SELECT COUNT(*) FROM Stadium WHERE OwnerID = ? AND StadiumID = ?";
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, userId);
+        stmt.setInt(2, stadiumId);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+    }
+    return false;
+}
 
     // Updated getUsersByPage with role support
     public List<User> getUsersByPageWithRoles(int page, int itemsPerPage) throws SQLException {
