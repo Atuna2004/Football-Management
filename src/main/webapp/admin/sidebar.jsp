@@ -388,6 +388,14 @@
                 </a>
             </div>
             
+            <!-- Chat Section Added Here -->
+            <div class="nav-item">
+                <a href="${pageContext.request.contextPath}/admin/chat" class="nav-link">
+                    <i class="fas fa-comments"></i>
+                    <span>Tin Nhắn</span>
+                </a>
+            </div>
+            
             <div class="nav-item">
                 <a href="<%= request.getContextPath() %>/admin/reports/user" class="nav-link">
                     <i class="fas fa-flag"></i>
