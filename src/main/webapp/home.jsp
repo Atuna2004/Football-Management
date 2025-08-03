@@ -177,28 +177,18 @@
         <%@ include file="/includes/footer.jsp" %>
         <% if (currentUser != null) { %>
         <%-- Nếu đã đăng nhập, dẫn đến trang chat.jsp --%>
-        <a href="${pageContext.request.contextPath}/chat.jsp" id="human-chat-link">
+        <a href="${pageContext.request.contextPath}/chat-admin.jsp" id="human-chat-link">
             <i class="fas fa-headset"></i>
             <span>Chat với nhân viên</span>
         </a>
-        <% } else { %>
+        <% } else { %>  
         <%-- Nếu chưa đăng nhập, dẫn đến trang login.jsp --%>
         <a href="${pageContext.request.contextPath}/account/login.jsp" id="human-chat-link">
             <i class="fas fa-sign-in-alt"></i>
             <span>Đăng nhập để Chat</span>
         </a>
         <% } %>
-        <!-- Chatbot button -->
-        <button id="chat-button">💬</button>
-
-        <!-- Chatbot box -->
-        <div id="chat-box">
-            <div id="chat-messages"></div>
-            <div id="chat-input">
-                <input type="text" id="user-message" placeholder="Nhập tin nhắn...">
-                <button id="send">Gửi</button>
-            </div>
-        </div>
+        
 
         <script>
             const chatButton = document.getElementById("chat-button");
