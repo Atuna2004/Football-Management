@@ -156,6 +156,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            cursor: pointer;
         }
 
         .btn-custom:hover {
@@ -172,6 +173,15 @@
         .btn-report:hover {
             background: linear-gradient(135deg, #c82333, #dc3545);
             box-shadow: 0 8px 24px rgba(220, 53, 69, 0.25);
+        }
+
+        .btn-contact {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .btn-contact:hover {
+            background: linear-gradient(135deg, #218838, #1ea085);
+            box-shadow: 0 8px 24px rgba(40, 167, 69, 0.25);
         }
 
         @media (max-width: 992px) {
@@ -485,6 +495,26 @@
             font-size: 14px;
             border: 1px solid #f5c6cb;
         }
+
+        .login-required-message {
+            text-align: center;
+            padding: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            color: #856404;
+            margin-bottom: 20px;
+        }
+
+        .login-required-message a {
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-required-message a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -539,6 +569,17 @@
 
     <div class="btn-container">
         <a class="btn-custom" href="stadiums" style="background: #6c757d;"><i class="fas fa-arrow-left"></i> Quay lại</a>
+        
+        <%
+            model.User sessionUser = (model.User) session.getAttribute("currentUser");
+            if (sessionUser != null) {
+                // User is logged in - show contact button
+        %>
+        <a class="btn-custom btn-contact" href="chat/stadium?stadiumId=<%= stadium.getStadiumID() %>">
+            <i class="fas fa-comments"></i> Liên hệ với chủ sân
+        </a>
+        <% } %>
+        
         <button type="button" class="btn-custom btn-report" data-bs-toggle="modal" data-bs-target="#reportModal">
             <i class="fas fa-flag"></i> Báo cáo
         </button>
@@ -546,6 +587,16 @@
             Xem lịch đặt sân <i class="fas fa-arrow-right"></i>
         </a>
     </div>
+
+    <!-- Login Required Message for Contact Button -->
+    <%
+        if (sessionUser == null) {
+    %>
+    <div class="login-required-message">
+        <i class="fas fa-info-circle"></i>
+        <a href="login">Đăng nhập</a> để liên hệ trực tiếp với chủ sân
+    </div>
+    <% } %>
 
     <!-- Comment Section -->
     <div class="comment-section">
@@ -559,7 +610,6 @@
 
         <!-- Comment Form (only for logged-in users) -->
         <%
-            model.User sessionUser = (model.User) session.getAttribute("currentUser");
             if (sessionUser != null) {
         %>
         <div class="comment-form">

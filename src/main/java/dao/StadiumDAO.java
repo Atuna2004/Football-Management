@@ -2,6 +2,7 @@ package dao;
 
 import connect.DBConnection;
 import model.Stadium;
+import model.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -311,7 +312,6 @@ public class StadiumDAO {
         return stadium;
     }
 
-
     public List<Stadium> getStadiumsByOwner(int ownerId) {
         List<Stadium> list = new ArrayList<>();
         String sql = "SELECT StadiumID, Name FROM Stadium WHERE OwnerID = ?";
@@ -447,5 +447,30 @@ public class StadiumDAO {
             }
         }
         return false;
+    }
+
+    // NEW METHOD: Get stadium owner for chat functionality
+    public User getStadiumOwner(int stadiumId) throws SQLException {
+        String sql = "SELECT u.UserID, u.Email, u.FullName, u.Phone, u.AvatarUrl " +
+                    "FROM [User] u " +
+                    "INNER JOIN Stadium s ON u.UserID = s.OwnerID " +
+                    "WHERE s.StadiumID = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, stadiumId);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                User owner = new User();
+                owner.setUserID(rs.getInt("UserID"));
+                owner.setEmail(rs.getString("Email"));
+                owner.setFullName(rs.getString("FullName"));
+                owner.setPhone(rs.getString("Phone"));
+                owner.setAvatarUrl(rs.getString("AvatarUrl"));
+                return owner;
+            }
+        }
+        return null;
     }
 }
