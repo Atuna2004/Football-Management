@@ -1,14 +1,12 @@
 package controller.Stadium;
-
 import dao.StadiumDAO;
+import dao.CommentDAO; // ADD THIS IMPORT
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
-
 import model.Stadium;
 
 @WebServlet("/stadium-detail")
@@ -21,17 +19,20 @@ public class StadiumDetailServlet extends HttpServlet {
             response.sendRedirect("stadiums");
             return;
         }
-
         int stadiumId = Integer.parseInt(idStr);
         StadiumDAO dao = new StadiumDAO();
         Stadium stadium = dao.getStadiumById(stadiumId);
-
         if (stadium == null) {
             request.setAttribute("errorMessage", "Không tìm thấy sân bóng.");
             request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
-
+        
+        // ADD THESE 3 LINES
+        CommentDAO commentDAO = new CommentDAO();
+        int commentCount = commentDAO.getCommentCount(stadiumId);
+        request.setAttribute("commentCount", commentCount);
+        
         request.setAttribute("stadium", stadium);
         request.getRequestDispatcher("/stadium/stadium-detail.jsp").forward(request, response);
     }

@@ -242,6 +242,14 @@
             </div>
         </li>
 
+        <!-- Chat Section Fixed -->
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/fieldOwner/fieldowner-chat" class="nav-link">
+                <i class="fas fa-comments"></i>
+                <span>Tin Nhắn</span>
+            </a>
+        </li>
+
         <li class="nav-item">
             <a href="${pageContext.request.contextPath}/tournament" class="nav-link">
                 <i class="fas fa-trophy"></i>
@@ -298,4 +306,4 @@
             }
         });
     });
-</script>
+</script>   

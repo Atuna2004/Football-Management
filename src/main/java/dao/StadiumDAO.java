@@ -2,6 +2,7 @@ package dao;
 
 import connect.DBConnection;
 import model.Stadium;
+import model.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class StadiumDAO {
         }
         return stadiumList;
     }
-    
+
     public List<Stadium> getAllStadiumsForFieldOwner() {
         List<Stadium> stadiumList = new ArrayList<>();
         String sql = "SELECT * FROM Stadium";
@@ -106,7 +107,7 @@ public class StadiumDAO {
         }
         return false;
     }
-    
+
     public List<Stadium> getStadiumsByPage(int page, int recordsPerPage) {
         List<Stadium> stadiumList = new ArrayList<>();
         String sql = "SELECT * FROM Stadium ORDER BY stadiumID LIMIT ? OFFSET ?";
@@ -282,14 +283,14 @@ public class StadiumDAO {
 
     private Stadium mapResultSetToStadium(ResultSet rs) throws SQLException {
         Stadium stadium = new Stadium(
-            rs.getInt("stadiumID"),
-            rs.getString("name"),
-            rs.getString("location"),
-            rs.getString("description"),
-            rs.getString("status"),
-            rs.getTimestamp("createdAt"),
-            rs.getString("phoneNumber"),
-            rs.getInt("OwnerID")
+                rs.getInt("stadiumID"),
+                rs.getString("name"),
+                rs.getString("location"),
+                rs.getString("description"),
+                rs.getString("status"),
+                rs.getTimestamp("createdAt"),
+                rs.getString("phoneNumber"),
+                rs.getInt("OwnerID")
         );
 
         // ✅ LẤY TỌA ĐỘ
@@ -311,7 +312,6 @@ public class StadiumDAO {
         return stadium;
     }
 
-    
     public List<Stadium> getStadiumsByOwner(int ownerId) {
         List<Stadium> list = new ArrayList<>();
         String sql = "SELECT StadiumID, Name FROM Stadium WHERE OwnerID = ?";
@@ -337,13 +337,13 @@ public class StadiumDAO {
 
         return list;
     }
-    
+
     public List<Stadium> searchStadiumsByOwner(int ownerId, String keyword, int page, int recordsPerPage) {
         List<Stadium> stadiumList = new ArrayList<>();
         String sql = "SELECT * FROM Stadium " +
-                     "WHERE OwnerID = ? AND (name LIKE ? OR location LIKE ?) " +
-                     "ORDER BY stadiumID " +
-                     "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+                "WHERE OwnerID = ? AND (name LIKE ? OR location LIKE ?) " +
+                "ORDER BY stadiumID " +
+                "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, ownerId);
@@ -363,7 +363,7 @@ public class StadiumDAO {
 
     public int getTotalSearchCountByOwner(int ownerId, String keyword) {
         String sql = "SELECT COUNT(*) AS total FROM Stadium " +
-                     "WHERE OwnerID = ? AND (name LIKE ? OR location LIKE ?)";
+                "WHERE OwnerID = ? AND (name LIKE ? OR location LIKE ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, ownerId);
@@ -419,7 +419,7 @@ public class StadiumDAO {
         }
         return false;
     }
-    
+  
     public String getStadiumNameById(int stadiumId) throws SQLException {
         String sql = "SELECT Name FROM Stadium WHERE StadiumID = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -433,7 +433,7 @@ public class StadiumDAO {
         }
         return "Sân không xác định";
     }
-    
+
     public boolean isStadiumBelongsToOwner(int stadiumId, int ownerId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Stadium WHERE StadiumID = ? AND OwnerID = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -447,5 +447,30 @@ public class StadiumDAO {
             }
         }
         return false;
+    }
+
+    // NEW METHOD: Get stadium owner for chat functionality
+    public User getStadiumOwner(int stadiumId) throws SQLException {
+        String sql = "SELECT u.UserID, u.Email, u.FullName, u.Phone, u.AvatarUrl " +
+                    "FROM [User] u " +
+                    "INNER JOIN Stadium s ON u.UserID = s.OwnerID " +
+                    "WHERE s.StadiumID = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, stadiumId);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                User owner = new User();
+                owner.setUserID(rs.getInt("UserID"));
+                owner.setEmail(rs.getString("Email"));
+                owner.setFullName(rs.getString("FullName"));
+                owner.setPhone(rs.getString("Phone"));
+                owner.setAvatarUrl(rs.getString("AvatarUrl"));
+                return owner;
+            }
+        }
+        return null;
     }
 }
