@@ -109,6 +109,14 @@
                                     <i class="fas fa-user"></i>
                                     Hồ sơ
                                 </a>
+                                <a href="${pageContext.request.contextPath}/team" class="dropdown-item">
+                                    <i class="fas fa-user"></i>
+                                    Đội của bạn
+                                </a>
+                                <a href="${pageContext.request.contextPath}/tournamentTeam/user" class="dropdown-item">
+                                    <i class="fas fa-futbol"></i>
+                                    Giải đăng ký
+                                </a>
                                 <a href="${pageContext.request.contextPath}/booking-history" class="dropdown-item">
                                     <i class="fas fa-history"></i>
                                     Lịch sử đặt sân

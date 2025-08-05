@@ -105,6 +105,9 @@ public class ChatBotServlet extends HttpServlet {
                         } else {
                             botReply = "Lỗi gọi Gemini (HTTP " + status + "): " + body;
                         }
+                    } catch (Exception e) {
+                        botReply = "Lỗi hệ thống: " + e.getMessage();
+                        e.printStackTrace();
                     }
                 }
             } catch (Exception e) {
@@ -154,7 +157,7 @@ public class ChatBotServlet extends HttpServlet {
         if (text == null) return "";
         return text.replace("\\", "\\\\")
                 .replace("\"", "\\\"")
-                .replace("\n", "<br>")
+                .replace("\n", "<br\\>")
                 .replace("\r", "")
                 .replace("\t", "\\t")
                 .replace("\f", "\\f");

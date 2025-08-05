@@ -5,11 +5,13 @@
 
 package controller.Tournament;
 
+import config.CloudinaryUtils;
 import dao.StadiumDAO;
 import dao.TournamentDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +28,11 @@ import model.User;
  * @author Dell
  */
 @WebServlet("/edit-tournament")
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,
+    maxFileSize = 5 * 1024 * 1024,
+    maxRequestSize = 10 * 1024 * 1024
+)
 public class EditTournamentServlet extends HttpServlet {
     // Khai báo Logger cho servlet này
     private static final Logger logger = Logger.getLogger(EditTournamentServlet.class.getName());
@@ -134,6 +141,9 @@ public class EditTournamentServlet extends HttpServlet {
        logger.info("Bắt đầu xử lý doPost: Lưu thay đổi giải");
 
         req.setCharacterEncoding("UTF-8");
+        
+        HttpSession session = req.getSession();
+        User currentUser = (User) session.getAttribute("currentUser");
 
         try {
             // Lấy dữ liệu từ form
@@ -143,6 +153,8 @@ public class EditTournamentServlet extends HttpServlet {
             String desc = req.getParameter("description");
             String startStr = req.getParameter("startDate");
             String endStr = req.getParameter("endDate");
+            String totalTeamsStr = req.getParameter("totalTeams");
+            String awardStr = req.getParameter("award");
             String createdAtStr = req.getParameter("createdAt");
 
             logger.fine(String.format("Thông tin nhận được: %s, %s, %s, %s, %s, %s, %s",
@@ -150,11 +162,23 @@ public class EditTournamentServlet extends HttpServlet {
 
             int id = Integer.parseInt(tournamentIdStr);
             int stadiumId = Integer.parseInt(stadiumIdStr);
+            int totalTeams = Integer.parseInt(totalTeamsStr);
+            double award = Double.parseDouble(awardStr);
+            
+            Part imagePart = req.getPart("imageFile");
+            String imageUrl = null;
+            if (imagePart != null && imagePart.getSize() > 0) {
+                try {
+                    // Upload lên Cloudinary hoặc server của bạn
+                    imageUrl = CloudinaryUtils.uploadImage(imagePart,currentUser.getUserID());
+                    logger.info("Upload ảnh thành công: " + imageUrl);
+                } catch (Exception ex) {
+                    logger.warning("Upload ảnh thất bại: " + ex.getMessage());
+                }
+            }
             
             java.sql.Date startDate = java.sql.Date.valueOf(startStr);
             java.sql.Date endDate = java.sql.Date.valueOf(endStr);
-
-            java.sql.Timestamp createdAt = java.sql.Timestamp.valueOf(createdAtStr + " 00:00:00");
 
             // Lấy đối tượng giải đấu từ DB
             TournamentDAO dao = new TournamentDAO();
@@ -172,7 +196,11 @@ public class EditTournamentServlet extends HttpServlet {
             t.setDescription(desc);
             t.setStartDate(startDate);
             t.setEndDate(endDate);
-            t.setCreatedAt(createdAt);
+            t.setAward(award);
+            t.setTotalTeams(totalTeams);
+            if (imageUrl != null) {
+                t.setImageUrl(imageUrl);
+            }
 
             
             // Cập nhật database
@@ -190,7 +218,7 @@ public class EditTournamentServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             logger.log(Level.SEVERE, "Dữ liệu đầu vào không hợp lệ", e);
             req.getSession().setAttribute("error", "Dữ liệu đầu vào không hợp lệ.");
-            resp.sendRedirect(req.getContextPath() + "/fieldOwner/tournamentSoccer/tour-edit.jsp?id=" + req.getParameter("tournament"));
+            resp.sendRedirect(req.getContextPath() + "//tournament");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Lỗi khi xử lý doPost", e);
             req.getSession().setAttribute("error", "Có lỗi xảy ra khi cập nhật giải đấu.");

@@ -73,6 +73,9 @@ public class AddTournamentServlet extends HttpServlet {
             String stadiumIdStr = req.getParameter("stadiumId");
             String startStr = req.getParameter("startDate");
             String endStr = req.getParameter("endDate");
+            String imageUrl = req.getParameter("imageUrl");
+            int totalTeams = Integer.parseInt(req.getParameter("totalTeams"));
+            double award = Double.parseDouble(req.getParameter("award"));
 
             // Kiểm tra null/empty cho các trường bắt buộc
             if (name == null || name.isEmpty() || stadiumIdStr == null || stadiumIdStr.isEmpty() ||
@@ -155,6 +158,10 @@ public class AddTournamentServlet extends HttpServlet {
             t.setDescription(desc);
             t.setStartDate(start);
             t.setEndDate(end);
+            t.setTotalTeams(totalTeams);
+            t.setAward(award);
+            t.setQuantityTeams(0);
+            t.setImageUrl(imageUrl);
             // --- SET CreatedBy ---
             t.setCreatedBy(ownerId); // <-- Đây là phần quan trọng bạn thiếu
             LOGGER.fine(String.format("[%s] Created Tournament object with CreatedBy set to %d", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), ownerId)); // Log mức FINE hơn

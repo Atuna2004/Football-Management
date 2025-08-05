@@ -18,6 +18,11 @@ public class TournamentDAO {
                 + "Tournament.EndDate, "
                 + "Tournament.CreatedBy, "
                 + "Tournament.CreatedAt, "
+                + "Tournament.StadiumID, "
+                + "Tournament.ImageUrl, "
+                + "Tournament.TotalTeams, "
+                + "Tournament.Award, "
+                + "Tournament.QuantityTeams, "
                 + "Stadium.Name AS StadiumName "
                 + "FROM Tournament "
                 + "JOIN Stadium ON Tournament.StadiumID = Stadium.StadiumID "
@@ -32,6 +37,11 @@ public class TournamentDAO {
                 t.setEndDate(rs.getDate("EndDate"));
                 t.setCreatedBy(rs.getInt("CreatedBy"));
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                t.setStadiumID(rs.getInt("StadiumID"));
+                t.setImageUrl(rs.getString("ImageUrl"));
+                t.setTotalTeams(rs.getInt("TotalTeams"));
+                t.setAward(rs.getDouble("Award"));
+                t.setQuantityTeams(rs.getInt("QuantityTeams"));
                 // Thêm tên sân vào đối tượng Tournament
                 t.setStadiumName(rs.getString("StadiumName"));
                 list.add(t);
@@ -147,8 +157,8 @@ public class TournamentDAO {
     }
     
     public int addTournament(Tournament t) {
-        final String sql = "INSERT INTO Tournament (StadiumID, Name, Description, StartDate, EndDate, CreatedBy, CreatedAt) "
-                + "VALUES (?, ?, ?, ?, ?, ?, GETDATE())";
+        final String sql = "INSERT INTO Tournament (StadiumID, Name, Description, StartDate, EndDate, CreatedBy, CreatedAt, ImageUrl, TotalTeams, Award, QuantityTeams) "
+                + "VALUES (?, ?, ?, ?, ?, ?, GETDATE(), ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) { // Thêm PreparedStatement.RETURN_GENERATED_KEYS
             ps.setInt(1, t.getStadiumID());
             ps.setString(2, t.getName());
@@ -156,6 +166,10 @@ public class TournamentDAO {
             ps.setDate(4, new java.sql.Date(t.getStartDate().getTime()));
             ps.setDate(5, new java.sql.Date(t.getEndDate().getTime()));
             ps.setInt(6, t.getCreatedBy());
+            ps.setString(7, t.getImageUrl());
+            ps.setInt(8, t.getTotalTeams());
+            ps.setDouble(9, t.getAward());
+            ps.setInt(10, t.getQuantityTeams());
 
             ps.executeUpdate();
 
@@ -187,6 +201,10 @@ public class TournamentDAO {
                 t.setEndDate(rs.getDate("EndDate"));
                 t.setCreatedBy(rs.getInt("CreatedBy"));
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                t.setImageUrl(rs.getString("ImageUrl"));
+                t.setTotalTeams(rs.getInt("TotalTeams"));
+                t.setAward(rs.getDouble("Award"));
+                t.setQuantityTeams(rs.getInt("QuantityTeams"));
                 return t;
             }
         } catch (Exception e) {
@@ -196,7 +214,7 @@ public class TournamentDAO {
     }
 
     public boolean updateTournament(Tournament t) {
-        String sql = "UPDATE Tournament SET StadiumID=?, Name=?, Description=?, StartDate=?, EndDate=? WHERE TournamentID=?";
+        String sql = "UPDATE Tournament SET StadiumID=?, Name=?, Description=?, StartDate=?, EndDate=?, ImageUrl=?, TotalTeams=?, Award=?, QuantityTeams=? WHERE TournamentID=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, t.getStadiumID());
@@ -204,7 +222,11 @@ public class TournamentDAO {
             ps.setString(3, t.getDescription());
             ps.setDate(4, new java.sql.Date(t.getStartDate().getTime()));
             ps.setDate(5, new java.sql.Date(t.getEndDate().getTime()));
-            ps.setInt(6, t.getTournamentID());
+            ps.setString(6, t.getImageUrl());
+            ps.setInt(7, t.getTotalTeams());
+            ps.setDouble(8, t.getAward());
+            ps.setInt(9, t.getQuantityTeams());
+            ps.setInt(10, t.getTournamentID());
             
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -273,6 +295,7 @@ public class TournamentDAO {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT t.TournamentID, t.StadiumID, t.Name, t.Description, ")
                 .append("t.StartDate, t.EndDate, t.CreatedBy, t.CreatedAt, ")
+                .append("t.ImageUrl, t.TotalTeams, t.Award, t.QuantityTeams, ")
                 .append("s.Name AS StadiumName ")
                 .append("FROM Tournament t ")
                 .append("JOIN Stadium s ON t.StadiumID = s.StadiumID ") 
@@ -316,6 +339,10 @@ public class TournamentDAO {
         t.setCreatedBy(rs.getInt("CreatedBy"));
         Timestamp createdAtTimestamp = rs.getTimestamp("CreatedAt");
         t.setCreatedAt(rs.getDate("CreatedAt"));
+        t.setImageUrl(rs.getString("ImageUrl"));
+        t.setTotalTeams(rs.getInt("TotalTeams"));
+        t.setAward(rs.getDouble("Award"));
+        t.setQuantityTeams(rs.getInt("QuantityTeams"));
         if (includeStadium) {
             t.setStadiumName(rs.getString("StadiumName"));
         }

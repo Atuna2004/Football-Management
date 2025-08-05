@@ -65,11 +65,11 @@ public class DeleteTournamentServlet extends HttpServlet {
         }
 
         try {
-            int tournamentId = Integer.parseInt(request.getParameter("id"));
+            int tournamentId = Integer.parseInt(request.getParameter("tournamentID"));
             boolean success = tournamentDAO.hardDeleteTournament(tournamentId); // Sử dụng toggleActive
 
             if (success) {
-                request.setAttribute("message", "Xóa giai thành công!");
+                request.setAttribute("success", "Xóa giai thành công!");
             } else {
                 request.setAttribute("error", "Không thể xóa giai.");
             }

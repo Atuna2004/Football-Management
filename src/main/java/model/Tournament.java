@@ -15,6 +15,11 @@ public class Tournament {
     private int stadiumID;
     private String stadiumName;
 
+    private String imageUrl;
+    private int totalTeams;
+    private double award;
+    private int quantityTeams;
+
     public Tournament() {
     }
 
@@ -100,6 +105,38 @@ public class Tournament {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public int getTotalTeams() {
+        return totalTeams;
+    }
+
+    public void setTotalTeams(int totalTeams) {
+        this.totalTeams = totalTeams;
+    }
+
+    public double getAward() {
+        return award;
+    }
+
+    public void setAward(double award) {
+        this.award = award;
+    }
+
+    public int getQuantityTeams() {
+        return quantityTeams;
+    }
+
+    public void setQuantityTeams(int quantityTeams) {
+        this.quantityTeams = quantityTeams;
     }
 
     

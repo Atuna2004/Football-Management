@@ -5,10 +5,13 @@ import com.cloudinary.utils.ObjectUtils;
 import jakarta.servlet.http.Part;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import org.apache.commons.io.FileUtils;
 
 
 public class CloudinaryUtils {
@@ -63,6 +66,46 @@ public class CloudinaryUtils {
         } catch (Exception ex) {
             System.out.println("[CloudinaryUtils] Error during upload: " + ex.getMessage());
             throw new IOException("Error uploading image to Cloudinary: " + ex.getMessage(), ex);
+        }
+    }
+    
+    public static String uploadImage(InputStream inputStream, String fileName, String folder) throws IOException {
+        File tempFile = null;
+        try {
+            // Create temporary file
+            String fileExtension = "";
+            if (fileName != null && fileName.contains(".")) {
+                fileExtension = fileName.substring(fileName.lastIndexOf("."));
+            }
+            tempFile = File.createTempFile("upload_" + UUID.randomUUID().toString(), fileExtension);
+            
+            // Copy input stream to temporary file
+            FileUtils.copyInputStreamToFile(inputStream, tempFile);
+            
+            // Configure upload options
+            Map<String, Object> uploadOptions = new HashMap<>();
+            uploadOptions.put("resource_type", "image");
+            uploadOptions.put("quality", "auto");
+            uploadOptions.put("fetch_format", "auto");
+            
+            // Add folder if specified
+            if (folder != null && !folder.trim().isEmpty()) {
+                uploadOptions.put("folder", folder);
+            }
+            
+            // Upload to Cloudinary
+            Map uploadResult = cloudinary.uploader().upload(tempFile, uploadOptions);
+            
+            // Return secure URL
+            return (String) uploadResult.get("secure_url");
+            
+        } catch (Exception e) {
+            throw new IOException("Failed to upload image to Cloudinary: " + e.getMessage(), e);
+        } finally {
+            // Clean up temporary file
+            if (tempFile != null && tempFile.exists()) {
+                tempFile.delete();
+            }
         }
     }
 }
