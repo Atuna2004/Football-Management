@@ -52,9 +52,8 @@ public class ChatBotServlet extends HttpServlet {
         String userMessage = request.getParameter("message");
         String botReply;
 
-        String finalPrompt = "Bạn là một trợ lý ảo của nền tảng SmartPitch..."
-                + baseSchemaPrompt;
-
+        String finalPrompt = "Bạn là một trợ lý ảo của nền tảng SmartPitch... Dưới đây là thông tin về cơ sở dữ liệu của website."
+                + baseSchemaPrompt + "\n Hãy giới thiệu dịch vụ của chúng tôi cho khách hàng với câu hỏi của họ là:";
         if (userMessage == null || userMessage.trim().isEmpty()) {
             botReply = "Xin vui lòng nhập tin nhắn.";
         } else {
@@ -157,7 +156,8 @@ public class ChatBotServlet extends HttpServlet {
         if (text == null) return "";
         return text.replace("\\", "\\\\")
                 .replace("\"", "\\\"")
-                .replace("\n", "<br\\>")
+//                .replace("\n", "<br>")
+                .replace("\n", "\\n")
                 .replace("\r", "")
                 .replace("\t", "\\t")
                 .replace("\f", "\\f");

@@ -189,6 +189,17 @@
         </a>
         <% } %>
         
+        <!-- Chatbot button -->
+        <button id="chat-button">💬</button>
+
+        <!-- Chatbot box -->
+        <div id="chat-box">
+            <div id="chat-messages"></div>
+            <div id="chat-input">
+                <input type="text" id="user-message" placeholder="Nhập tin nhắn...">
+                <button id="send">Gửi</button>
+            </div>
+        </div>
 
         <script>
             const chatButton = document.getElementById("chat-button");
@@ -246,7 +257,7 @@
                     const botMsg = document.createElement("div");
                     botMsg.style.textAlign = "left";
                     botMsg.style.margin = "5px";
-                    botMsg.innerHTML = "<b>Bot:</b> " + escapeHtml(data.reply);
+                    botMsg.innerHTML = "<b>Bot:</b> " + escapeHtml(data.reply).replace(/\n/g, "<br>");
                     messages.appendChild(botMsg);
                     messages.scrollTop = messages.scrollHeight;
 
