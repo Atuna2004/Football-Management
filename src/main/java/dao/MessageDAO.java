@@ -91,4 +91,24 @@ public class MessageDAO {
         }
         return history;
     }
+  
+public boolean hasChatHistory(int userId1, int userId2) throws SQLException {
+    String sql = "SELECT COUNT(*) FROM Message WHERE " +
+                 "(SenderID = ? AND ReceiverID = ?) OR " +
+                 "(SenderID = ? AND ReceiverID = ?)";
+    
+    try (PreparedStatement ps = this.conn.prepareStatement(sql)) {
+        ps.setInt(1, userId1);
+        ps.setInt(2, userId2);
+        ps.setInt(3, userId2);
+        ps.setInt(4, userId1);
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+    }
+    return false;
+}
 }

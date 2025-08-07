@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dao.AccountDAO;
+import dao.MessageDAO;
 import model.User;
 import connect.DBConnection;
 import jakarta.servlet.ServletException;
@@ -18,7 +19,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @WebServlet("/api/chatusers")
 public class ChatUserListServlet extends HttpServlet {
@@ -49,6 +49,7 @@ public class ChatUserListServlet extends HttpServlet {
         try {
             conn = DBConnection.getConnection();
             AccountDAO accountDAO = new AccountDAO(conn);
+            MessageDAO messageDAO = new MessageDAO(conn);
             List<User> allUsers = accountDAO.getAllUsers();
             List<User> chatableUsers = new ArrayList<>();
 
@@ -70,88 +71,45 @@ public class ChatUserListServlet extends HttpServlet {
                                  " isFieldOwner:" + u.isFieldOwner() + " isUser:" + u.isUser());
             }
 
-            // Logic phân quyền dựa trên vai trò
+            // Logic phân quyền dựa trên vai trò với kiểm tra lịch sử chat
             if (currentUser.isAdmin()) {
-                // Admin có thể chat với tất cả Field Owner và User
-                chatableUsers = allUsers.stream()
-                        .filter(u -> {
-                            boolean canChat = u.isFieldOwner() || u.isUser();
-                            System.out.println("Admin filtering - User: " + u.getFullName() + 
-                                             " canChat: " + canChat + " (isFieldOwner: " + 
-                                             u.isFieldOwner() + ", isUser: " + u.isUser() + ")");
-                            return canChat;
-                        })
-                        .collect(Collectors.toList());
+                // Admin có thể chat với tất cả Field Owner và User (có lịch sử chat)
+                chatableUsers = filterUsersWithChatHistory(allUsers, currentUser, messageDAO, 
+                    user -> user.isFieldOwner() || user.isUser(), "Admin");
                         
             } else if (currentUser.isFieldOwner()) {
-                // Field Owner có thể chat với Admin và User
-                chatableUsers = allUsers.stream()
-                        .filter(u -> {
-                            boolean canChat = u.isAdmin() || u.isUser();
-                            System.out.println("FieldOwner filtering - User: " + u.getFullName() + 
-                                             " canChat: " + canChat + " (isAdmin: " + 
-                                             u.isAdmin() + ", isUser: " + u.isUser() + ")");
-                            return canChat;
-                        })
-                        .collect(Collectors.toList());
+                // Field Owner có thể chat với Admin và User (có lịch sử chat)
+                chatableUsers = filterUsersWithChatHistory(allUsers, currentUser, messageDAO, 
+                    user -> user.isAdmin() || user.isUser(), "FieldOwner");
                         
             } else if (currentUser.isUser()) {
-                // User logic - có thể chat với Admin và Field Owner cụ thể
+                // User logic - có thể chat với Admin và Field Owner cụ thể (có lịch sử chat)
                 String stadiumIdStr = request.getParameter("stadiumId");
                 
                 if (stadiumIdStr != null && !stadiumIdStr.trim().isEmpty()) {
-                    // Stadium-specific chat: chỉ hiển thị Admin + chủ sân cụ thể
+                    // Stadium-specific chat: chỉ hiển thị Admin + chủ sân cụ thể (có lịch sử chat)
                     try {
                         int stadiumId = Integer.parseInt(stadiumIdStr);
-                        final int finalStadiumId = stadiumId;
                         
-                        chatableUsers = allUsers.stream()
-                                .filter(u -> {
-                                    boolean canChat = u.isAdmin() || 
-                                                   (u.isFieldOwner() && ownsStadium(accountDAO, u.getUserID(), finalStadiumId));
-                                    System.out.println("User filtering (stadium-specific) - User: " + u.getFullName() + 
-                                                     " canChat: " + canChat);
-                                    return canChat;
-                                })
-                                .collect(Collectors.toList());
+                        chatableUsers = filterUsersWithChatHistory(allUsers, currentUser, messageDAO, 
+                            user -> user.isAdmin() || (user.isFieldOwner() && ownsStadium(accountDAO, user.getUserID(), stadiumId)), 
+                            "User (stadium-specific)");
                                 
                     } catch (NumberFormatException e) {
                         // Nếu stadiumId không hợp lệ, fallback về logic cũ
                         System.err.println("Invalid stadiumId parameter: " + stadiumIdStr);
-                        chatableUsers = allUsers.stream()
-                                .filter(u -> {
-                                    boolean canChat = u.isAdmin() || u.isFieldOwner();
-                                    System.out.println("User filtering (fallback) - User: " + u.getFullName() + 
-                                                     " canChat: " + canChat);
-                                    return canChat;
-                                })
-                                .collect(Collectors.toList());
+                        chatableUsers = filterUsersWithChatHistory(allUsers, currentUser, messageDAO, 
+                            user -> user.isAdmin() || user.isFieldOwner(), "User (fallback)");
                     }
                 } else {
-                    // Không có stadiumId: hiển thị tất cả Admin và Field Owner
-                    chatableUsers = allUsers.stream()
-                            .filter(u -> {
-                                boolean canChat = u.isAdmin() || u.isFieldOwner();
-                                System.out.println("User filtering (general) - User: " + u.getFullName() + 
-                                                 " canChat: " + canChat + " (isAdmin: " + 
-                                                 u.isAdmin() + ", isFieldOwner: " + u.isFieldOwner() + ")");
-                                return canChat;
-                            })
-                            .collect(Collectors.toList());
+                    // Không có stadiumId: hiển thị tất cả Admin và Field Owner (có lịch sử chat)
+                    chatableUsers = filterUsersWithChatHistory(allUsers, currentUser, messageDAO, 
+                        user -> user.isAdmin() || user.isFieldOwner(), "User (general)");
                 }
             }
 
             // Loại bỏ chính mình khỏi danh sách
-            final int currentId = currentUser.getUserID();
-            chatableUsers = chatableUsers.stream()
-                    .filter(u -> {
-                        boolean notSelf = u.getUserID() != currentId;
-                        if (!notSelf) {
-                            System.out.println("Filtering out self: " + u.getFullName());
-                        }
-                        return notSelf;
-                    })
-                    .collect(Collectors.toList());
+            chatableUsers.removeIf(user -> user.getUserID() == currentUser.getUserID());
 
             System.out.println("Final chatable users count: " + chatableUsers.size());
             for (User u : chatableUsers) {
@@ -162,33 +120,7 @@ public class ChatUserListServlet extends HttpServlet {
             // Create custom JSON response with proper role information
             JsonArray usersJsonArray = new JsonArray();
             for (User user : chatableUsers) {
-                JsonObject userJson = new JsonObject();
-                userJson.addProperty("userID", user.getUserID());
-                userJson.addProperty("fullName", user.getFullName());
-                userJson.addProperty("email", user.getEmail());
-                
-                // Add role information in the format expected by the frontend
-                JsonArray rolesArray = new JsonArray();
-                JsonObject roleObject = new JsonObject();
-                
-                if (user.isAdmin()) {
-                    roleObject.addProperty("roleName", "admin");
-                } else if (user.isFieldOwner()) {
-                    roleObject.addProperty("roleName", "owner");
-                } else if (user.isUser()) {
-                    roleObject.addProperty("roleName", "user");
-                } else {
-                    roleObject.addProperty("roleName", "unknown");
-                }
-                
-                rolesArray.add(roleObject);
-                userJson.add("roles", rolesArray);
-                
-                // Also add individual role flags for compatibility
-                userJson.addProperty("isAdmin", user.isAdmin());
-                userJson.addProperty("isFieldOwner", user.isFieldOwner());
-                userJson.addProperty("isUser", user.isUser());
-                
+                JsonObject userJson = createUserJsonObject(user);
                 usersJsonArray.add(userJson);
             }
             
@@ -221,6 +153,70 @@ public class ChatUserListServlet extends HttpServlet {
     }
 
     /**
+     * Filter users based on role criteria and chat history
+     */
+    private List<User> filterUsersWithChatHistory(List<User> allUsers, User currentUser, 
+            MessageDAO messageDAO, UserFilter filter, String context) throws SQLException {
+        
+        List<User> filteredUsers = new ArrayList<>();
+        
+        for (User user : allUsers) {
+            // Check if user meets role criteria
+            if (filter.test(user)) {
+                // Check if there's chat history between current user and this user
+                boolean hasChatHistory = messageDAO.hasChatHistory(currentUser.getUserID(), user.getUserID());
+                
+                System.out.println(context + " filtering - User: " + user.getFullName() + 
+                                 " meetsCriteria: true" +
+                                 " hasChatHistory: " + hasChatHistory);
+                
+                if (hasChatHistory) {
+                    filteredUsers.add(user);
+                }
+            } else {
+                System.out.println(context + " filtering - User: " + user.getFullName() + 
+                                 " meetsCriteria: false");
+            }
+        }
+        
+        return filteredUsers;
+    }
+
+    /**
+     * Create JSON object for user with proper role information
+     */
+    private JsonObject createUserJsonObject(User user) {
+        JsonObject userJson = new JsonObject();
+        userJson.addProperty("userID", user.getUserID());
+        userJson.addProperty("fullName", user.getFullName());
+        userJson.addProperty("email", user.getEmail());
+        
+        // Add role information in the format expected by the frontend
+        JsonArray rolesArray = new JsonArray();
+        JsonObject roleObject = new JsonObject();
+        
+        if (user.isAdmin()) {
+            roleObject.addProperty("roleName", "admin");
+        } else if (user.isFieldOwner()) {
+            roleObject.addProperty("roleName", "owner");
+        } else if (user.isUser()) {
+            roleObject.addProperty("roleName", "user");
+        } else {
+            roleObject.addProperty("roleName", "unknown");
+        }
+        
+        rolesArray.add(roleObject);
+        userJson.add("roles", rolesArray);
+        
+        // Also add individual role flags for compatibility
+        userJson.addProperty("isAdmin", user.isAdmin());
+        userJson.addProperty("isFieldOwner", user.isFieldOwner());
+        userJson.addProperty("isUser", user.isUser());
+        
+        return userJson;
+    }
+
+    /**
      * Kiểm tra xem Field Owner có sở hữu stadium cụ thể không
      */
     private boolean ownsStadium(AccountDAO accountDAO, int userId, int stadiumId) {
@@ -233,5 +229,13 @@ public class ChatUserListServlet extends HttpServlet {
             System.err.println("Error checking stadium ownership: " + e.getMessage());
             return false;
         }
+    }
+
+    /**
+     * Functional interface for user filtering
+     */
+    @FunctionalInterface
+    private interface UserFilter {
+        boolean test(User user);
     }
 }
