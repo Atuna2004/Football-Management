@@ -57,8 +57,9 @@ public class StadiumDAO {
         return null;
     }
 
+    // 🔥 FIXED: Added Latitude and Longitude to insertStadium
     public boolean insertStadium(Stadium stadium) {
-        String sql = "INSERT INTO Stadium(name, location, description, status, createdAt, phoneNumber, OwnerID) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Stadium(name, location, description, status, createdAt, phoneNumber, OwnerID, Latitude, Longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -70,15 +71,46 @@ public class StadiumDAO {
             ps.setString(6, stadium.getPhoneNumber());
             ps.setInt(7, stadium.getOwnerID());
 
-            return ps.executeUpdate() > 0;
+            // 🔥 CRITICAL: Handle coordinates
+            if (stadium.getLatitude() != null) {
+                ps.setDouble(8, stadium.getLatitude());
+                System.out.println("✅ Setting latitude: " + stadium.getLatitude());
+            } else {
+                ps.setNull(8, java.sql.Types.DOUBLE);
+                System.out.println("⚠️ Latitude is null");
+            }
+            
+            if (stadium.getLongitude() != null) {
+                ps.setDouble(9, stadium.getLongitude());
+                System.out.println("✅ Setting longitude: " + stadium.getLongitude());
+            } else {
+                ps.setNull(9, java.sql.Types.DOUBLE);
+                System.out.println("⚠️ Longitude is null");
+            }
+
+            System.out.println("🔍 Executing SQL: " + sql);
+            System.out.println("📊 Stadium: " + stadium.getName());
+            System.out.println("📍 Coordinates: " + stadium.getLatitude() + ", " + stadium.getLongitude());
+
+            int result = ps.executeUpdate();
+            
+            if (result > 0) {
+                System.out.println("🎉 Stadium successfully saved with coordinates!");
+            } else {
+                System.err.println("❌ Failed to insert stadium");
+            }
+
+            return result > 0;
         } catch (SQLException e) {
+            System.err.println("❌ SQL Error in insertStadium: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
     }
 
+    // 🔥 FIXED: Added Latitude and Longitude to updateStadium
     public boolean updateStadium(Stadium stadium) {
-        String sql = "UPDATE Stadium SET name = ?, location = ?, description = ?, status = ?, phoneNumber = ? WHERE stadiumID = ?";
+        String sql = "UPDATE Stadium SET name = ?, location = ?, description = ?, status = ?, phoneNumber = ?, Latitude = ?, Longitude = ? WHERE stadiumID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -87,10 +119,40 @@ public class StadiumDAO {
             ps.setString(3, stadium.getDescription());
             ps.setString(4, stadium.getStatus());
             ps.setString(5, stadium.getPhoneNumber());
-            ps.setInt(6, stadium.getStadiumID());
 
-            return ps.executeUpdate() > 0;
+            // Handle coordinates
+            if (stadium.getLatitude() != null) {
+                ps.setDouble(6, stadium.getLatitude());
+                System.out.println("✅ Updating latitude: " + stadium.getLatitude());
+            } else {
+                ps.setNull(6, java.sql.Types.DOUBLE);
+                System.out.println("⚠️ Setting latitude to null");
+            }
+            
+            if (stadium.getLongitude() != null) {
+                ps.setDouble(7, stadium.getLongitude());
+                System.out.println("✅ Updating longitude: " + stadium.getLongitude());
+            } else {
+                ps.setNull(7, java.sql.Types.DOUBLE);
+                System.out.println("⚠️ Setting longitude to null");
+            }
+
+            ps.setInt(8, stadium.getStadiumID());
+
+            System.out.println("🔍 Executing UPDATE for Stadium ID: " + stadium.getStadiumID());
+            System.out.println("📍 New coordinates: " + stadium.getLatitude() + ", " + stadium.getLongitude());
+
+            int result = ps.executeUpdate();
+            
+            if (result > 0) {
+                System.out.println("✅ Stadium updated successfully with coordinates");
+            } else {
+                System.err.println("❌ Failed to update stadium");
+            }
+
+            return result > 0;
         } catch (SQLException e) {
+            System.err.println("❌ SQL Error in updateStadium: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -379,8 +441,9 @@ public class StadiumDAO {
         return 0;
     }
 
+    // 🔥 FIXED: Added Latitude and Longitude to insertStadiumWithImage
     public boolean insertStadiumWithImage(Stadium stadium) {
-        String sql = "INSERT INTO Stadium(name, location, description, status, createdAt, phoneNumber, OwnerID, ImageURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Stadium(name, location, description, status, createdAt, phoneNumber, OwnerID, ImageURL, Latitude, Longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -393,15 +456,35 @@ public class StadiumDAO {
             ps.setInt(7, stadium.getOwnerID());
             ps.setString(8, stadium.getImageURL());
 
+            // Handle coordinates
+            if (stadium.getLatitude() != null) {
+                ps.setDouble(9, stadium.getLatitude());
+            } else {
+                ps.setNull(9, java.sql.Types.DOUBLE);
+            }
+            
+            if (stadium.getLongitude() != null) {
+                ps.setDouble(10, stadium.getLongitude());
+            } else {
+                ps.setNull(10, java.sql.Types.DOUBLE);
+            }
+
+            System.out.println("🔍 Inserting stadium with image and coordinates");
+            System.out.println("📊 Stadium: " + stadium.getName());
+            System.out.println("🖼️ Image: " + stadium.getImageURL());
+            System.out.println("📍 Coordinates: " + stadium.getLatitude() + ", " + stadium.getLongitude());
+
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
+            System.err.println("❌ SQL Error in insertStadiumWithImage: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
     }
 
+    // 🔥 FIXED: Added Latitude and Longitude to updateStadiumWithImage
     public boolean updateStadiumWithImage(Stadium stadium) {
-        String sql = "UPDATE Stadium SET name = ?, location = ?, description = ?, status = ?, phoneNumber = ?, ImageURL = ? WHERE stadiumID = ?";
+        String sql = "UPDATE Stadium SET name = ?, location = ?, description = ?, status = ?, phoneNumber = ?, ImageURL = ?, Latitude = ?, Longitude = ? WHERE stadiumID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -411,10 +494,25 @@ public class StadiumDAO {
             ps.setString(4, stadium.getStatus());
             ps.setString(5, stadium.getPhoneNumber());
             ps.setString(6, stadium.getImageURL());
-            ps.setInt(7, stadium.getStadiumID());
+
+            // Handle coordinates
+            if (stadium.getLatitude() != null) {
+                ps.setDouble(7, stadium.getLatitude());
+            } else {
+                ps.setNull(7, java.sql.Types.DOUBLE);
+            }
+            
+            if (stadium.getLongitude() != null) {
+                ps.setDouble(8, stadium.getLongitude());
+            } else {
+                ps.setNull(8, java.sql.Types.DOUBLE);
+            }
+
+            ps.setInt(9, stadium.getStadiumID());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
+            System.err.println("❌ SQL Error in updateStadiumWithImage: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
